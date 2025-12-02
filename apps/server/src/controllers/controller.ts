@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { logger } from "../services/logs";
+import { logger } from "../services/logger";
 
 export function controller<TResult>(
   baseController: (

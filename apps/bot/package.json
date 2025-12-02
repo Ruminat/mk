@@ -2,7 +2,6 @@
   "name": "mooduck-bot",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "build": "node ./esbuild.config.js",
     "dev": "tsx watch src/index.ts",

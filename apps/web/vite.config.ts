@@ -11,7 +11,7 @@ export default defineConfig(() => {
       hmr: false,
       port: 3228,
       host: true, // Allow external access
-      open: true, // Automatically open browser
+      open: false, // Automatically open browser
     },
   };
 });

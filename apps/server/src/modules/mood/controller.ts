@@ -1,15 +1,30 @@
 import { controller } from "../../controllers/controller";
+import { getValidModel } from "../../models/validation";
+import { AddMoodRequestSchema, DeleteMoodRequestSchema } from "./schema";
+import { moodService } from "./service";
 
 export const moodController = {
-  addMoodEntry: controller(async (req, res) => {
-    return { status: 200, result: {} };
+  addMoodEntry: controller(async (req) => {
+    const moodParams = getValidModel(AddMoodRequestSchema, req.body);
+
+    const addedMood = await moodService.addMoodEntry({ ...moodParams, userId: "1" });
+
+    return { status: 200, result: { mood: addedMood } };
   }),
 
-  deleteMoodEntry: controller(async () => {
-    return { status: 200, result: {} };
+  deleteMoodEntry: controller(async (req) => {
+    const moodParams = getValidModel(DeleteMoodRequestSchema, req.body);
+
+    await moodService.deleteMoodEntry(moodParams.id);
+
+    return { status: 200, result: { message: "Successfully deleted the mood" } };
   }),
 
-  listMoodEntries: controller(async () => {
-    return { status: 200, result: {} };
+  listMoodEntries: controller(async (req) => {
+    // const moodParams = getValidModel(DeleteMoodRequestSchema, req.query);
+
+    const entries = await moodService.listMoodEntries({ userId: "1" });
+
+    return { status: 200, result: { moods: entries } };
   }),
 };

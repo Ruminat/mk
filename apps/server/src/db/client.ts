@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/libsql";
 
 config({ path: ".env" });
 
-const isTesting = true;
+const isTesting = false;
 
 const realDBParams = {
   url: process.env.TURSO_CONNECTION_URL!,

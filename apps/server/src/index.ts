@@ -22,7 +22,6 @@ const limiter = rateLimit({
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(limiter);
-
 app.use(express.json());
 
 // Health check
@@ -47,6 +46,7 @@ const server = app.listen(port, () => {
 // Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("SIGTERM received. Shutting down gracefully...");
+
   server.close(() => {
     console.log("Process terminated");
   });

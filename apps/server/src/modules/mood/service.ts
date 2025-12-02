@@ -1,18 +1,32 @@
+import { eq } from "drizzle-orm";
 import { db } from "../../db/client";
-import { MoodTable, TInsertMoodEntry } from "./model";
+import { ServiceError } from "../../services/errors/ServiceError";
+import { MoodTable, TInsertMoodEntry, TSelectMoodEntry } from "./model";
 
 export const moodService = {
   addMoodEntry: async (entry: TInsertMoodEntry) => {
-    const response = await db.insert(MoodTable).values(entry);
+    const response = await db.insert(MoodTable).values(entry).returning();
 
-    return { status: 200, result: {} };
+    if (response.length !== 1) {
+      new ServiceError("Failed to add mood entry");
+    }
+
+    const [row] = response;
+
+    return row;
   },
 
-  deleteMoodEntry: controller(async () => {
-    return { status: 200, result: {} };
-  }),
+  deleteMoodEntry: async (entryId: TSelectMoodEntry["id"]) => {
+    const response = await db.delete(MoodTable).where(eq(MoodTable.id, entryId));
 
-  listMoodEntries: controller(async () => {
-    return { status: 200, result: {} };
-  }),
+    if (response.rows.length !== 1) {
+      new ServiceError("Failed to delete the mood entry");
+    }
+  },
+
+  listMoodEntries: async ({ userId }: Pick<TSelectMoodEntry, "userId">) => {
+    const response = await db.select().from(MoodTable).where(eq(MoodTable.userId, userId));
+
+    return response;
+  },
 };
