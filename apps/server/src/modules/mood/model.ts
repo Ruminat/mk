@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { CommonTableField } from "../../models/commonFields";
+import { CommonTableField } from "../../common/commonFields";
 
 export const MoodTable = sqliteTable("mood_entries", {
   id: integer("id").primaryKey({ autoIncrement: true }),

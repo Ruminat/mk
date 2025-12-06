@@ -1,5 +1,5 @@
 import { controller } from "../../controllers/controller";
-import { getValidModel } from "../../models/validation";
+import { getValidModel } from "../../common/validation";
 import { AddMoodRequestSchema, DeleteMoodRequestSchema } from "./schema";
 import { moodService } from "./service";
 

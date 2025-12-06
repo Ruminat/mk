@@ -29,6 +29,7 @@
     "@shreklabs/core": "^1.0.11",
     "@shreklabs/ui": "^1.0.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.1.13"
   }
 }

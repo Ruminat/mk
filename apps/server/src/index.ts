@@ -1,15 +1,13 @@
 import cors from "cors";
-import { config } from "dotenv";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
+import { getEnvironmentVariables } from "./common/environment";
 import { moodRouter } from "./modules/mood/route";
-
-config({ path: ".env" });
 
 export const app = express();
 
-const port = process.env.PORT || 3001;
+const { port } = getEnvironmentVariables();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -39,7 +37,11 @@ app.use((req, res) => {
 });
 
 // The server starts here
-const server = app.listen(port, () => {
+const server = app.listen(port, "0.0.0.0", (error) => {
+  if (error) {
+    console.log("Server error!", error);
+  }
+
   console.log(`Server running on port ${port}`);
 });
 

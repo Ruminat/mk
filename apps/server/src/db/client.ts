@@ -1,18 +1,18 @@
 import { Config, createClient } from "@libsql/client";
-import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/libsql";
+import { getEnvironmentVariables } from "../common/environment";
 
-config({ path: ".env" });
+const { turso } = getEnvironmentVariables();
 
 const isTesting = false;
 
-const realDBParams = {
-  url: process.env.TURSO_CONNECTION_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN!,
-} satisfies Config;
-
 const testDBParams = {
   url: ":memory:",
+} satisfies Config;
+
+const realDBParams = {
+  url: turso.url,
+  authToken: turso.authToken,
 } satisfies Config;
 
 const client = createClient({
