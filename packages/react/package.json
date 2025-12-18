@@ -1,0 +1,20 @@
+{
+  "name": "@mooduck/react",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

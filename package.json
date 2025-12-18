@@ -8,7 +8,8 @@
     "dev.server": "turbo dev --filter=server",
     "dev.bot": "turbo dev --filter=bot",
     "lint": "turbo lint",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "typecheck": "turbo typecheck"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

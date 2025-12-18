@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../../db/client";
 import { ServiceError } from "../../services/errors/ServiceError";
 import { MoodTable, TInsertMoodEntry, TSelectMoodEntry } from "./model";
@@ -16,10 +16,10 @@ export const moodService = {
     return row;
   },
 
-  deleteMoodEntry: async (entryId: TSelectMoodEntry["id"]) => {
+  deleteMoodEntry: async ({ entryId, userId }: { entryId: TSelectMoodEntry["id"], userId: string }) => {
     const response = await db
       .delete(MoodTable)
-      .where(eq(MoodTable.id, entryId));
+      .where(and(eq(MoodTable.id, entryId), eq(MoodTable.userId, userId)));
 
     if (response.rowsAffected !== 1) {
       throw new ServiceError("Failed to delete the mood entry");

@@ -1,0 +1,116 @@
+# Cursor Rules for Mooduck Project
+
+## Type System Rules
+
+- **Always use types instead of interfaces when possible**
+  - Prefer `type` over `interface` for all type definitions
+  - Use intersection types (`&`) instead of `extends` for type composition
+  - Example: `type AuthenticatedRequest = Request & { user: TSelectUser }`
+
+- **Never use `any`, unless absolutely necessary**
+  - Use `unknown` for truly unknown types
+  - Use proper type inference and generics
+  - If `any` is absolutely necessary, add a comment explaining why
+
+## File Organization Rules
+
+- **Absolutely never re-export anything in other files (barrel-files are forbidden)**
+  - Do not create index.ts files that re-export from other files
+  - Do not create schema.ts files that re-export tables
+  - Import directly from source files: `import { UserTable } from "./modules/auth/model"`
+  - For Drizzle config, list schema files directly in an array
+
+- **Type definitions belong in model.ts files**
+  - Export types alongside table definitions in `model.ts` files
+  - Do not create separate `types.ts` files unless absolutely necessary
+  - Example: `AuthenticatedRequest` is exported from `modules/auth/model.ts`
+
+## Project Structure
+
+- Follow the modular structure: `modules/{moduleName}/{model|service|controller|route|schema}.ts`
+- Each module should be self-contained with its own files
+- Common utilities go in `common/` directory
+- Services go in `services/` directory
+- Database client is in `db/client.ts`
+
+## Naming Conventions
+
+- Use PascalCase for types: `TSelectUser`, `TInsertUser`, `AuthenticatedRequest`
+- Use camelCase for variables, functions, and exports: `authService`, `getValidModel`
+- Use UPPER_SNAKE_CASE for constants: `JWT_SECRET`
+- Table names use PascalCase with "Table" suffix: `UserTable`, `MoodTable`
+- Type names prefixed with `T` for inferred types: `TSelectUser`, `TInsertUser`
+
+## Code Patterns
+
+### Controllers
+
+- Use the `controller` wrapper function from `common/controller` for authenticated routes
+- Use `unauthenticatedController` for public routes that don't require authentication
+- The default `controller` function expects `AuthenticatedRequest` and provides `req.user`
+- Controllers should be simple and delegate to services
+- Use `getValidModel` for request validation
+- Return `{ status, result }` objects
+
+### Services
+
+- Services contain business logic
+- Services are exported as objects with methods: `export const authService = { ... }`
+- Use `ServiceError` for service-level errors
+- Services interact with the database directly
+- When a service function has multiple parameters, use an object parameter instead: `deleteMoodEntry({ entryId, userId })` instead of `deleteMoodEntry(entryId, userId)`
+
+### Validation
+
+- Use Zod schemas for all input validation
+- Define schemas in `schema.ts` files within modules
+- Use `getValidModel` helper to validate and throw `ValidationError` on failure
+- Export inferred types: `export type TEmailAuth = z.infer<typeof EmailAuthSchema>`
+
+### Error Handling
+
+- Use custom error classes: `ServiceError`, `ValidationError`
+- Errors are caught in the controller wrapper and logged
+- Return appropriate HTTP status codes
+
+### Database
+
+- Use Drizzle ORM for database operations
+- Define tables in `model.ts` files
+- Export table definitions, insert types, and select types from `model.ts`
+- Use `TInsertX` and `TSelectX` types for insert/select operations
+- Use `CommonTableField` for shared fields like `userId` and `createdAt`
+- Always verify ownership when deleting/updating user-specific resources
+
+### Environment Variables
+
+- All environment variables must be defined in `common/environment.ts`
+- Use Zod schema for validation
+- Export a function `getEnvironmentVariables()` that returns typed config
+
+### Logging
+
+- Use the logger from `services/logger`
+- Log errors with context: `logger.error("Controller error", error)`
+
+## Express Patterns
+
+- Use typed middleware when possible
+- The `authenticate` middleware attaches user to request: `(req as AuthenticatedRequest).user`
+- Keep middleware simple and focused
+- Use the `authenticate` middleware for protected routes
+- Apply authentication middleware in route files, not controllers
+
+## Dependencies
+
+- Use battle-tested libraries
+- Prefer simplicity over complexity
+- Keep dependencies minimal
+
+## General Principles
+
+- **Simplicity**: Don't overcomplicate things
+- **Consistency**: Follow existing patterns in the codebase
+- **Type Safety**: Leverage TypeScript's type system fully
+- **Modularity**: Keep modules self-contained
+- **Direct Imports**: Always import from source files, never from barrel files

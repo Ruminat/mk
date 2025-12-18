@@ -1,34 +1,87 @@
+import compression from "compression";
 import cors from "cors";
-import express from "express";
-import rateLimit from "express-rate-limit";
+import { randomUUID } from "crypto";
+import express, { NextFunction, Request, Response } from "express";
+import helmet from "helmet";
 import morgan from "morgan";
 import { getEnvironmentVariables } from "./common/environment";
+import { rateLimiter } from "./middlewares/rateLimiter";
+import { authRouter } from "./modules/auth/route";
 import { moodRouter } from "./modules/mood/route";
 
 export const app = express();
 
+const SERVER_TIMEOUT = 30000;
 const { port } = getEnvironmentVariables();
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-  standardHeaders: "draft-8", // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-  ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
+/**
+ * App middlewares
+ **/
+
+app.use(compression());
+
+// CORS settings
+app.use(
+  cors({
+    origin: process.env.NODE_ENV === "production" ? ["https://shrek-labs.com", "https://mooduck.shrek-labs.com"] : "*",
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
+
+// Adding X-Request-ID to every request, so we can always track them
+app.use((req: Request & { id?: string }, res: Response, next) => {
+  req.id = randomUUID();
+  res.setHeader("X-Request-ID", req.id);
+  next();
 });
 
-app.use(cors());
-app.use(morgan("tiny"));
-app.use(limiter);
-app.use(express.json());
+// Logs
+app.use(morgan(":method :url :status :response-time ms - :req[id]"));
 
-// Health check
+// Rate limiter
+app.use(rateLimiter.default);
+app.use("/api/auth", rateLimiter.auth);
+
+// JSON settings (protecting against large payload attacks)
+app.use(
+  express.json({
+    limit: "16kb",
+    type: "application/json",
+  })
+);
+
+// Security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false,
+  })
+);
+
+// No cache for api calls
+app.use("/api", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+  next();
+});
+
+/**
+ * App routes
+ **/
+
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
 
-// App routes
+app.use("/api/auth", authRouter);
 app.use("/api/mood", moodRouter);
 
-// 404 handler
+/**
+ * 404 error handling
+ **/
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -36,16 +89,44 @@ app.use((req, res) => {
   });
 });
 
-// The server starts here
+/**
+ * In case of an uncaught error
+ **/
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("Unhandled error:", error);
+
+  res.status(500).json({
+    success: false,
+    message: process.env.NODE_ENV === "production" ? "Internal server error" : error.message,
+    ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+  });
+});
+
+/**
+ * Starting the server
+ **/
+
 const server = app.listen(port, "0.0.0.0", (error) => {
   if (error) {
     console.log("Server error!", error);
   }
 
-  console.log(`Server running on port ${port}`);
+  console.log(`
+    🚀 Server running in ${process.env.NODE_ENV || "development"} mode
+    📡 Listening on port ${port}
+    🕐 ${new Date().toISOString()}
+  `);
 });
 
-// Graceful shutdown
+server.setTimeout(SERVER_TIMEOUT);
+server.keepAliveTimeout = 65000; // Helps with load balancers
+server.headersTimeout = 66000; // Just slightly longer
+
+/**
+ * Graceful shutdown
+ **/
+
 process.on("SIGTERM", () => {
   console.log("SIGTERM received. Shutting down gracefully...");
 

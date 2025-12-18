@@ -1,7 +1,6 @@
 import { ThemeProvider } from "@gravity-ui/uikit";
 import "@gravity-ui/uikit/styles/fonts.css";
 import "@gravity-ui/uikit/styles/styles.css";
-import "@shreklabs/ui/dist/style.css";
 import ReactDOM from "react-dom/client";
 import { SignUp } from "./components/SignUp";
 import "./style/reset.css";

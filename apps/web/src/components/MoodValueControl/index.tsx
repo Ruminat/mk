@@ -1,6 +1,6 @@
 import { ControlGroupOption, SegmentedRadioGroup, SegmentedRadioGroupProps } from "@gravity-ui/uikit";
 import { notEmpty } from "@shreklabs/core";
-import { useFn } from "@shreklabs/ui";
+import { useFn } from "@mooduck/react";
 import { TMoodStringValue, TMoodValue } from "../../models/mood/definitions";
 
 const options: ControlGroupOption<TMoodStringValue>[] = [
