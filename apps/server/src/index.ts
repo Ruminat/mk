@@ -8,8 +8,11 @@ import { getEnvironmentVariables } from "./common/environment";
 import { rateLimiter } from "./middlewares/rateLimiter";
 import { authRouter } from "./modules/auth/route";
 import { moodRouter } from "./modules/mood/route";
+import { setupMooDuckTelegramBot } from "./modules/TelegramBot";
 
 export const app = express();
+
+app.set("trust proxy", 1);
 
 const SERVER_TIMEOUT = 30000;
 const { port } = getEnvironmentVariables();
@@ -18,16 +21,18 @@ const { port } = getEnvironmentVariables();
  * App middlewares
  **/
 
-app.use(compression());
-
 // CORS settings
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? ["https://shrek-labs.com", "https://mooduck.shrek-labs.com"] : "*",
+    origin: process.env.NODE_ENV === "production" ? ["https://shrek-labs.ru", "https://mooduck.shrek-labs.ru"] : "*",
     credentials: true,
     optionsSuccessStatus: 200,
   })
 );
+
+// Rate limiter
+app.use(rateLimiter.default);
+app.use("/api/auth", rateLimiter.auth);
 
 // Adding X-Request-ID to every request, so we can always track them
 app.use((req: Request & { id?: string }, res: Response, next) => {
@@ -36,27 +41,26 @@ app.use((req: Request & { id?: string }, res: Response, next) => {
   next();
 });
 
-// Logs
-app.use(morgan(":method :url :status :response-time ms - :req[id]"));
-
-// Rate limiter
-app.use(rateLimiter.default);
-app.use("/api/auth", rateLimiter.auth);
-
-// JSON settings (protecting against large payload attacks)
-app.use(
-  express.json({
-    limit: "16kb",
-    type: "application/json",
-  })
-);
-
 // Security headers
 app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: false,
+  })
+);
+
+// Compression
+app.use(compression());
+
+// Logs
+app.use(morgan(":method :url :status :response-time ms - :req[id]"));
+
+// JSON settings (protecting against large payload attacks)
+app.use(
+  express.json({
+    limit: "16kb",
+    type: "application/json",
   })
 );
 
@@ -72,6 +76,8 @@ app.use("/api", (req, res, next) => {
 /**
  * App routes
  **/
+
+setupMooDuckTelegramBot(app);
 
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
 
@@ -107,17 +113,21 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
  * Starting the server
  **/
 
-const server = app.listen(port, "0.0.0.0", (error) => {
-  if (error) {
-    console.log("Server error!", error);
-  }
+const server = app
+  .listen(port, "0.0.0.0", (error) => {
+    if (error) {
+      console.log("Server error!", error);
+    }
 
-  console.log(`
+    console.log(`
     🚀 Server running in ${process.env.NODE_ENV || "development"} mode
     📡 Listening on port ${port}
     🕐 ${new Date().toISOString()}
   `);
-});
+  })
+  .on("error", (error) => {
+    console.error("Server failed to start:", error);
+  });
 
 server.setTimeout(SERVER_TIMEOUT);
 server.keepAliveTimeout = 65000; // Helps with load balancers

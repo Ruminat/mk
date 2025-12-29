@@ -1,14 +1,18 @@
 import { config } from "dotenv";
-import z from "zod";
+import { number, object, string, url } from "zod";
 
 config({ path: ".env" });
 
-const envSchema = z.object({
-  PORT: z.number().optional(),
-  TURSO_CONNECTION_URL: z.string(),
-  TURSO_AUTH_TOKEN: z.string(),
-  JWT_SECRET: z.string(),
-  TELEGRAM_BOT_TOKEN: z.string(),
+const envSchema = object({
+  PORT: number().optional(),
+  TURSO_CONNECTION_URL: string(),
+  TURSO_AUTH_TOKEN: string(),
+  JWT_SECRET: string(),
+  TELEGRAM_BOT_TOKEN: string().optional(),
+  TELEGRAM_BOT_WEBHOOK_DOMAIN: url().optional(),
+  TELEGRAM_BOT_WEBHOOK_PATH: string()
+    .regex(/(\/\w+)+/)
+    .optional(),
 });
 
 export function getEnvironmentVariables() {
@@ -25,6 +29,12 @@ export function getEnvironmentVariables() {
     auth: {
       jwtSecret: values.JWT_SECRET,
       telegramBotToken: values.TELEGRAM_BOT_TOKEN,
+    },
+
+    telegramBot: {
+      token: values.TELEGRAM_BOT_TOKEN,
+      webhookDomain: values.TELEGRAM_BOT_WEBHOOK_DOMAIN,
+      webhookPath: values.TELEGRAM_BOT_WEBHOOK_PATH,
     },
   };
 }
