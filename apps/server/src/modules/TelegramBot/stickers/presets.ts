@@ -1,3 +1,4 @@
+import { randomFrom } from "@mooduck/core";
 import { Sticker } from ".";
 
 export function getErrorSticker() {

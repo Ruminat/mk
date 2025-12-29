@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { logger } from "../services/logger";
-import { AuthenticatedRequest } from "../modules/auth/model";
+import { AuthenticatedRequest } from "../modules/Auth/model";
 
 type ControllerHandler<TResult, TRequest extends Request = Request> = (
   req: TRequest,

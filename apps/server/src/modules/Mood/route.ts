@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticate } from "../auth/middleware";
+import { authenticate } from "../Auth/middleware";
 import { moodController } from "./controller";
 
 const router = Router();

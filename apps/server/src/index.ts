@@ -6,8 +6,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { getEnvironmentVariables } from "./common/environment";
 import { rateLimiter } from "./middlewares/rateLimiter";
-import { authRouter } from "./modules/auth/route";
-import { moodRouter } from "./modules/mood/route";
+import { authRouter } from "./modules/Auth/route";
+import { moodRouter } from "./modules/Mood/route";
 import { setupMooDuckTelegramBot } from "./modules/TelegramBot";
 
 export const app = express();
