@@ -11,11 +11,11 @@ export default defineConfig(() => {
     server: {
       hmr: false,
       port: 3228,
-      host: true, // Allow external access
-      open: false, // Automatically open browser
+      host: true,
+      open: false,
     },
     alias: {
-      "@mooduck/react": path.resolve(__dirname, "../../packages/react"),
+      "@mooduck/react": path.resolve(__dirname, "../../packages/react/src"),
     },
   };
 });

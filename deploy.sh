@@ -17,6 +17,6 @@ echo "🏗️ Building project..."
 pnpm build
 
 echo "🔄 Restarting with PM2..."
-pnpm run start.server.pm2.restart || echo "PM2 restart failed :("
+pnpm run pm2.restart || echo "PM2 restart failed :("
 
 echo "✅ Deployment completed!"
