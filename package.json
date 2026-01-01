@@ -1,20 +1,24 @@
 {
   "name": "mooduck",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "dev.web": "turbo dev --filter=web",
     "dev.server": "turbo dev --filter=server",
-    "dev.bot": "turbo dev --filter=bot",
-    "lint": "turbo lint",
+    "start": "turbo start",
+    "start.server": "pnpm --filter server start",
+    "start.server.pm2.start": "pnpm --filter server start",
+    "start.server.pm2.restart": "pm2 reload ecosystem.config.js --update-env",
+    "lint": "echo 'lint is not ready yet...'",
     "clean": "turbo clean",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "codecheck": "pnpm run typecheck && pnpm run lint"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
     "turbo": "^2.6.1",
     "typescript": "5.9.2"
-  },
-  "packageManager": "pnpm@9.0.0"
+  }
 }

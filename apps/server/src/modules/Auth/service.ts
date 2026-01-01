@@ -35,6 +35,8 @@ function verifyTelegramAuth(data: TelegramAuthData): boolean {
     .map((key) => `${key}=${userData[key as keyof typeof userData]}`)
     .join("\n");
 
+  if (!auth.telegramBotToken) return false;
+
   const secretKey = createHash("sha256").update(auth.telegramBotToken).digest();
 
   const calculatedHash = createHmac("sha256", secretKey).update(dataCheckString).digest("hex");
