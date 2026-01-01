@@ -20,7 +20,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@mooduck/react": ["../../packages/react"],
+      "@mooduck/react": ["../../packages/react/src"],
     }
   },
   "include": ["src"]
