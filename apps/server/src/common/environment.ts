@@ -1,9 +1,10 @@
 import { config } from "dotenv";
-import { number, object, string, url } from "zod";
+import z, { number, object, string, url } from "zod";
 
 config({ path: ".env" });
 
 const envSchema = object({
+  MODE: z.enum(["prod", "dev"]).optional(),
   PORT: number().optional(),
   TURSO_CONNECTION_URL: string(),
   TURSO_AUTH_TOKEN: string(),
@@ -19,6 +20,7 @@ export function getEnvironmentVariables() {
   const values = envSchema.parse(process.env);
 
   return {
+    isDev: (values.MODE ?? "dev") === "dev",
     port: values.PORT ?? 3001,
 
     turso: {

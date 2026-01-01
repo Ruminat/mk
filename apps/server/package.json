@@ -3,9 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build": "node ./esbuild.config.js",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/mooduck.js",
+    "build": "MODE=prod node ./esbuild.config.js",
+    "dev": "MODE=dev tsx watch src/index.ts",
+    "start": "MODE=prod node dist/mooduck.js",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint-fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "typecheck": "tsc --noEmit"

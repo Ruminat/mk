@@ -15,7 +15,7 @@ export const app = express();
 app.set("trust proxy", 1);
 
 const SERVER_TIMEOUT = 30000;
-const { port } = getEnvironmentVariables();
+const { port, isDev } = getEnvironmentVariables();
 
 /**
  * App middlewares
@@ -24,7 +24,7 @@ const { port } = getEnvironmentVariables();
 // CORS settings
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? ["https://shrek-labs.ru", "https://mooduck.shrek-labs.ru"] : "*",
+    origin: isDev ? "*" : ["https://shrek-labs.ru", "https://mooduck.shrek-labs.ru"],
     credentials: true,
     optionsSuccessStatus: 200,
   })
@@ -104,8 +104,8 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 
   res.status(500).json({
     success: false,
-    message: process.env.NODE_ENV === "production" ? "Internal server error" : error.message,
-    ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+    message: isDev ? error.message : "Internal server error",
+    ...(isDev && { stack: error.stack }),
   });
 });
 
@@ -120,7 +120,7 @@ const server = app
     }
 
     console.log(`
-    🚀 Server running in ${process.env.NODE_ENV || "development"} mode
+    🚀 Server running in ${isDev ? "development" : "PRODUCTION"} mode
     📡 Listening on port ${port}
     🕐 ${new Date().toISOString()}
   `);

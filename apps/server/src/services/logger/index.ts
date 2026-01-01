@@ -1,4 +1,7 @@
 import winston from "winston";
+import { getEnvironmentVariables } from "../../common/environment";
+
+const { isDev } = getEnvironmentVariables();
 
 export const logger = winston.createLogger({
   level: "info",
@@ -18,10 +21,6 @@ export const logger = winston.createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
+if (isDev) {
+  logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
