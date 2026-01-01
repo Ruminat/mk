@@ -1,6 +1,4 @@
 import TelegramBot from "node-telegram-bot-api";
-import { TUser } from "../models/User/definitions";
-import { createUserEntryIfNotPresent } from "../models/User/storage";
 import { TTelegramCommandProps, TTelegramReply } from "./definitions";
 
 export function code(content: string): string {
@@ -31,10 +29,10 @@ export function telegramSendReply(bot: TelegramBot, props: TTelegramCommandProps
   }
 }
 
-export function getOrCreateTelegramUser(props: TTelegramCommandProps) {
-  return createUserEntryIfNotPresent(props.chatId, getUserPropsFromMessage(props.message));
-}
+// export function getOrCreateTelegramUser(props: TTelegramCommandProps) {
+//   return createUserEntryIfNotPresent(props.chatId, getUserPropsFromMessage(props.message));
+// }
 
-function getUserPropsFromMessage(message: TelegramBot.Message) {
-  return { login: message.from?.username } satisfies Partial<TUser>;
-}
+// function getUserPropsFromMessage(message: TelegramBot.Message) {
+//   return { login: message.from?.username } satisfies Partial<TUser>;
+// }

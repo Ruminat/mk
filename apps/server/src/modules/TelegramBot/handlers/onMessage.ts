@@ -1,15 +1,16 @@
 import TelegramBot from "node-telegram-bot-api";
-import { logInfo } from "../common/logging";
-import { withProbability } from "../common/random/utils";
-import { sentence } from "../models/SentenceBuilder";
-import { Interjection } from "../models/SentenceBuilder/interjections";
-import { telegramMoodEntry } from "./commands/addMoodEntry";
-import { telegramErrorCommand } from "./commands/error";
-import { telegramHelpCommand } from "./commands/help";
-import { telegramSettingsCommand } from "./commands/settings";
-import { telegramStartCommand } from "./commands/start";
-import { telegramStatCommand } from "./commands/stat";
-import { getErrorSticker, getUnknownSticker } from "./stickers/presets";
+// import { withProbability } from "../common/random/utils";
+// import { sentence } from "../models/SentenceBuilder";
+// import { Interjection } from "../models/SentenceBuilder/interjections";
+import { TelegramInputError, type TTelegramCommandProps, type TTelegramGetReplyFn } from "../definitions";
+import { logTelegram } from "../logging/utils";
+import { telegramSendReply } from "../utils";
+import { getErrorSticker, getUnknownSticker } from "../stickers/presets";
+import { telegramErrorCommand } from "../commands/error";
+import { telegramStatCommand } from "../commands/stat";
+import { telegramMoodEntry } from "../commands/addMoodEntry";
+import { telegramHelpCommand } from "../commands/help";
+import { telegramStartCommand } from "../commands/start";
 
 const MAX_SYMBOLS = 1024;
 const MAX_SYMBOLS_COUNT = `${MAX_SYMBOLS} символа`;
@@ -35,8 +36,9 @@ const getReply: TTelegramGetReplyFn = (props) => {
     return telegramErrorCommand.getReply();
   }
 
-  const text = sentence`Не пон... ${Interjection.neutral} Напиши /help, чтобы почитать, как мной пользоваться`;
-  const sticker = withProbability(0.3, () => getUnknownSticker());
+  // const text = sentence`Не пон... ${Interjection.neutral} Напиши /help, чтобы почитать, как мной пользоваться`;
+  const text = "Напиши /help, чтобы почитать, как мной пользоваться";
+  const sticker = Math.random() < 0.3 ? getUnknownSticker() : undefined;
 
   return sticker ? [{ sticker }, { text }] : { text };
 };
@@ -67,13 +69,13 @@ export function telegramOnMessage(bot: TelegramBot): void {
         throw new TelegramInputError(`Не могу обрабатывать больше, чем ${MAX_SYMBOLS_COUNT}`);
       }
 
-      logInfo(`${fromPart} ${message.text}`);
+      logTelegram(`${fromPart} ${message.text}`);
 
       bot.sendChatAction(chatId, "typing");
 
       const reply = await getReply(commandProps);
 
-      logInfo(`@MooDuck: ${reply}\n`);
+      logTelegram(`@MooDuck: ${reply}\n`);
 
       telegramSendReply(bot, commandProps, reply);
     } catch (error) {
@@ -84,11 +86,9 @@ export function telegramOnMessage(bot: TelegramBot): void {
 
         telegramSendReply(bot, commandProps, [
           { sticker: getErrorSticker() },
-          { text: sentence`${Interjection.negative} Какая-то ошибка! Попробуй написать попозже...` },
+          { text: "Какая-то ошибка! Попробуй написать попозже..." },
         ]);
       }
     }
   });
-
-  console.log(`\n << MooDuck is listening >> \n`);
 }

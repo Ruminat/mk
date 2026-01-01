@@ -25,19 +25,35 @@ export function setupMooDuckTelegramBot(app: Express) {
 
     bot.setWebHook(url);
 
-    telegramOnMessage(bot);
+    listen(bot);
 
     console.log(`🤖 Running telegram bot on ${url}`);
 
     process.on("SIGTERM", async () => {
-      await bot.deleteWebHook();
-      console.log("✅ Telegram webhook removed");
+      const id = setTimeout(() => {
+        console.error("Could not close connections in time, forcefully shutting down");
+        process.exit(1);
+      }, 5000);
+
+      const removed = await bot.deleteWebHook();
+
+      if (removed) {
+        console.log("✅ Telegram webhook removed");
+      } else {
+        console.log("⚠️ Couldn't remove the telegram bot");
+      }
+
+      clearTimeout(id);
     });
   } else {
     const pollingBot = new TelegramBot(token, { polling: true });
 
-    telegramOnMessage(pollingBot);
+    listen(pollingBot);
 
     console.log(`🤖 Running telegram bot in polling mode`);
   }
+}
+
+function listen(bot: TelegramBot) {
+  telegramOnMessage(bot);
 }
