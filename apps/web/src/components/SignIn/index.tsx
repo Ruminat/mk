@@ -1,16 +1,16 @@
-import { Button, Flex } from "@gravity-ui/uikit";
+import { Button, Flex, Text } from "@gravity-ui/uikit";
 import { getRequest } from "../../models/api";
 import { MoodValueControl } from "../MoodValueControl";
 import { useState } from "react";
 import { TMoodValue } from "../../models/mood/definitions";
 
-export function SignUp() {
+export function SignIn() {
   const [mood, setMood] = useState<TMoodValue | undefined>(undefined);
 
   return (
     <Flex direction='column' gap={4} width='300px' spacing={{ p: 8 }}>
-      {/* <TextInput name='username' label='Username' />
-      <TextInput name='password' label='Password' type='password' /> */}
+      <Text variant='header-2'>MooDuck</Text>
+      <Text>Work in progress</Text>
 
       <MoodValueControl value={mood} onUpdate={setMood} />
 

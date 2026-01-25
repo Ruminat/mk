@@ -49,7 +49,7 @@ export function telegramOnMessage(bot: TelegramBot): void {
 
     const chatId = chat.id;
     const fromPart = from ? `@${from.username} (${from.first_name} ${from.last_name}):` : `Unknown fool:`;
-    const messageParsed = message.text ? message.text.toLowerCase().replace(/ё/g, "е") : message.text;
+    const messageParsed = message.text ? message.text.toLowerCase().replace(/ё/g, "е").trim() : message.text;
 
     const commandProps = {
       metadata,
