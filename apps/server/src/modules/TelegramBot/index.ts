@@ -3,7 +3,7 @@ import TelegramBot from "node-telegram-bot-api";
 import { getEnvironmentVariables } from "../../common/environment";
 import { telegramOnMessage } from "./handlers/onMessage";
 
-export function setupMooDuckTelegramBot(app: Express) {
+export async function setupMooDuckTelegramBot(app: Express) {
   const {
     telegramBot: { token, webhookDomain, webhookPath },
   } = getEnvironmentVariables();
@@ -18,27 +18,35 @@ export function setupMooDuckTelegramBot(app: Express) {
     const bot = new TelegramBot(token);
     const url = `${webhookDomain}${webhookPath}`;
 
+    app.get(webhookPath, (req, res) => {
+      console.log("GOT SOMETHING (GET)!");
+
+      res.sendStatus(200);
+    });
+
     app.post(webhookPath, (req, res) => {
+      console.log("GOT SOMETHING!", req.body);
+
       bot.processUpdate(req.body);
       res.sendStatus(200);
     });
 
-    bot
-      .deleteWebHook()
-      .then(() => bot.setWebHook(url))
-      .then(() => {
-        console.log(`🤖 Running telegram bot on ${url}`);
+    try {
+      await bot.deleteWebHook();
+      await bot.setWebHook(url);
 
-        listen(bot);
+      console.log(`🤖 Running telegram bot on ${url}`);
 
-        return bot.getWebHookInfo();
-      })
-      .then((info) => {
-        console.log("Webhook info:", info);
-      })
-      .catch((error) => {
-        console.error("❌ Webhook setup failed:", error);
-      });
+      listen(bot);
+
+      const info = await bot.getWebHookInfo();
+      const me = await bot.getMe();
+
+      console.log("Webhook info:", info);
+      console.log("My info:", me);
+    } catch (error) {
+      console.error("❌ Webhook setup failed:", error);
+    }
 
     process.on("SIGTERM", async () => {
       const id = setTimeout(() => {
