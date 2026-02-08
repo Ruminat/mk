@@ -19,5 +19,5 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             set -e
-            cd ~/mk
+            cd /var/www/mooduck
             ./deploy.sh

@@ -2,10 +2,6 @@ import { readFile } from "fs/promises";
 import { unauthenticatedController } from "../../common/controller";
 import appRoot from "app-root-path";
 
-// const deployInfoPath = appRoot.path;
-
-console.log("HOBA", appRoot.path);
-
 export const adminController = {
   // TODO: switch to controller
   getDeployInfo: unauthenticatedController(async (req) => {

@@ -23,11 +23,22 @@ export function setupMooDuckTelegramBot(app: Express) {
       res.sendStatus(200);
     });
 
-    bot.setWebHook(url);
+    bot
+      .deleteWebHook()
+      .then(() => bot.setWebHook(url))
+      .then(() => {
+        console.log(`🤖 Running telegram bot on ${url}`);
 
-    listen(bot);
+        listen(bot);
 
-    console.log(`🤖 Running telegram bot on ${url}`);
+        return bot.getWebHookInfo();
+      })
+      .then((info) => {
+        console.log("Webhook info:", info);
+      })
+      .catch((error) => {
+        console.error("❌ Webhook setup failed:", error);
+      });
 
     process.on("SIGTERM", async () => {
       const id = setTimeout(() => {
