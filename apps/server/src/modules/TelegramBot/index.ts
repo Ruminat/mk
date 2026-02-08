@@ -18,14 +18,14 @@ export async function setupMooDuckTelegramBot(app: Express) {
     const bot = new TelegramBot(token);
     const url = `${webhookDomain}${webhookPath}`;
 
-    app.get(webhookPath, (req, res) => {
-      console.log("GOT SOMETHING (GET)!");
+    // app.get(webhookPath, (req, res) => {
+    //   console.log("GOT SOMETHING (GET)!");
 
-      res.sendStatus(200);
-    });
+    //   res.sendStatus(200);
+    // });
 
     app.post(webhookPath, (req, res) => {
-      console.log("GOT SOMETHING!", req.body);
+      // console.log("GOT SOMETHING!", req.body);
 
       bot.processUpdate(req.body);
       res.sendStatus(200);
@@ -35,15 +35,12 @@ export async function setupMooDuckTelegramBot(app: Express) {
       await bot.deleteWebHook();
       await bot.setWebHook(url);
 
-      console.log(`🤖 Running telegram bot on ${url}`);
-
-      listen(bot);
-
       const info = await bot.getWebHookInfo();
       const me = await bot.getMe();
 
-      console.log("Webhook info:", info);
-      console.log("My info:", me);
+      console.log(`🤖 Running telegram bot on ${url}`, me, info);
+
+      listen(bot);
     } catch (error) {
       console.error("❌ Webhook setup failed:", error);
     }
