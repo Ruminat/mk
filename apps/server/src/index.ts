@@ -6,6 +6,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { getEnvironmentVariables } from "./common/environment";
 import { rateLimiter } from "./middlewares/rateLimiter";
+import { adminRouter } from "./modules/Admin/route";
 import { authRouter } from "./modules/Auth/route";
 import { moodRouter } from "./modules/Mood/route";
 import { setupMooDuckTelegramBot } from "./modules/TelegramBot";
@@ -27,7 +28,7 @@ app.use(
     origin: isDev ? "*" : ["https://shrek-labs.ru", "https://mooduck.shrek-labs.ru"],
     credentials: true,
     optionsSuccessStatus: 200,
-  })
+  }),
 );
 
 // Rate limiter
@@ -47,7 +48,7 @@ app.use(
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: false,
-  })
+  }),
 );
 
 // Compression
@@ -61,7 +62,7 @@ app.use(
   express.json({
     limit: "16kb",
     type: "application/json",
-  })
+  }),
 );
 
 // No cache for api calls
@@ -82,6 +83,7 @@ setupMooDuckTelegramBot(app);
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
 
 app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/mood", moodRouter);
 
 /**

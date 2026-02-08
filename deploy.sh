@@ -19,4 +19,5 @@ pnpm build
 echo "🔄 Restarting with PM2..."
 pnpm run pm2.restart || echo "PM2 restart failed :("
 
+echo "Deployed at $(date +%Y.%m.%d-%H:%M:%S)" > .deploy.info
 echo "✅ Deployment completed!"

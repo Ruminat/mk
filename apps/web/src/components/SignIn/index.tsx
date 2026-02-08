@@ -3,9 +3,17 @@ import { getRequest } from "../../models/api";
 import { MoodValueControl } from "../MoodValueControl";
 import { useState } from "react";
 import { TMoodValue } from "../../models/mood/definitions";
+import { useFn } from "@mooduck/react";
+// import { useFn } from "@shreklabs/ui";
 
 export function SignIn() {
   const [mood, setMood] = useState<TMoodValue | undefined>(undefined);
+
+  const onClick = useFn(async () => {
+    const info = await getRequest("/api/admin/getDeployInfo");
+
+    console.log(info);
+  });
 
   return (
     <Flex direction='column' gap={4} width='300px' spacing={{ p: 8 }}>
@@ -14,12 +22,7 @@ export function SignIn() {
 
       <MoodValueControl value={mood} onUpdate={setMood} />
 
-      <Button
-        autoFocus
-        onClick={() => {
-          getRequest("/api/mood/listMoodEntries");
-        }}
-      >
+      <Button autoFocus onClick={onClick}>
         List
       </Button>
     </Flex>
