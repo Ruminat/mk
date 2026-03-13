@@ -159,6 +159,9 @@ importers:
       '@shreklabs/ui':
         specifier: ^1.0.0
         version: 1.0.0(@gravity-ui/components@4.16.0(@gravity-ui/uikit@7.26.1(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@gravity-ui/icons@2.16.0(react@19.2.0))(@gravity-ui/navigation@1.10.3(@bem-react/classname@1.7.0)(@gravity-ui/components@4.16.0(@gravity-ui/uikit@7.26.1(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@gravity-ui/icons@2.16.0(react@19.2.0))(@gravity-ui/uikit@7.26.1(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@gravity-ui/uikit@7.26.1(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@shreklabs/core@1.0.11(immer@10.2.0))(immer@10.2.0)(lodash@4.17.21)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@telegram-auth/react':
+        specifier: ^1.0.4
+        version: 1.0.4(react@19.2.0)
       react:
         specifier: ^19.2.0
         version: 19.2.0
@@ -1292,6 +1295,11 @@ packages:
 
   '@tanstack/virtual-core@3.13.12':
     resolution: {integrity: sha512-1YBOJfRHV4sXUmWsFSf5rQor4Ss82G8dQWLRbnk3GA4jeP8hQt1hxXh0tmflpC0dz3VgEv/1+qwPyLeWkQuPFA==}
+
+  '@telegram-auth/react@1.0.4':
+    resolution: {integrity: sha512-VPCIrA6h5+w69S1QvB/k2PphmAA9E8BSqEX4WMSE1P7KxexKl/VRdoTRKSsSx1/In94S+R7FufbjLrRMnEGEKg==}
+    peerDependencies:
+      react: '>=18'
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4299,6 +4307,10 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
 
   '@tanstack/virtual-core@3.13.12': {}
+
+  '@telegram-auth/react@1.0.4(react@19.2.0)':
+    dependencies:
+      react: 19.2.0
 
   '@types/babel__core@7.20.5':
     dependencies:
