@@ -1,4 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
+import { getEnvironmentVariables } from "../../common/environment";
+import { getHashFromNumber } from "../crypto/utils";
 import { TTelegramCommandProps, TTelegramReply } from "./definitions";
 
 export function code(content: string): string {
@@ -36,3 +38,7 @@ export function telegramSendReply(bot: TelegramBot, props: TTelegramCommandProps
 // function getUserPropsFromMessage(message: TelegramBot.Message) {
 //   return { login: message.from?.username } satisfies Partial<TUser>;
 // }
+
+export function getTelegramUserIdSecureHash(userId: number) {
+  return getHashFromNumber(userId, { secret: getEnvironmentVariables().auth.jwtSecret });
+}

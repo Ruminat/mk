@@ -14,6 +14,7 @@ const envSchema = object({
   TELEGRAM_BOT_WEBHOOK_PATH: string()
     .regex(/(\/\w+)+/)
     .optional(),
+  TELEGRAM_USER_ID_SECURE_HASH_LENGTH: string(),
 });
 
 export function getEnvironmentVariables() {
@@ -37,6 +38,7 @@ export function getEnvironmentVariables() {
       token: values.TELEGRAM_BOT_TOKEN,
       webhookDomain: values.TELEGRAM_BOT_WEBHOOK_DOMAIN,
       webhookPath: values.TELEGRAM_BOT_WEBHOOK_PATH,
+      telegramUserIdSecureHashLength: values.TELEGRAM_USER_ID_SECURE_HASH_LENGTH,
     },
   };
 }

@@ -11,6 +11,8 @@ import { telegramStatCommand } from "../commands/stat";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
 import { telegramHelpCommand } from "../commands/help";
 import { telegramStartCommand } from "../commands/start";
+import { getEnvironmentVariables } from "../../../common/environment";
+import { getHashFromNumber } from "../../crypto/utils";
 
 const MAX_SYMBOLS = 1024;
 const MAX_SYMBOLS_COUNT = `${MAX_SYMBOLS} символа`;
@@ -47,9 +49,19 @@ export function telegramOnMessage(bot: TelegramBot): void {
   bot.on("message", async (message, metadata) => {
     const { from, chat } = message;
 
+    if (!from) {
+      console.log("\nReceived message without from, ignoring...");
+      return;
+    }
+
+    const userId = from.id;
     const chatId = chat.id;
-    const fromPart = from ? `@${from.username} (${from.first_name} ${from.last_name}):` : `Unknown fool:`;
+    const fromPart = `@${from.username} (${from.first_name} ${from.last_name}):`;
     const messageParsed = message.text ? message.text.toLowerCase().replace(/ё/g, "е").trim() : message.text;
+
+    console.log("\nJOPA\n");
+    console.log(getHashFromNumber(userId, getEnvironmentVariables().auth.jwtSecret));
+    console.log("\nJOPA\n");
 
     const commandProps = {
       metadata,

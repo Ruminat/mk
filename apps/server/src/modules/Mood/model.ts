@@ -6,7 +6,7 @@ export const MoodTable = sqliteTable("mood_entries", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   value: integer("value").notNull(),
   comment: text("comment"),
-  userId: CommonTableField.userId.notNull(),
+  telegramUserId: CommonTableField.telegramUserId.notNull(),
   createdAt: CommonTableField.createdAt.default(sql`CURRENT_TIMESTAMP`),
 });
 
