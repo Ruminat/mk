@@ -75,7 +75,7 @@ export function telegramOnMessage(bot: TelegramBot): void {
 
       const reply = await getReply(commandProps);
 
-      logTelegram(`@MooDuck: ${reply}\n`);
+      logTelegram(`@MooDuck:`, reply);
 
       telegramSendReply(bot, commandProps, reply);
     } catch (error) {

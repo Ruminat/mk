@@ -16,6 +16,11 @@
     "typecheck": "turbo typecheck",
     "codecheck": "pnpm run typecheck && pnpm run lint"
   },
+  "engines": {
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm",
+    "pnpm": ">=9.0.0"
+  },
   "devDependencies": {
     "prettier": "^3.6.2",
     "turbo": "^2.6.1",

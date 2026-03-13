@@ -1,3 +1,3 @@
-export function logTelegram(...params: (string | number)[]) {
+export function logTelegram(...params: unknown[]) {
   console.log(...params);
 }
