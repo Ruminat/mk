@@ -14,16 +14,15 @@ const testDBParams = {
 } satisfies Config;
 
 const localDBParams = (): Config => {
-  const absolutePath = path.isAbsolute(localDbPath)
-    ? localDbPath
-    : path.join(process.cwd(), localDbPath);
+  const absolutePath = path.isAbsolute(localDbPath) ? localDbPath : path.join(process.cwd(), localDbPath);
+
   const dir = path.dirname(absolutePath);
+
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
-  return {
-    url: pathToFileURL(absolutePath).toString(),
-  };
+
+  return { url: pathToFileURL(absolutePath).toString() };
 };
 
 const tursoDBParams = {
@@ -32,11 +31,7 @@ const tursoDBParams = {
 } satisfies Config;
 
 const client = createClient({
-  ...(isTesting
-    ? testDBParams
-    : useLocalDb
-      ? localDBParams()
-      : tursoDBParams),
+  ...(isTesting ? testDBParams : useLocalDb ? localDBParams() : tursoDBParams),
 });
 
 export const db = drizzle(client);
