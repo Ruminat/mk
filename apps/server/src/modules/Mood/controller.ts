@@ -7,7 +7,7 @@ export const moodController = {
   addMoodEntry: controller(async (req) => {
     const moodParams = getValidModel(AddMoodRequestSchema, req.body);
 
-    const addedMood = await moodService.addMoodEntry({ ...moodParams, userId: req.user.id });
+    const addedMood = await moodService.addMoodEntry({ ...moodParams, telegramUserIdHash: req.user.id });
 
     return { status: 200, result: { mood: addedMood } };
   }),
