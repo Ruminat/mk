@@ -1,0 +1,11 @@
+---
+description: Use "." not ":" for delimiters in names
+alwaysApply: true
+---
+
+# Delimiters
+
+Use **`.`** (dot) as the delimiter, never `:` (colon).
+
+- Script names: `dev.local`, `db.push.local`, `test.watch` — not `dev:local`, `db.push:local`, `test:watch`
+- Other compound names: prefer `foo.bar` over `foo:bar`

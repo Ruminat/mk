@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1763492824124,
-      "tag": "0000_fearless_zeigeist",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1773432056555,
-      "tag": "0001_tan_shard",
+      "when": 1773435135675,
+      "tag": "0000_deep_jubilee",
       "breakpoints": true
     }
   ]

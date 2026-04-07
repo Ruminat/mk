@@ -31,14 +31,20 @@ export function telegramSendReply(bot: TelegramBot, props: TTelegramCommandProps
   }
 }
 
-// export function getOrCreateTelegramUser(props: TTelegramCommandProps) {
-//   return createUserEntryIfNotPresent(props.chatId, getUserPropsFromMessage(props.message));
-// }
-
-// function getUserPropsFromMessage(message: TelegramBot.Message) {
-//   return { login: message.from?.username } satisfies Partial<TUser>;
-// }
+export function getTelegramUserIdHash(props: TTelegramCommandProps): string {
+  const telegramUserId = props.message.from?.id;
+  if (telegramUserId === undefined) {
+    throw new Error("No telegram user id in message");
+  }
+  return getTelegramUserIdSecureHash(telegramUserId);
+}
 
 export function getTelegramUserIdSecureHash(userId: number) {
-  return getHashFromNumber(userId, { secret: getEnvironmentVariables().auth.jwtSecret });
+  const secret = getEnvironmentVariables().telegramBot.telegramUserIdSecureHash;
+
+  if (!secret) {
+    console.log("TELEGRAM_USER_ID_SECURE_HASH is not set!!!");
+  }
+
+  return getHashFromNumber(userId, { secret });
 }

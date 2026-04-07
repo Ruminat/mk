@@ -2,17 +2,15 @@ import TelegramBot from "node-telegram-bot-api";
 // import { withProbability } from "../common/random/utils";
 // import { sentence } from "../models/SentenceBuilder";
 // import { Interjection } from "../models/SentenceBuilder/interjections";
-import { TelegramInputError, type TTelegramCommandProps, type TTelegramGetReplyFn } from "../definitions";
-import { logTelegram } from "../logging/utils";
-import { telegramSendReply } from "../utils";
-import { getErrorSticker, getUnknownSticker } from "../stickers/presets";
-import { telegramErrorCommand } from "../commands/error";
-import { telegramStatCommand } from "../commands/stat";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
+import { telegramErrorCommand } from "../commands/error";
 import { telegramHelpCommand } from "../commands/help";
 import { telegramStartCommand } from "../commands/start";
-import { getEnvironmentVariables } from "../../../common/environment";
-import { getHashFromNumber } from "../../crypto/utils";
+import { telegramStatCommand } from "../commands/stat";
+import { TelegramInputError, type TTelegramCommandProps, type TTelegramGetReplyFn } from "../definitions";
+import { logTelegram } from "../logging/utils";
+import { getErrorSticker, getUnknownSticker } from "../stickers/presets";
+import { telegramSendReply } from "../utils";
 
 const MAX_SYMBOLS = 1024;
 const MAX_SYMBOLS_COUNT = `${MAX_SYMBOLS} символа`;
@@ -54,14 +52,9 @@ export function telegramOnMessage(bot: TelegramBot): void {
       return;
     }
 
-    const userId = from.id;
     const chatId = chat.id;
     const fromPart = `@${from.username} (${from.first_name} ${from.last_name}):`;
     const messageParsed = message.text ? message.text.toLowerCase().replace(/ё/g, "е").trim() : message.text;
-
-    console.log("\nJOPA\n");
-    console.log(getHashFromNumber(userId, getEnvironmentVariables().auth.jwtSecret));
-    console.log("\nJOPA\n");
 
     const commandProps = {
       metadata,

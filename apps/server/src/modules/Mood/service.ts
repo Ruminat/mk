@@ -16,21 +16,18 @@ export const moodService = {
     return row;
   },
 
-  deleteMoodEntry: async ({ entryId, userId }: { entryId: TSelectMoodEntry["id"], userId: string }) => {
+  deleteMoodEntry: async ({ entryId, userId }: { entryId: TSelectMoodEntry["id"]; userId: string }) => {
     const response = await db
       .delete(MoodTable)
-      .where(and(eq(MoodTable.id, entryId), eq(MoodTable.userId, userId)));
+      .where(and(eq(MoodTable.id, entryId), eq(MoodTable.telegramUserIdHash, userId)));
 
     if (response.rowsAffected !== 1) {
       throw new ServiceError("Failed to delete the mood entry");
     }
   },
 
-  listMoodEntries: async ({ userId }: Pick<TSelectMoodEntry, "userId">) => {
-    const response = await db
-      .select()
-      .from(MoodTable)
-      .where(eq(MoodTable.userId, userId));
+  listMoodEntries: async ({ userId }: { userId: string }) => {
+    const response = await db.select().from(MoodTable).where(eq(MoodTable.telegramUserIdHash, userId));
 
     return response;
   },

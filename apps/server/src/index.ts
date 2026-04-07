@@ -16,7 +16,7 @@ export const app = express();
 app.set("trust proxy", 1);
 
 const SERVER_TIMEOUT = 30000;
-const { port, isDev } = getEnvironmentVariables();
+const { port, isDev, useLocalDb } = getEnvironmentVariables();
 
 /**
  * App middlewares
@@ -124,6 +124,7 @@ const server = app
     console.log(`
     🚀 Server running in ${isDev ? "development" : "PRODUCTION"} mode
     📡 Listening on port ${port}
+    ${useLocalDb ? "💾 Using local SQLite database" : ""}
     🕐 ${new Date().toISOString()}
   `);
   })
