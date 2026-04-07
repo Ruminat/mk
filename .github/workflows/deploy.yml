@@ -1,23 +1,23 @@
-name: Deploy to VPS
+# name: Deploy to VPS
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch: # allows manual triggering
+# on:
+#   push:
+#     branches: [main]
+#   workflow_dispatch: # allows manual triggering
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            set -e
-            cd /var/www/mooduck
-            ./deploy.sh
+#     steps:
+#       - name: Deploy to VPS via SSH
+#         uses: appleboy/ssh-action@v1.0.0
+#         with:
+#           host: ${{ secrets.VPS_HOST }}
+#           username: ${{ secrets.VPS_USERNAME }}
+#           key: ${{ secrets.VPS_SSH_KEY }}
+#           port: ${{ secrets.VPS_PORT }}
+#           script: |
+#             set -e
+#             cd /var/www/mooduck
+#             ./deploy.sh
