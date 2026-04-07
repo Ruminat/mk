@@ -5,7 +5,6 @@ import { MoodTable, TInsertMoodEntry, TSelectMoodEntry } from "./model";
 
 export const moodService = {
   addMoodEntry: async (entry: TInsertMoodEntry) => {
-    console.log("addMoodEntry", entry);
     const response = await db.insert(MoodTable).values(entry).returning();
 
     if (response.length !== 1) {
