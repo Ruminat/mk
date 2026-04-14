@@ -1,4 +1,5 @@
 import { TTelegramCommandMethods } from "../definitions";
+import { formatTelegramMoodEntryStatBullet } from "../moodReplyFormat";
 import { getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
@@ -9,28 +10,8 @@ import type { TSelectMoodEntry } from "../../Mood/model";
 const LAST_LIMIT = 10;
 const AI_WORDS_MAX = 35;
 
-function formatEntrySentAt(createdAt: TSelectMoodEntry["createdAt"]): string {
-  if (!createdAt) {
-    return "дата неизвестна";
-  }
-
-  const normalized = createdAt.includes("T") ? createdAt : createdAt.replace(" ", "T");
-  const parsed = new Date(normalized);
-  if (Number.isNaN(parsed.getTime())) {
-    return createdAt;
-  }
-
-  return parsed.toLocaleString("ru-RU", { dateStyle: "short", timeStyle: "short" });
-}
-
 function formatEntriesBlock(entries: TSelectMoodEntry[]): string {
-  return entries
-    .map((entry, index) => {
-      const when = formatEntrySentAt(entry.createdAt);
-      const tail = entry.comment ? ` — ${entry.comment}` : "";
-      return `${index + 1}. ${when}: ${entry.value}/10${tail}`;
-    })
-    .join("\n");
+  return entries.map((entry) => formatTelegramMoodEntryStatBullet(entry)).join("\n");
 }
 
 export const telegramLastCommand = {

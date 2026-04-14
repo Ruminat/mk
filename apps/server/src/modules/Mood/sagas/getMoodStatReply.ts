@@ -1,10 +1,6 @@
-import { code } from "../../TelegramBot/utils";
+import { moodScoreCode } from "../../TelegramBot/utils";
 import { getMoodStats } from "./getMoodStats";
 import { getMoodStatsLists } from "../utils";
-
-function padStart(str: string, length: number, pad: string): string {
-  return str.padStart(length, pad);
-}
 
 export function getMoodStatReply(entries: Parameters<typeof getMoodStats>[0]["entries"]) {
   const stats = getMoodStats({ entries });
@@ -14,7 +10,7 @@ export function getMoodStatReply(entries: Parameters<typeof getMoodStats>[0]["en
   }
 
   const { statsList, scoresList, topEntriesList } = getMoodStatsLists(stats, {
-    moodMarkup: (score) => code(`${padStart(String(score), 2, " ")}/10`),
+    moodMarkup: moodScoreCode,
   });
 
   const topEntriesMarkup =

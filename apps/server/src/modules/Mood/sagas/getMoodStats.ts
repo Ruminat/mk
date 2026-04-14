@@ -1,3 +1,4 @@
+import { parseMoodEntryCreatedAtMs } from "../../../common/moodFormat";
 import { TSelectMoodEntry } from "../model";
 import type { TMoodScore, TMoodStats, TMoodStatsEntry } from "../utils";
 import { getMoodInterest } from "../utils";
@@ -8,17 +9,11 @@ type TGetMoodStatsParams = {
   lastCommentedEntries?: number;
 };
 
-function parseCreatedAt(createdAt: string | null): number {
-  if (!createdAt) return Date.now();
-  const ts = Date.parse(createdAt);
-  return Number.isNaN(ts) ? Date.now() : ts;
-}
-
 function toMoodEntry(entry: TSelectMoodEntry): TMoodStatsEntry {
   return {
     score: entry.value as TMoodScore,
     comment: entry.comment ?? undefined,
-    created: parseCreatedAt(entry.createdAt),
+    created: parseMoodEntryCreatedAtMs(entry.createdAt),
   };
 }
 

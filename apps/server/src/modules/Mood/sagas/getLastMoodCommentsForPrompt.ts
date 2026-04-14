@@ -1,4 +1,5 @@
 import { howLongAgo } from "../../../common/dateUtils";
+import { formatPaddedMoodScoreDenominator } from "../../../common/moodFormat";
 import { TSelectMoodEntry } from "../model";
 import { getMoodStats } from "./getMoodStats";
 
@@ -18,6 +19,9 @@ export function getLastMoodCommentsForPrompt(entries: TSelectMoodEntry[]): strin
   return `Недавние комментарии пользователя. Прими их к сведению, но не упоминай их. Можешь обыграть интересные комментарии, но только если это будет в тему:
 
 ${lastEntries
-  .map((entry) => `- ${entry.score}/10: ${entry.comment!} (${howLongAgo(Date.now() - entry.created)})`)
+  .map(
+    (entry) =>
+      `- ${formatPaddedMoodScoreDenominator(entry.score)}: ${entry.comment!} (${howLongAgo(Date.now() - entry.created)})`,
+  )
   .join("\n")}`;
 }

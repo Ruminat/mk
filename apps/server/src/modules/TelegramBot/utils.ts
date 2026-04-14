@@ -1,10 +1,15 @@
 import TelegramBot from "node-telegram-bot-api";
+import { formatPaddedMoodScoreDenominator } from "../../common/moodFormat";
 import { getEnvironmentVariables } from "../../common/environment";
 import { getHashFromNumber } from "../crypto/utils";
 import { TTelegramCommandProps, TTelegramReply } from "./definitions";
 
 export function code(content: string): string {
   return `<code>${content}</code>`;
+}
+
+export function moodScoreCode(score: number): string {
+  return code(formatPaddedMoodScoreDenominator(score));
 }
 
 export function b(content: string): string {
