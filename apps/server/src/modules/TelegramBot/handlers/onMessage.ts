@@ -5,6 +5,7 @@ import TelegramBot from "node-telegram-bot-api";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
 import { telegramErrorCommand } from "../commands/error";
 import { telegramHelpCommand } from "../commands/help";
+import { telegramLastCommand } from "../commands/last";
 import { telegramStartCommand } from "../commands/start";
 import { telegramStatCommand } from "../commands/stat";
 import { TelegramInputError, type TTelegramCommandProps, type TTelegramGetReplyFn } from "../definitions";
@@ -22,6 +23,10 @@ const getReply: TTelegramGetReplyFn = (props) => {
 
   if (telegramHelpCommand.test(props)) {
     return telegramHelpCommand.getReply();
+  }
+
+  if (telegramLastCommand.test(props)) {
+    return telegramLastCommand.getReply(props);
   }
 
   if (telegramMoodEntry.test(props)) {

@@ -21,4 +21,4 @@ export type TTelegramCommandMethods = {
   getReply: TTelegramGetReplyFn;
 };
 
-export type TTelegramCommand = "/start" | "/stat" | "/settings" | "/help";
+export type TTelegramCommand = "/start" | "/last" | "/stat" | "/settings" | "/help";

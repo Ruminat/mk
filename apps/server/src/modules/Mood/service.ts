@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../../db/client";
 import { ServiceError } from "../../services/errors/ServiceError";
 import { MoodTable, TInsertMoodEntry, TSelectMoodEntry } from "./model";
@@ -28,6 +28,17 @@ export const moodService = {
 
   listMoodEntries: async ({ userId }: { userId: string }) => {
     const response = await db.select().from(MoodTable).where(eq(MoodTable.telegramUserIdHash, userId));
+
+    return response;
+  },
+
+  listRecentMoodEntries: async ({ telegramUserIdHash, limit }: { telegramUserIdHash: string; limit: number }) => {
+    const response = await db
+      .select()
+      .from(MoodTable)
+      .where(eq(MoodTable.telegramUserIdHash, telegramUserIdHash))
+      .orderBy(desc(MoodTable.createdAt), desc(MoodTable.id))
+      .limit(limit);
 
     return response;
   },
