@@ -35,8 +35,6 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           # port: ${{ secrets.VPS_PORT || 22 }}
-          # Login shell loads ~/.profile (often sources ~/.bashrc), so nvm/pnpm
-          # match an interactive SSH session. Plain remote commands are non-interactive
-          # and skip those files, which is why pnpm was missing from PATH.
+          # bash -l helps some setups; deploy.sh also bootstraps PATH for CI/SSH.
           script: |
             bash -l -c "set -e && cd /var/www/mooduck && ./deploy.sh"
