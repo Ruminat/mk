@@ -21,7 +21,7 @@ export const telegramLastCommand = {
 
   getReply: async (props) => {
     const telegramUserIdHash = getTelegramUserIdHash(props);
-    const entries = await moodService.listRecentMoodEntries({ telegramUserIdHash, limit: LAST_LIMIT });
+    const entries = await moodService.listMoodEntries({ userId: telegramUserIdHash, limit: LAST_LIMIT });
 
     if (entries.length === 0) {
       return {

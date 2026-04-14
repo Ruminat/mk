@@ -30,7 +30,7 @@ export const telegramStatCommand = {
 ${pickRandomPromptMode()}
 Предоставь только ответ пользователю и больше ничего.
 ${MoodPromptCommon.banPhrases}
-${MoodPromptCommon.wordsLimit(getRandomInt(300, 500))}
+${MoodPromptCommon.wordsLimit(getRandomInt(80, 180))}
 
 ${stats}`;
 
