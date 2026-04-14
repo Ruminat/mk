@@ -1,135 +1,73 @@
-# Turborepo starter
+# Mooduck
 
-This Turborepo starter is maintained by the Turborepo core team.
+Mooduck is a small mood journal: you log how you feel on a 1–10 scale, optionally add a short note, and review your history. Identity comes from **Telegram** (Mini App / web login and bot); the backend stores a **hashed Telegram user id**, not a full user profile.
 
-## Using this example
+The repo is a **pnpm** + **Turborepo** monorepo.
 
-Run the following command:
+## Repository layout
+
+| Path | Role |
+|------|------|
+| `apps/web` | **mooduck-web** — React 19 + Vite SPA (Gravity UI, Telegram auth widget) |
+| `apps/server` | **mooduck-server** — Express API, Drizzle ORM, SQLite (Turso in production or a local file in dev) |
+| `packages/core` | Shared non-UI utilities (`Null`, `Number`, `Random`, …) |
+| `packages/react` | Shared React helpers (e.g. `useFn`) |
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) (CI uses 22; match or exceed that locally)
+- [pnpm](https://pnpm.io/) **9.x** or newer (`package.json` pins the workspace package manager)
+
+## Install
 
 ```sh
-npx create-turbo@latest
+pnpm install
 ```
 
-## What's inside?
+## Environment
 
-This Turborepo includes the following packages/apps:
+Server configuration is validated in `apps/server/src/common/environment.ts`. At minimum you need:
 
-### Apps and Packages
+- **`JWT_SECRET`** — signing secret for API tokens
+- **Database** — either Turso (`TURSO_CONNECTION_URL`, `TURSO_AUTH_TOKEN`) or, in dev only, `USE_LOCAL_DB=true` with optional `LOCAL_DB_PATH` (defaults to `data/local.db` under the server app)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Optional but used when you enable those features:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Telegram** — `TELEGRAM_BOT_TOKEN`, webhook settings, `TELEGRAM_USER_ID_SECURE_HASH` (see the same file for exact names and shapes)
+- **DeepSeek** — `DEEPSEEK_API_TOKEN` for AI-assisted replies in the Telegram bot flow
 
-### Utilities
+Copy or create `.env` under `apps/server` as you normally would for local work.
 
-This Turborepo has some additional tools already setup for you:
+## Common scripts (repo root)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+| Script | What it does |
+|--------|----------------|
+| `pnpm dev` | Runs Turborepo `dev` (web + server and related packages, with `MODE=dev`) |
+| `pnpm dev.web` | Dev for the web app only |
+| `pnpm dev.server` | Dev for the API only |
+| `pnpm dev.local` | Server dev with **`USE_LOCAL_DB=true`** (local SQLite file) |
+| `pnpm build` | Production build (`MODE=prod`) |
+| `pnpm typecheck` | Typecheck across the workspace |
+| `pnpm test` | Tests (where configured; server uses Vitest) |
+| `pnpm db.push.local` / `pnpm db.migrate.local` / `pnpm db.studio.local` | Drizzle against the local DB (dev + `USE_LOCAL_DB`) |
+| `pnpm db.push` / `pnpm db.migrate` / `pnpm db.studio` | Drizzle against configured remote DB |
 
-### Build
+Package-specific scripts (lint, `test.watch`, etc.) live in each `package.json`.
 
-To build all apps and packages, run the following command:
+## Production process
 
-```
-cd my-turborepo
+- **`pnpm start`** — Turborepo `start` for production-oriented entrypoints.
+- **`pnpm start.server`** — Run the built server bundle only.
+- **`pnpm pm2.start`** / **`pnpm pm2.restart`** — PM2 helpers using `ecosystem.config.js`.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+CI (`.github/workflows/deploy.yml`) installs with a frozen lockfile, runs `pnpm run codecheck` (typecheck + placeholder lint), then deploys to a VPS via SSH and `./deploy.sh` on the host.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+## Tech stack (short)
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+- **Web:** Vite, React 19, TypeScript, Zod  
+- **Server:** Express, Drizzle + libSQL/Turso, Zod, Winston, optional `node-telegram-bot-api` and OpenAI-compatible client for DeepSeek  
+- **Repo:** Turborepo, Prettier at the root
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Internal conventions (types vs interfaces, no barrel re-exports, module layout) are documented in `.cursorrules` for contributors.
