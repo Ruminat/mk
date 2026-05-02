@@ -1,5 +1,5 @@
-import { getRandomInt, randomFrom } from "@mooduck/core";
-import { pickRandomPromptMode, PROMPT_MODE } from "./mode";
+import { getRandomInt } from "@mooduck/core";
+import { pickRandomPromptMode, pickRandomPromptModeForGentleBand, PROMPT_MODE } from "./mode";
 import { getLastMoodCommentsForPrompt } from "../sagas/getLastMoodCommentsForPrompt";
 import { TSelectMoodEntry } from "../model";
 
@@ -43,7 +43,7 @@ function getMode(props: TProps): string {
   }
 
   if (props.score >= 2) {
-    return randomFrom([PROMPT_MODE.friendly, PROMPT_MODE.philosophical]);
+    return pickRandomPromptModeForGentleBand();
   }
 
   return PROMPT_MODE.friendly;

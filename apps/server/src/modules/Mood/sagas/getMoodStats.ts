@@ -57,7 +57,9 @@ export function getMoodStats(params: TGetMoodStatsParams): TMoodStats | undefine
     }
   }
 
-  const lastCommentedEntries = withComments.slice(-lastEntriesCount);
+  const lastCommentedEntries = [...withComments]
+    .sort((a, b) => b.created - a.created)
+    .slice(0, lastEntriesCount);
 
   const interestingEntriesSorted = [...interestingEntries].sort((a, b) => {
     const byInterest = b.interest - a.interest;
