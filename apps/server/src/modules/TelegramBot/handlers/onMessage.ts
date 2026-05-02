@@ -2,6 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 // import { withProbability } from "../common/random/utils";
 // import { sentence } from "../models/SentenceBuilder";
 // import { Interjection } from "../models/SentenceBuilder/interjections";
+import { aiService } from "../../AI/service";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
 import { telegramErrorCommand } from "../commands/error";
 import { telegramHelpCommand } from "../commands/help";
@@ -10,13 +11,18 @@ import { telegramStartCommand } from "../commands/start";
 import { telegramStatCommand } from "../commands/stat";
 import { TelegramInputError, type TTelegramCommandProps, type TTelegramGetReplyFn } from "../definitions";
 import { logTelegram } from "../logging/utils";
+import { getPromptForTelegramChat } from "../prompts/getPromptForTelegramChat";
 import { getErrorSticker, getUnknownSticker } from "../stickers/presets";
-import { telegramSendReply } from "../utils";
+import {
+  getRecentTelegramUserChatMessages,
+  recordTelegramUserChatMessage,
+} from "../telegramUserChatHistory";
+import { getTelegramUserIdHash, telegramSendReply } from "../utils";
 
 const MAX_SYMBOLS = 1024;
 const MAX_SYMBOLS_COUNT = `${MAX_SYMBOLS} символа`;
 
-const getReply: TTelegramGetReplyFn = (props) => {
+const getReply: TTelegramGetReplyFn = async (props) => {
   if (telegramStartCommand.test(props)) {
     return telegramStartCommand.getReply();
   }
@@ -41,7 +47,25 @@ const getReply: TTelegramGetReplyFn = (props) => {
     return telegramErrorCommand.getReply();
   }
 
-  // const text = sentence`Не пон... ${Interjection.neutral} Напиши /help, чтобы почитать, как мной пользоваться`;
+  const userText = props.message.text;
+  if (!userText) {
+    throw new Error("Empty message text");
+  }
+
+  const telegramUserIdHash = getTelegramUserIdHash(props);
+  recordTelegramUserChatMessage(telegramUserIdHash, userText);
+  const recentUserMessages = getRecentTelegramUserChatMessages(telegramUserIdHash);
+  const prompt = getPromptForTelegramChat({ recentUserMessages });
+
+  try {
+    const aiReply = await aiService.getDeepSeekReply({ prompt });
+    if (aiReply) {
+      return { text: aiReply };
+    }
+  } catch (error) {
+    console.log("AI chat reply failed:", error);
+  }
+
   const text = "Напиши /help, чтобы почитать, как мной пользоваться";
   const sticker = Math.random() < 0.3 ? getUnknownSticker() : undefined;
 
