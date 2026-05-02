@@ -4,6 +4,7 @@ import TelegramBot from "node-telegram-bot-api";
 // import { Interjection } from "../models/SentenceBuilder/interjections";
 import { aiService } from "../../AI/service";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
+import { telegramDebugCommand } from "../commands/debug";
 import { telegramErrorCommand } from "../commands/error";
 import { telegramHelpCommand } from "../commands/help";
 import { telegramLastCommand } from "../commands/last";
@@ -11,11 +12,12 @@ import { telegramStartCommand } from "../commands/start";
 import { telegramStatCommand } from "../commands/stat";
 import { TelegramInputError, type TTelegramCommandProps, type TTelegramGetReplyFn } from "../definitions";
 import { logTelegram } from "../logging/utils";
+import { formatTelegramAiReplyText } from "../formatTelegramAiReplyText";
 import { getPromptForTelegramChat } from "../prompts/getPromptForTelegramChat";
 import { getErrorSticker, getUnknownSticker } from "../stickers/presets";
 import {
-  getRecentTelegramUserChatMessages,
-  recordTelegramUserChatMessage,
+  appendTelegramChatMessage,
+  getRecentTelegramChatMessages,
 } from "../telegramUserChatHistory";
 import { getTelegramUserIdHash, telegramSendReply } from "../utils";
 
@@ -29,6 +31,10 @@ const getReply: TTelegramGetReplyFn = async (props) => {
 
   if (telegramHelpCommand.test(props)) {
     return telegramHelpCommand.getReply();
+  }
+
+  if (telegramDebugCommand.test(props)) {
+    return telegramDebugCommand.getReply(props);
   }
 
   if (telegramLastCommand.test(props)) {
@@ -53,14 +59,21 @@ const getReply: TTelegramGetReplyFn = async (props) => {
   }
 
   const telegramUserIdHash = getTelegramUserIdHash(props);
-  recordTelegramUserChatMessage(telegramUserIdHash, userText);
-  const recentUserMessages = getRecentTelegramUserChatMessages(telegramUserIdHash);
-  const prompt = getPromptForTelegramChat({ recentUserMessages });
+  appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: userText });
+  const recentMessages = getRecentTelegramChatMessages(telegramUserIdHash);
+  const prompt = getPromptForTelegramChat({ recentMessages });
 
   try {
     const aiReply = await aiService.getDeepSeekReply({ prompt });
     if (aiReply) {
-      return { text: aiReply };
+      appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: aiReply });
+      return {
+        text: formatTelegramAiReplyText({
+          prompt,
+          reply: aiReply,
+          username: props.message.from?.username,
+        }),
+      };
     }
   } catch (error) {
     console.log("AI chat reply failed:", error);

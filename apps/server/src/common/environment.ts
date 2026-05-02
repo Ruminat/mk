@@ -18,6 +18,7 @@ const envSchema = object({
     .regex(/(\/\w+)+/)
     .optional(),
   TELEGRAM_USER_ID_SECURE_HASH: string().optional(),
+  ADMIN_TELEGRAM_LOGINS: string().optional(),
   DEEPSEEK_API_TOKEN: string().optional(),
 }).refine(
   (data) => {
@@ -33,6 +34,16 @@ const envSchema = object({
 );
 
 const values = envSchema.parse(process.env);
+
+function parseAdminTelegramLogins(raw: string | undefined): string[] {
+  if (!raw?.trim()) {
+    return [];
+  }
+  return raw
+    .split(",")
+    .map((login) => login.trim().toLowerCase())
+    .filter((login) => login.length > 0);
+}
 
 export function getEnvironmentVariables() {
   const isDev = (values.MODE ?? "dev") === "dev";
@@ -62,6 +73,7 @@ export function getEnvironmentVariables() {
       webhookDomain: values.TELEGRAM_BOT_WEBHOOK_DOMAIN,
       webhookPath: values.TELEGRAM_BOT_WEBHOOK_PATH,
       telegramUserIdSecureHash: values.TELEGRAM_USER_ID_SECURE_HASH,
+      adminTelegramLogins: parseAdminTelegramLogins(values.ADMIN_TELEGRAM_LOGINS),
     },
 
     deepseek: {

@@ -36,4 +36,5 @@ Either use **local DB** (dev only) or **Turso** (remote).
 | `TELEGRAM_BOT_WEBHOOK_DOMAIN`  | Webhook base URL (e.g. `https://example.com`) |
 | `TELEGRAM_BOT_WEBHOOK_PATH`    | Webhook path (e.g. `/api/telegram/webhook`)   |
 | `TELEGRAM_USER_ID_SECURE_HASH` | Hash for encrypting Telegram user IDs         |
+| `ADMIN_TELEGRAM_LOGINS`        | Comma-separated Telegram **@usernames** (without `@`) allowed to use `/debug` |
 | `DEEPSEEK_API_TOKEN`           | API key for DeepSeek AI                       |

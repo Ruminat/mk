@@ -1,17 +1,16 @@
 import { getRandomInt } from "@mooduck/core";
 import { pickRandomPromptMode } from "../../Mood/prompts/mode";
+import type { TTelegramChatHistoryEntry } from "../telegramUserChatHistory";
 
 type TProps = {
-  recentUserMessages: readonly string[];
+  recentMessages: readonly TTelegramChatHistoryEntry[];
 };
 
 export function getPromptForTelegramChat(props: TProps): string {
   const wordsLimit = getWordsLimit();
-  const messageCount = props.recentUserMessages.length;
+  const messageCount = props.recentMessages.length;
 
-  const numberedLines = props.recentUserMessages
-    .map((line, index) => `${index + 1}. ${line}`)
-    .join("\n");
+  const numberedLines = props.recentMessages.map((entry, index) => formatHistoryLine(entry, index)).join("\n");
 
   const historyBlock =
     numberedLines.length > 0
@@ -36,6 +35,11 @@ ${pickRandomPromptMode()}
 ЕЩЁ РАЗ, НИЧЕГО, КРОМЕ ОТВЕТА ПОЛЬЗОВАТЕЛЮ, ПИСАТЬ НЕ НАДО`;
 }
 
+function formatHistoryLine(entry: TTelegramChatHistoryEntry, index: number): string {
+  const speaker = entry.role === "user" ? "Пользователь" : "Бот";
+  return `${index + 1}. ${speaker}: ${entry.text}`;
+}
+
 function getWordsLimit(): number {
   return getRandomInt(20, 60);
 }
@@ -53,5 +57,5 @@ function lastMessagesLabel(count: number): string {
   } else {
     word = "сообщений";
   }
-  return `Выше — последние ${count} ${word} пользователя.`;
+  return `Выше — последние ${count} ${word} диалога (реплики пользователя и бота).`;
 }

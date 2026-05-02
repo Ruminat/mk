@@ -1,16 +1,21 @@
-const MAX_USER_MESSAGES = 10;
+const MAX_CHAT_MESSAGES = 10;
 
-const messagesByTelegramUserIdHash = new Map<string, string[]>();
+export type TTelegramChatHistoryEntry = {
+  role: "user" | "assistant";
+  text: string;
+};
 
-export function recordTelegramUserChatMessage(telegramUserIdHash: string, text: string): void {
+const messagesByTelegramUserIdHash = new Map<string, TTelegramChatHistoryEntry[]>();
+
+export function appendTelegramChatMessage(telegramUserIdHash: string, entry: TTelegramChatHistoryEntry): void {
   const existing = messagesByTelegramUserIdHash.get(telegramUserIdHash) ?? [];
-  existing.push(text);
-  if (existing.length > MAX_USER_MESSAGES) {
-    existing.splice(0, existing.length - MAX_USER_MESSAGES);
+  existing.push(entry);
+  if (existing.length > MAX_CHAT_MESSAGES) {
+    existing.splice(0, existing.length - MAX_CHAT_MESSAGES);
   }
   messagesByTelegramUserIdHash.set(telegramUserIdHash, existing);
 }
 
-export function getRecentTelegramUserChatMessages(telegramUserIdHash: string): readonly string[] {
+export function getRecentTelegramChatMessages(telegramUserIdHash: string): readonly TTelegramChatHistoryEntry[] {
   return messagesByTelegramUserIdHash.get(telegramUserIdHash) ?? [];
 }

@@ -1,4 +1,6 @@
 import { TelegramInputError, TTelegramCommandMethods, TTelegramReply } from "../definitions";
+import { formatTelegramAiReplyText } from "../formatTelegramAiReplyText";
+import { appendTelegramChatMessage } from "../telegramUserChatHistory";
 import { getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
@@ -47,6 +49,8 @@ export const telegramMoodEntry = {
       telegramUserIdHash,
     });
 
+    appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: message });
+
     const boring = `(${score}${comment ? ` + "${comment}"` : ""})`;
     const defaultResults: TTelegramReply[] = [
       { text: `${boring}` },
@@ -60,7 +64,14 @@ export const telegramMoodEntry = {
       const reply = await aiService.getDeepSeekReply({ prompt });
 
       if (reply) {
-        result = { text: reply };
+        result = {
+          text: formatTelegramAiReplyText({
+            prompt,
+            reply,
+            username: props.message.from?.username,
+          }),
+        };
+        appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: reply });
       }
     } catch (error) {
       console.log("AI reply failed:", error);
