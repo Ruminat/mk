@@ -7,7 +7,7 @@ const getDeepSeekClient = () => {
   if (!apiKey) {
     throw new Error("DEEPSEEK_API_KEY is not set");
   }
-  
+
   return new OpenAI({ baseURL: "https://api.deepseek.com", apiKey });
 };
 
@@ -20,7 +20,7 @@ export const aiService = {
     const client = getDeepSeekClient();
     const completion = await client.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "deepseek-chat",
+      model: "deepseek-v4-flash",
     });
 
     return completion?.choices?.[0]?.message?.content ?? null;
