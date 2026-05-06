@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db/client";
 import { ServiceError } from "../../services/errors/ServiceError";
 import { MoodTable, TInsertMoodEntry, TSelectMoodEntry } from "./model";
@@ -34,7 +34,7 @@ export const moodService = {
       .select()
       .from(MoodTable)
       .where(eq(MoodTable.telegramUserIdHash, userId))
-      .orderBy(desc(MoodTable.createdAt), desc(MoodTable.id))
+      .orderBy(desc(sql`datetime(${MoodTable.createdAt})`), desc(MoodTable.id))
       .limit(cappedLimit);
 
     return response;
