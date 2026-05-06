@@ -78,8 +78,6 @@ app.use("/api", (req, res, next) => {
  * App routes
  **/
 
-setupMooDuckTelegramBot(app);
-
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
 
 app.use("/api/auth", authRouter);
@@ -115,35 +113,86 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
  * Starting the server
  **/
 
-const server = app
-  .listen(port, "0.0.0.0", (error) => {
-    if (error) {
-      console.log("Server error!", error);
-    }
+let isShuttingDown = false;
 
-    console.log(`
+async function bootstrap() {
+  const telegramLifecycle = await setupMooDuckTelegramBot(app);
+
+  const server = app
+    .listen(port, "0.0.0.0", (error) => {
+      if (error) {
+        console.log("Server error!", error);
+      }
+
+      console.log(`
     🚀 Server running in ${isDev ? "development" : "PRODUCTION"} mode
     📡 Listening on port ${port}
     ${useLocalDb ? "💾 Using local SQLite database" : ""}
     🕐 ${new Date().toISOString()}
   `);
-  })
-  .on("error", (error) => {
-    console.error("Server failed to start:", error);
+    })
+    .on("error", (error) => {
+      console.error("Server failed to start:", error);
+    });
+
+  server.setTimeout(SERVER_TIMEOUT);
+  server.keepAliveTimeout = 65000; // Helps with load balancers
+  server.headersTimeout = 66000; // Just slightly longer
+
+  const shutdown = async (signal: string) => {
+    if (isShuttingDown) {
+      return;
+    }
+    isShuttingDown = true;
+
+    console.log(`${signal} received. Shutting down gracefully...`);
+
+    const forceExit = setTimeout(() => {
+      console.error("Shutdown timed out, forcing exit");
+      process.exit(0);
+    }, 4000);
+
+    try {
+      await telegramLifecycle?.shutdownTelegram();
+    } catch (error) {
+      console.error("Telegram shutdown error:", error);
+    }
+
+    // Without this, keep-alive HTTP sockets can keep the process alive for tens of seconds;
+    // node --watch then sits on "Waiting for graceful termination..." and the new run may
+    // bind the same port or load code in a bad state.
+    if (typeof server.closeAllConnections === "function") {
+      server.closeAllConnections();
+    }
+
+    server.close((error) => {
+      clearTimeout(forceExit);
+      if (error) {
+        console.error("Server close error:", error);
+      }
+      console.log("Process terminated");
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGTERM", () => {
+    if (isShuttingDown) {
+      process.exit(0);
+      return;
+    }
+    void shutdown("SIGTERM");
   });
 
-server.setTimeout(SERVER_TIMEOUT);
-server.keepAliveTimeout = 65000; // Helps with load balancers
-server.headersTimeout = 66000; // Just slightly longer
-
-/**
- * Graceful shutdown
- **/
-
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
-
-  server.close(() => {
-    console.log("Process terminated");
+  process.on("SIGINT", () => {
+    if (isShuttingDown) {
+      process.exit(0);
+      return;
+    }
+    void shutdown("SIGINT");
   });
+}
+
+void bootstrap().catch((error) => {
+  console.error("Bootstrap failed:", error);
+  process.exit(1);
 });

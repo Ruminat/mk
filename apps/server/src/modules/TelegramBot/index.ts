@@ -3,7 +3,11 @@ import TelegramBot from "node-telegram-bot-api";
 import { getEnvironmentVariables } from "../../common/environment";
 import { telegramOnMessage } from "./handlers/onMessage";
 
-export async function setupMooDuckTelegramBot(app: Express) {
+export type TMooDuckTelegramLifecycle = {
+  shutdownTelegram: () => Promise<void>;
+};
+
+export async function setupMooDuckTelegramBot(app: Express): Promise<TMooDuckTelegramLifecycle | undefined> {
   const {
     telegramBot: { token, webhookDomain, webhookPath },
   } = getEnvironmentVariables();
@@ -11,7 +15,7 @@ export async function setupMooDuckTelegramBot(app: Express) {
   if (!token) {
     console.log("⚠️ Telegram bot token is not set");
 
-    return;
+    return undefined;
   }
 
   if (webhookDomain && webhookPath) {
@@ -41,29 +45,41 @@ export async function setupMooDuckTelegramBot(app: Express) {
       console.error("❌ Webhook setup failed:", error);
     }
 
-    process.on("SIGTERM", async () => {
-      const id = setTimeout(() => {
-        console.error("Could not close connections in time, forcefully shutting down");
-        process.exit(1);
-      }, 5000);
+    return {
+      shutdownTelegram: async () => {
+        const id = setTimeout(() => {
+          console.error("Could not close Telegram webhook in time, forcefully shutting down");
+          process.exit(1);
+        }, 5000);
 
-      const removed = await bot.deleteWebHook();
+        try {
+          const removed = await bot.deleteWebHook();
 
-      if (removed) {
-        console.log("✅ Telegram webhook removed");
-      } else {
-        console.log("⚠️ Couldn't remove the telegram bot");
-      }
-
-      clearTimeout(id);
-    });
-  } else {
-    const pollingBot = new TelegramBot(token, { polling: true });
-
-    listen(pollingBot);
-
-    console.log(`🤖 Running telegram bot in polling mode`);
+          if (removed) {
+            console.log("✅ Telegram webhook removed");
+          } else {
+            console.log("⚠️ Couldn't remove the telegram bot webhook");
+          }
+        } finally {
+          clearTimeout(id);
+        }
+      },
+    };
   }
+
+  const pollingBot = new TelegramBot(token, { polling: true });
+
+  listen(pollingBot);
+
+  console.log(`🤖 Running telegram bot in polling mode`);
+
+  return {
+    shutdownTelegram: async () => {
+      if (pollingBot.isPolling()) {
+        await pollingBot.stopPolling({ cancel: true });
+      }
+    },
+  };
 }
 
 function listen(bot: TelegramBot) {
