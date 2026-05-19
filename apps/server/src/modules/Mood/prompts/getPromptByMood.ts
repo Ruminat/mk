@@ -1,7 +1,7 @@
 import { getRandomInt } from "@mooduck/core";
-import { pickRandomPromptMode, pickRandomPromptModeForGentleBand, PROMPT_MODE } from "./mode";
-import { getLastMoodCommentsForPrompt } from "../sagas/getLastMoodCommentsForPrompt";
 import { TSelectMoodEntry } from "../model";
+import { getLastMoodCommentsForPrompt } from "../sagas/getLastMoodCommentsForPrompt";
+import { pickRandomPromptMode } from "./mode";
 
 type TProps = {
   entries: TSelectMoodEntry[];
@@ -38,15 +38,16 @@ function getComment(props: TProps): string {
 }
 
 function getMode(props: TProps): string {
-  if (props.score >= 4) {
-    return pickRandomPromptMode();
-  }
+  return pickRandomPromptMode();
+  // if (props.score >= 4) {
+  //   return pickRandomPromptMode();
+  // }
 
-  if (props.score >= 2) {
-    return pickRandomPromptModeForGentleBand();
-  }
+  // if (props.score >= 2) {
+  //   return pickRandomPromptModeForGentleBand();
+  // }
 
-  return PROMPT_MODE.friendly;
+  // return PROMPT_MODE.friendly;
 }
 
 function getWordsLimit(props: TProps): number {
