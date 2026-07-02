@@ -11,8 +11,8 @@ import {
 } from "./Icons";
 
 /** Where the CTA buttons point. */
-export const TELEGRAM_URL = "https://t.me/MooDuckBot";
-export const GITHUB_URL = "https://github.com/";
+export const TELEGRAM_URL = "https://t.me/Moo_Duck_zae_bot";
+export const GITHUB_URL = "https://github.com/Ruminat/mooduck";
 
 /** Accent palette used by feature cards and the "how it works" steps. */
 export type AccentTone = "blue" | "gold" | "green" | "purple";
