@@ -9,7 +9,7 @@ The repo is a **pnpm** + **Turborepo** monorepo.
 | Path | Role |
 |------|------|
 | `apps/web` | **mooduck-web** — React 19 + Vite SPA (Gravity UI, Telegram auth widget) |
-| `apps/landing` | **mooduck-landing** — React 19 + Next.js (App Router) marketing site, Tailwind CSS v4 + CSS Modules (runs on port `3001`) |
+| `apps/landing` | **mooduck-landing** — React 19 + Next.js (App Router) marketing site, Tailwind CSS v4 + CSS Modules; built as a static export (`out/`) served by nginx |
 | `apps/server` | **mooduck-server** — Express API, Drizzle ORM, SQLite (Turso in production or a local file in dev) |
 | `packages/core` | Shared non-UI utilities (`Null`, `Number`, `Random`, …) |
 | `packages/react` | Shared React helpers (e.g. `useFn`) |
@@ -45,7 +45,7 @@ Copy or create `.env` under `apps/server` as you normally would for local work.
 |--------|----------------|
 | `pnpm dev` | Runs Turborepo `dev` (web + server and related packages, with `MODE=dev`) |
 | `pnpm dev.web` | Dev for the web app only |
-| `pnpm dev.landing` | Dev for the Next.js landing site only (`http://localhost:3001`) |
+| `pnpm dev.landing` | Dev for the Next.js landing site only (`http://localhost:3002`) |
 | `pnpm dev.server` | Dev for the API only |
 | `pnpm dev.local` | Server dev with **`USE_LOCAL_DB=true`** (local SQLite file) |
 | `pnpm build` | Production build (`MODE=prod`) |

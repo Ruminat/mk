@@ -25,10 +25,16 @@ echo "📥 Pulling latest changes..."
 git pull
 
 echo "📦 Installing dependencies..."
-pnpm install --frozen-lockfile
+# Serialize package extraction/lifecycle scripts to keep peak memory low on the
+# VPS. `sharp` is skipped via `pnpm.neverBuiltDependencies` (the landing site is
+# a static export with unoptimized images, so it is never needed).
+pnpm install --frozen-lockfile --child-concurrency=1
 
 echo "🏗️ Building project..."
-pnpm build
+# Landing builds as a static export into apps/landing/out (see next.config.ts):
+# no Node runtime, no sharp, and lint/type-check are skipped at build time
+# (CI already runs `pnpm codecheck`), which keeps the build within the VPS's RAM.
+MODE=prod pnpm build
 
 echo "🔄 Restarting with PM2..."
 pnpm run pm2.restart || echo "PM2 restart failed :("

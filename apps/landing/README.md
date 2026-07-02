@@ -2,20 +2,32 @@
 
 The public marketing site for MooDuck — a **Next.js (App Router)** app built with **React 19**, **TypeScript**, **Tailwind CSS v4**, and **CSS Modules**.
 
-It is a fully static, server-rendered page (no client-side JavaScript beyond Next's runtime): every section is a React Server Component.
+Every section is a React Server Component, so the app is built as a **static export**
+(`output: "export"`) — `pnpm build` writes plain HTML/CSS/JS to `out/`, which nginx
+serves directly. There is no Node runtime, no `next start`, and no `sharp` on the box.
 
 ## Scripts
 
 | Script | What it does |
 |--------|----------------|
-| `pnpm dev` | Dev server on [http://localhost:3001](http://localhost:3001) |
-| `pnpm build` | Production build (`next build`) |
-| `pnpm start` | Serve the production build on port `3001` |
+| `pnpm dev` | Dev server on [http://localhost:3002](http://localhost:3002) |
+| `pnpm build` | Static export → `out/` (`next build`) |
+| `pnpm preview` | Serve the built `out/` on port `3002` |
 | `pnpm lint` | ESLint (`next/core-web-vitals` + `next/typescript`), `--max-warnings=0` |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm codecheck` | `typecheck` + `lint` |
 
 From the repo root: `pnpm dev.landing`.
+
+## Deployment (VPS)
+
+The build is tuned to run on the low-memory VPS:
+
+- **Static export** — no Node server, no `sharp` (`images.unoptimized`), so runtime memory is zero.
+- **Build-time lint/type-check are skipped** (`next.config.ts`); correctness is enforced in CI via `pnpm codecheck`, which still lints and type-checks this app in full.
+- `deploy.sh` installs with `--config.child-concurrency=1` and skips `sharp`'s native build (`pnpm.neverBuiltDependencies`) to keep install within RAM.
+
+nginx serves `apps/landing/out` — see [`nginx/landing.config`](../../nginx/landing.config) for a ready-to-fill server block.
 
 ## Layout
 
