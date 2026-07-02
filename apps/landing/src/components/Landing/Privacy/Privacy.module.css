@@ -1,0 +1,93 @@
+.section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(24px, 4vw, 44px);
+  margin-top: clamp(44px, 6vw, 80px);
+  background: #fbf1da;
+  border: 1px solid #eedcb6;
+  border-radius: 26px;
+  padding: clamp(28px, 4vw, 48px);
+}
+
+.shield {
+  flex: none;
+  width: 130px;
+  display: flex;
+  justify-content: center;
+}
+
+.shieldImage {
+  width: 118px;
+  height: auto;
+  filter: drop-shadow(0 12px 20px rgba(28, 75, 135, 0.28));
+}
+
+.content {
+  flex: 1 1 460px;
+  min-width: 280px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(26px, 3.4vw, 36px);
+  color: var(--color-ink);
+  margin: 0 0 10px;
+  line-height: 1.1;
+}
+
+.intro {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--color-body);
+  margin: 0 0 26px;
+  max-width: 560px;
+}
+
+.points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 22px 26px;
+}
+
+.pointHeader {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 6px;
+}
+
+.pointIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pointIconWrap[data-tone="blue"] {
+  color: var(--color-accent);
+}
+
+.pointIconWrap[data-tone="gold"] {
+  color: #e7b23e;
+}
+
+.pointIcon {
+  width: 19px;
+  height: 19px;
+}
+
+.pointTitle {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink-soft);
+  margin: 0;
+}
+
+.pointBody {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  margin: 0;
+}

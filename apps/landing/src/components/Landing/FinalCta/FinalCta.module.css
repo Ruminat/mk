@@ -1,0 +1,109 @@
+.section {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(20px, 3vw, 36px);
+  margin-top: clamp(30px, 4vw, 44px);
+  background: var(--color-brand);
+  border-radius: 26px;
+  padding: clamp(26px, 4vw, 44px);
+  overflow: hidden;
+}
+
+.waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.mascot {
+  position: relative;
+  z-index: 1;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-brand-deep);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  flex: none;
+}
+
+.cover {
+  object-fit: cover;
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 360px;
+  min-width: 260px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(26px, 3.4vw, 36px);
+  color: #fff;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #cbdcf0;
+  margin: 0;
+}
+
+.actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--color-surface);
+  color: var(--color-brand);
+  font-size: 17px;
+  font-weight: 700;
+  padding: 15px 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.4);
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.button:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.buttonIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.signoff {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-script);
+  font-size: 26px;
+  color: var(--color-gold-bright);
+}
+
+.signoffIcon {
+  width: 18px;
+  height: 18px;
+}

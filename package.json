@@ -14,6 +14,7 @@
     "dev": "MODE=dev turbo dev",
     "dev.local": "pnpm --filter mooduck-server run dev.local",
     "dev.web": "MODE=dev turbo dev --filter=mooduck-web",
+    "dev.landing": "MODE=dev turbo dev --filter=mooduck-landing",
     "dev.server": "MODE=dev turbo dev --filter=mooduck-server",
     "start": "MODE=prod turbo start",
     "start.server": "MODE=prod pnpm --filter mooduck-server start",

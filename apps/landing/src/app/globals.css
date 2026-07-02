@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens for the MooDuck landing page.
+ * Exposed through Tailwind's `@theme` so utilities like `text-ink` or
+ * `bg-surface` are generated, while CSS modules can read the same
+ * variables via `var(--color-*)`.
+ */
+@theme {
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --font-script: var(--font-caveat), cursive;
+
+  --color-page: #f1e8d4;
+  --color-surface: #fcf7ec;
+  --color-surface-raised: #fffdf7;
+
+  --color-brand: #1d4e93;
+  --color-brand-bright: #1e5099;
+  --color-brand-deep: #123b76;
+  --color-accent: #2c6cb0;
+  --color-accent-dark: #245c9b;
+
+  --color-ink: #173f73;
+  --color-ink-soft: #1c4b87;
+  --color-body: #5e564a;
+  --color-muted: #6b6152;
+  --color-soft: #8a7f6b;
+
+  --color-gold: #c9a94a;
+  --color-gold-bright: #f4c64b;
+  --color-gold-line: #d6b24a;
+
+  --color-border-cream: #ecdfc4;
+  --color-border-blue: #c6d6ea;
+
+  /* Feature / step accent tints */
+  --color-tint-blue: #dbeaf7;
+  --color-tint-blue-ink: #2c6cb0;
+  --color-tint-gold: #fbeecb;
+  --color-tint-gold-ink: #cf9a28;
+  --color-tint-green: #dcebd6;
+  --color-tint-green-ink: #3e8e6e;
+  --color-tint-purple: #e7e0f1;
+  --color-tint-purple-ink: #7e6bb0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--color-page);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

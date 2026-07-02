@@ -1,0 +1,69 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-top: clamp(40px, 6vw, 72px);
+}
+
+.card {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-cream);
+  border-radius: 22px;
+  padding: 24px 22px;
+  box-shadow: 0 6px 18px -14px rgba(60, 50, 30, 0.4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+}
+
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.iconCircle[data-tone="blue"] {
+  background: var(--color-tint-blue);
+  color: var(--color-tint-blue-ink);
+}
+.iconCircle[data-tone="gold"] {
+  background: var(--color-tint-gold);
+  color: var(--color-tint-gold-ink);
+}
+.iconCircle[data-tone="green"] {
+  background: var(--color-tint-green);
+  color: var(--color-tint-green-ink);
+}
+.iconCircle[data-tone="purple"] {
+  background: var(--color-tint-purple);
+  color: var(--color-tint-purple-ink);
+}
+
+.icon {
+  width: 23px;
+  height: 23px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--color-ink-soft);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.body {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-muted);
+  margin: 0;
+}

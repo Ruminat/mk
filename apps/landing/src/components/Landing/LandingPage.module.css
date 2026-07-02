@@ -1,0 +1,24 @@
+.page {
+  min-height: 100%;
+  background: var(--color-page);
+  padding: clamp(14px, 3vw, 40px);
+}
+
+.card {
+  position: relative;
+  max-width: 1140px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border-blue);
+  border-radius: 30px;
+  padding: clamp(22px, 4vw, 60px);
+  overflow: hidden;
+}
+
+.waves {
+  position: absolute;
+  left: -30px;
+  top: 360px;
+  opacity: 0.5;
+  pointer-events: none;
+}
