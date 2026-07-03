@@ -9,7 +9,7 @@ export function Hero() {
       <div className={styles.intro}>
         <div className={styles.brand}>
           <span className={styles.brandIcon}>
-            <Image src="/brandIcon.webp" alt="MooDuck logo" fill sizes="52px" className={styles.cover} />
+            <Image src="/icon.png" alt="MooDuck logo" fill sizes="52px" className={styles.cover} />
           </span>
           <span className={styles.brandName}>MooDuck</span>
         </div>
