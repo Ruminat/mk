@@ -30,3 +30,6 @@ yarn-error.log*
 # playwright
 /test-results/
 /playwright-report/
+
+# throwaway screenshot helper
+shot.mjs
