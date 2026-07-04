@@ -1,18 +1,35 @@
 import type { ComponentType } from "react";
 import type { IconProps } from "./Icons";
 import {
+  BellIcon,
   FileControlIcon,
-  HeartSolidIcon,
+  HeartIcon,
   LockIcon,
   PencilSquareIcon,
   ShieldCheckIcon,
   SmileIcon,
   SproutIcon,
+  TrendingUpIcon,
+  UserHeartIcon,
 } from "./Icons";
 
 /** Where the CTA buttons point. */
 export const TELEGRAM_URL = "https://t.me/Moo_Duck_zae_bot";
 export const GITHUB_URL = "https://github.com/Ruminat/mooduck";
+
+/** Anchor navigation in the header. */
+export interface NavLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+export const NAV_LINKS: NavLink[] = [
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Privacy", href: "#privacy" },
+  { label: "GitHub", href: GITHUB_URL, external: true },
+];
 
 /** Accent palette used by feature cards and the "how it works" steps. */
 export type AccentTone = "blue" | "gold" | "green" | "purple";
@@ -26,28 +43,28 @@ export interface Feature {
 
 export const FEATURES: Feature[] = [
   {
-    Icon: SproutIcon,
-    tone: "blue",
+    Icon: HeartIcon,
+    tone: "gold",
     title: "Gentle daily check-ins",
-    body: "A friendly nudge to pause and notice how you feel, no pressure.",
+    body: "A simple 1–10 mood scale helps you pause and tune in, without pressure.",
   },
   {
-    Icon: PencilSquareIcon,
-    tone: "gold",
-    title: "Short notes & reflections",
-    body: "Write a few words when you need to. Keep it light, or let it out.",
+    Icon: TrendingUpIcon,
+    tone: "blue",
+    title: "Understand patterns",
+    body: "See your mood history and spot patterns that matter to you.",
   },
   {
     Icon: LockIcon,
     tone: "green",
     title: "Private by design",
-    body: "Your thoughts are yours alone. No judgment, no public feed.",
+    body: "Your data stays private in Telegram. We don't store personal info.",
   },
   {
-    Icon: HeartSolidIcon,
+    Icon: PencilSquareIcon,
     tone: "purple",
-    title: "Low pressure, simple routine",
-    body: "Small moments, big impact. Build a habit that feels natural and kind.",
+    title: "Notes & reflection",
+    body: "Add short notes to capture context, thoughts, and small wins.",
   },
 ];
 
@@ -65,21 +82,21 @@ export const STEPS: Step[] = [
     Icon: SmileIcon,
     tone: "blue",
     title: "Check in",
-    body: "Open MooDuck in Telegram and tell us how you feel.",
+    body: "Open MooDuck in Telegram and rate how you feel on a 1–10 scale.",
   },
   {
     index: 2,
     Icon: PencilSquareIcon,
     tone: "gold",
     title: "Add a note",
-    body: "Share a few words if you want to. It's your space, your pace.",
+    body: "Share a few words about what's on your mind (optional, always yours).",
   },
   {
     index: 3,
-    Icon: SproutIcon,
+    Icon: TrendingUpIcon,
     tone: "green",
-    title: "Reflect over time",
-    body: "Come back anytime to look back, be kind to yourself, and grow.",
+    title: "Reflect on patterns",
+    body: "Review your mood history to understand your ups, downs, and everything in between.",
   },
 ];
 
@@ -93,28 +110,42 @@ export interface PrivacyPoint {
 export const PRIVACY_POINTS: PrivacyPoint[] = [
   {
     Icon: LockIcon,
-    tone: "blue",
-    title: "Private by design",
-    body: "Your data stays between you and MooDuck.",
-  },
-  {
-    Icon: HeartSolidIcon,
-    tone: "gold",
-    title: "No judgment",
-    body: "Always gentle, supportive, and non-judgmental.",
-  },
-  {
-    Icon: FileControlIcon,
-    tone: "blue",
-    title: "You're in control",
-    body: "You decide what to share and when.",
+    tone: "green",
+    title: "Private in Telegram",
+    body: "Your data stays in your Telegram account.",
   },
   {
     Icon: ShieldCheckIcon,
-    tone: "blue",
-    title: "Secure & safe",
-    body: "Built with simple, careful privacy practices.",
+    tone: "green",
+    title: "No data selling",
+    body: "We don't sell or share your data. Ever.",
   },
+  {
+    Icon: FileControlIcon,
+    tone: "green",
+    title: "You're in control",
+    body: "Delete, export, or stop anytime.",
+  },
+  {
+    Icon: UserHeartIcon,
+    tone: "green",
+    title: "Safe & supportive",
+    body: "A judgment-free space to be real with yourself.",
+  },
+];
+
+/** Checklist next to the product preview. */
+export interface PreviewPoint {
+  Icon: ComponentType<IconProps>;
+  tone: AccentTone;
+  text: string;
+}
+
+export const PREVIEW_POINTS: PreviewPoint[] = [
+  { Icon: HeartIcon, tone: "gold", text: "Rate how you feel on a 1–10 scale" },
+  { Icon: PencilSquareIcon, tone: "purple", text: "Add a short note (optional)" },
+  { Icon: SproutIcon, tone: "green", text: "Review your mood history anytime" },
+  { Icon: BellIcon, tone: "blue", text: "Private, low pressure, always" },
 ];
 
 export type ChatSide = "bot" | "user";
@@ -126,21 +157,40 @@ export interface ChatMessage {
 }
 
 export const CHAT_MESSAGES: ChatMessage[] = [
-  { side: "bot", text: "Hi there 👋 How are you feeling right now?", time: "10:30" },
-  { side: "user", text: "I'd say a 6", time: "10:30" },
   {
     side: "bot",
-    text: "Thanks for sharing. Want to add a short note about your day? You can skip this.",
-    time: "10:30",
+    text: "Hey there 👋 How are you feeling right now? On a scale from 1 (really tough) to 10 (feeling great).",
+    time: "10:29",
+  },
+  { side: "user", text: "7", time: "10:29" },
+  {
+    side: "bot",
+    text: "Got it. Want to add a short note about what's on your mind?",
+    time: "10:29",
   },
   {
     side: "user",
-    text: "It was a bit overwhelming, but I took a walk and that helped.",
-    time: "10:31",
+    text: "Had a productive morning and took a good walk. Feeling grateful.",
+    time: "10:30",
   },
   {
     side: "bot",
-    text: "You showed up for yourself today. That matters. 💛 I'm here whenever you want to check in.",
-    time: "10:31",
+    text: "Thanks for checking in 💛 I've saved your entry.",
+    time: "10:30",
   },
+];
+
+/** Demo data for the mood-history preview card. */
+export const MOOD_HISTORY_VALUES = [6, 7, 8, 6, 7, 9, 7, 5, 3, 4, 6, 8, 7, 6];
+
+export interface MoodEntry {
+  date: string;
+  score: string;
+  note: string;
+}
+
+export const MOOD_ENTRIES: MoodEntry[] = [
+  { date: "May 20", score: "7/10", note: "Had a productive morning…" },
+  { date: "May 18", score: "5/10", note: "Felt a bit overwhelmed." },
+  { date: "May 16", score: "8/10", note: "Good day with friends." },
 ];

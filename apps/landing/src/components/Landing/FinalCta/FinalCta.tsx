@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { TELEGRAM_URL } from "../Definitions";
-import { HeartSolidIcon, TelegramIcon } from "../Icons";
+import { GITHUB_URL, TELEGRAM_URL } from "../Definitions";
+import { GithubIcon, LockIcon, TelegramIcon } from "../Icons";
 import styles from "./FinalCta.module.css";
 
 export function FinalCta() {
@@ -16,19 +16,34 @@ export function FinalCta() {
       </span>
 
       <div className={styles.copy}>
-        <h2 className={styles.title}>Ready to start listening to yourself?</h2>
-        <p className={styles.body}>Open MooDuck in Telegram and take a gentle step toward you.</p>
-      </div>
+        <h2 className={styles.title}>You deserve a space that&apos;s just for you.</h2>
+        <p className={styles.body}>Start your gentle mood journey with MooDuck.</p>
 
-      <div className={styles.actions}>
-        <a className={styles.button} href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer">
-          <TelegramIcon className={styles.buttonIcon} />
-          Open in Telegram
-        </a>
-        <span className={styles.signoff}>
-          You matter. Always.
-          <HeartSolidIcon className={styles.signoffIcon} />
-        </span>
+        <div className={styles.actions}>
+          <a
+            className={`${styles.button} ${styles.buttonPrimary}`}
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <TelegramIcon className={styles.buttonIcon} />
+            Open in Telegram
+          </a>
+          <a
+            className={`${styles.button} ${styles.buttonGhost}`}
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <GithubIcon className={styles.buttonIcon} />
+            View on GitHub
+          </a>
+        </div>
+
+        <p className={styles.signoff}>
+          <LockIcon className={styles.signoffIcon} />
+          Private. Low pressure. Always here for you.
+        </p>
       </div>
     </section>
   );

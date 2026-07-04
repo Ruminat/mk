@@ -8,6 +8,8 @@
     "build": "next build",
     "preview": "npx -y serve out -l 3002",
     "lint": "next lint --max-warnings=0",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
     "codecheck": "pnpm run typecheck && pnpm run lint"
   },
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",

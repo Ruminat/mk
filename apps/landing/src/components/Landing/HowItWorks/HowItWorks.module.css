@@ -1,19 +1,6 @@
 .section {
   margin-top: clamp(44px, 6vw, 80px);
-}
-
-.heading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: clamp(28px, 4vw, 44px);
-}
-
-.sparkle {
-  width: 20px;
-  height: 20px;
-  color: var(--color-gold-line);
+  scroll-margin-top: 20px;
 }
 
 .title {
@@ -21,31 +8,61 @@
   font-weight: 600;
   font-size: clamp(28px, 3.6vw, 40px);
   color: var(--color-ink);
-  margin: 0;
+  text-align: center;
+  margin: 0 0 clamp(24px, 4vw, 40px);
 }
 
-.steps {
+.card {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: clamp(20px, 3vw, 40px);
-  max-width: 960px;
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: clamp(24px, 3vw, 36px);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-cream);
+  border-radius: 24px;
+  padding: clamp(24px, 3.4vw, 40px);
+  box-shadow: 0 6px 18px -14px rgba(60, 50, 30, 0.4);
 }
 
 .step {
-  text-align: center;
-  padding: 0 8px;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
 }
 
-.iconCircle {
-  position: relative;
+.number {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 96px;
-  height: 96px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  margin: 0 auto 20px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  flex: none;
+  margin-top: 4px;
+}
+
+.number[data-tone="blue"] {
+  background: var(--color-tint-blue-ink);
+}
+.number[data-tone="gold"] {
+  background: var(--color-tint-gold-ink);
+}
+.number[data-tone="green"] {
+  background: var(--color-tint-green-ink);
+}
+
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  flex: none;
 }
 
 .iconCircle[data-tone="blue"] {
@@ -62,47 +79,25 @@
 }
 
 .icon {
-  width: 42px;
-  height: 42px;
+  width: 27px;
+  height: 27px;
 }
 
-.number {
-  position: absolute;
-  top: -4px;
-  right: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-}
-
-.number[data-tone="blue"] {
-  background: var(--color-tint-blue-ink);
-}
-.number[data-tone="gold"] {
-  background: var(--color-tint-gold-ink);
-}
-.number[data-tone="green"] {
-  background: var(--color-tint-green-ink);
+.text {
+  min-width: 0;
 }
 
 .stepTitle {
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 21px;
+  font-size: 20px;
   color: var(--color-ink-soft);
-  margin: 0 0 10px;
+  margin: 0 0 7px;
 }
 
 .stepBody {
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.55;
   color: var(--color-muted);
-  margin: 0 auto;
-  max-width: 240px;
+  margin: 0;
 }

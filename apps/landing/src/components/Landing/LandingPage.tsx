@@ -1,15 +1,18 @@
-import { Conversation } from "./Conversation/Conversation";
 import { FeatureCards } from "./FeatureCards/FeatureCards";
 import { FinalCta } from "./FinalCta/FinalCta";
 import { Footer } from "./Footer/Footer";
+import { Header } from "./Header/Header";
 import { Hero } from "./Hero/Hero";
 import { HowItWorks } from "./HowItWorks/HowItWorks";
 import { Privacy } from "./Privacy/Privacy";
+import { ProductPreview } from "./ProductPreview/ProductPreview";
 import styles from "./LandingPage.module.css";
 
 export function LandingPage() {
   return (
-    <div className={styles.page}>
+    <div id="top" className={styles.page}>
+      <Header />
+
       <main className={styles.card}>
         <svg
           className={styles.waves}
@@ -37,7 +40,7 @@ export function LandingPage() {
 
         <Hero />
         <FeatureCards />
-        <Conversation />
+        <ProductPreview />
         <HowItWorks />
         <Privacy />
         <FinalCta />

@@ -1,24 +1,20 @@
 import Image from "next/image";
 import { GITHUB_URL, TELEGRAM_URL } from "../Definitions";
-import { GithubIcon, HeartIcon, TelegramIcon } from "../Icons";
+import { GithubIcon, HeartSolidIcon, LockIcon, TelegramIcon } from "../Icons";
 import styles from "./Hero.module.css";
 
 export function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.intro}>
-        <div className={styles.brand}>
-          <span className={styles.brandIcon}>
-            <Image src="/icon.png" alt="MooDuck logo" fill sizes="52px" className={styles.cover} />
-          </span>
-          <span className={styles.brandName}>MooDuck</span>
-        </div>
-
-        <h1 className={styles.title}>A calm place to&nbsp;listen to yourself.</h1>
+        <h1 className={styles.title}>
+          A calm place to&nbsp;listen to yourself.
+          <HeartSolidIcon className={styles.titleHeart} />
+        </h1>
 
         <p className={styles.subtitle}>
-          MooDuck is your private Telegram mood journal. Check in, add short notes, and reflect
-          gently — all in a safe, judgment-free space.
+          MooDuck is a private Telegram mood journal that helps you check in, add short notes, and
+          notice patterns over time — gently and without pressure.
         </p>
 
         <div className={styles.actions}>
@@ -43,8 +39,8 @@ export function Hero() {
         </div>
 
         <p className={styles.note}>
-          <HeartIcon className={styles.noteIcon} />
-          Made with care for quieter days and brighter ones.
+          <LockIcon className={styles.noteIcon} />
+          Private by design. Your check-ins are yours.
         </p>
       </div>
 
@@ -60,7 +56,7 @@ export function Hero() {
             alt="MooDuck mascot — a scholarly duck holding a journal"
             fill
             priority
-            sizes="(max-width: 768px) 280px, 430px"
+            sizes="(max-width: 768px) 300px, 430px"
             className={styles.cover}
           />
         </div>

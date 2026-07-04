@@ -7,7 +7,8 @@
   background: #fbf1da;
   border: 1px solid #eedcb6;
   border-radius: 26px;
-  padding: clamp(28px, 4vw, 48px);
+  padding: clamp(24px, 4vw, 48px);
+  scroll-margin-top: 20px;
 }
 
 .shield {
@@ -15,6 +16,7 @@
   width: 130px;
   display: flex;
   justify-content: center;
+  margin: 0 auto;
 }
 
 .shieldImage {
@@ -24,8 +26,8 @@
 }
 
 .content {
-  flex: 1 1 460px;
-  min-width: 280px;
+  flex: 1 1 min(460px, 100%);
+  min-width: 0;
 }
 
 .title {
@@ -33,43 +35,37 @@
   font-weight: 600;
   font-size: clamp(26px, 3.4vw, 36px);
   color: var(--color-ink);
-  margin: 0 0 10px;
-  line-height: 1.1;
+  margin: 0 0 8px;
+  line-height: 1.12;
 }
 
 .intro {
   font-size: 17px;
   line-height: 1.55;
   color: var(--color-body);
-  margin: 0 0 26px;
-  max-width: 560px;
+  margin: 0 0 28px;
 }
 
 .points {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 22px 26px;
+  grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+  gap: 22px 24px;
 }
 
-.pointHeader {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 6px;
+.point {
+  min-width: 0;
 }
 
 .pointIconWrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.pointIconWrap[data-tone="blue"] {
-  color: var(--color-accent);
-}
-
-.pointIconWrap[data-tone="gold"] {
-  color: #e7b23e;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-tint-green);
+  color: var(--color-tint-green-ink);
+  margin-bottom: 10px;
 }
 
 .pointIcon {
@@ -80,9 +76,9 @@
 .pointTitle {
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 16.5px;
   color: var(--color-ink-soft);
-  margin: 0;
+  margin: 0 0 5px;
 }
 
 .pointBody {

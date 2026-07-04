@@ -4,7 +4,7 @@ import styles from "./Privacy.module.css";
 
 export function Privacy() {
   return (
-    <section className={styles.section}>
+    <section id="privacy" className={styles.section}>
       <div className={styles.shield}>
         <Image
           src="/shieldHeart.png"
@@ -16,20 +16,16 @@ export function Privacy() {
       </div>
 
       <div className={styles.content}>
-        <h2 className={styles.title}>Your space. Your story. Your privacy.</h2>
-        <p className={styles.intro}>
-          MooDuck is built to protect your privacy and support your well-being.
-        </p>
+        <h2 className={styles.title}>Your check-ins are private and yours.</h2>
+        <p className={styles.intro}>Built for honesty, not pressure.</p>
 
         <div className={styles.points}>
           {PRIVACY_POINTS.map((point) => (
             <div key={point.title} className={styles.point}>
-              <div className={styles.pointHeader}>
-                <span className={styles.pointIconWrap} data-tone={point.tone}>
-                  <point.Icon className={styles.pointIcon} />
-                </span>
-                <h4 className={styles.pointTitle}>{point.title}</h4>
-              </div>
+              <span className={styles.pointIconWrap}>
+                <point.Icon className={styles.pointIcon} />
+              </span>
+              <h4 className={styles.pointTitle}>{point.title}</h4>
               <p className={styles.pointBody}>{point.body}</p>
             </div>
           ))}
