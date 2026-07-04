@@ -1,4 +1,4 @@
-import { parseMoodEntryCreatedAtMs } from "../../../common/moodFormat";
+import { parseMoodEntryCreatedAtMs } from "../../../common/mood/moodFormat";
 import { TSelectMoodEntry } from "../model";
 import type { TMoodScore, TMoodStats, TMoodStatsEntry } from "../utils";
 import { getMoodInterest } from "../utils";

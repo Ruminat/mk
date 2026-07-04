@@ -1,5 +1,5 @@
 import rateLimit from "express-rate-limit";
-import { getEnvironmentVariables } from "../common/environment";
+import { getEnvironmentVariables } from "../common/config/environment";
 
 const {
   telegramBot: { webhookPath },

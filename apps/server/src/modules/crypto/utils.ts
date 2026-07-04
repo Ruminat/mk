@@ -6,8 +6,12 @@ import { createHmac } from "crypto";
  */
 export function getHashFromNumber(
   userId: number,
-  { secret = "not so secret", length = 16 }: { secret?: string; length?: number } = {}
+  { secret, length = 16 }: { secret: string; length?: number }
 ): string {
+  if (!secret) {
+    throw new Error("A non-empty secret is required to hash the user id");
+  }
+
   if (length < 0 || length > 255) {
     throw new Error("Length must be between 0 and 255");
   }

@@ -1,4 +1,4 @@
-import { getEnvironmentVariables } from "../../common/environment";
+import { getEnvironmentVariables } from "../../common/config/environment";
 
 export function isAdminTelegramLogin(username: string | undefined): boolean {
   if (!username) {

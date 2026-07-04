@@ -1,7 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
-import { formatPaddedMoodScoreDenominator } from "../../common/moodFormat";
-import { getEnvironmentVariables } from "../../common/environment";
-import { getHashFromNumber } from "../crypto/utils";
+import { formatPaddedMoodScoreDenominator } from "../../common/mood/moodFormat";
+import { getTelegramUserIdSecureHash } from "../../common/telegram/telegramUserId";
 import { TTelegramCommandProps, TTelegramReply } from "./definitions";
 
 export function code(content: string): string {
@@ -42,14 +41,4 @@ export function getTelegramUserIdHash(props: TTelegramCommandProps): string {
     throw new Error("No telegram user id in message");
   }
   return getTelegramUserIdSecureHash(telegramUserId);
-}
-
-export function getTelegramUserIdSecureHash(userId: number) {
-  const secret = getEnvironmentVariables().telegramBot.telegramUserIdSecureHash;
-
-  if (!secret) {
-    console.log("TELEGRAM_USER_ID_SECURE_HASH is not set!!!");
-  }
-
-  return getHashFromNumber(userId, { secret });
 }

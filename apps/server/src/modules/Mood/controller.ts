@@ -1,5 +1,5 @@
-import { controller } from "../../common/controller";
-import { getValidModel } from "../../common/validation";
+import { controller } from "../../common/http/controller";
+import { getValidModel } from "../../common/http/validation";
 import { AddMoodRequestSchema, DeleteMoodRequestSchema } from "./schema";
 import { moodService } from "./service";
 

@@ -2,14 +2,16 @@ import { sql } from "drizzle-orm";
 import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { Request } from "express";
 
+/**
+ * Telegram is the single source of truth for identity. `id` is the secure hash
+ * of the Telegram user id (see getTelegramUserIdSecureHash), which is also the
+ * key mood entries are stored under — so the bot and the web/API share one user.
+ */
 export const UserTable = sqliteTable("users", {
   id: text("id").primaryKey().notNull(),
   name: text("name"),
   avatarUrl: text("avatar_url"),
-  email: text("email"),
-  passwordHash: text("password_hash"),
   telegramId: text("telegram_id"),
-  authProvider: text("auth_provider").notNull().default("telegram"), // 'telegram' | 'email'
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 

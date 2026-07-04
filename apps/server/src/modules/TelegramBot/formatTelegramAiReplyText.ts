@@ -1,4 +1,4 @@
-import { truncateTelegramMessage } from "../../common/truncateTelegramMessage";
+import { truncateTelegramMessage } from "../../common/telegram/truncateTelegramMessage";
 import { isAdminTelegramLogin } from "./isAdminTelegramLogin";
 import { isTelegramBotDebugEnabled } from "./telegramBotDebugState";
 

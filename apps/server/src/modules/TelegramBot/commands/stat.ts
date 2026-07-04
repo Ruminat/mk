@@ -35,7 +35,7 @@ ${MoodPromptCommon.wordsLimit(getRandomInt(80, 180))}
 ${stats}`;
 
     try {
-      const reply = await aiService.getDeepSeekReply({ prompt });
+      const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
       if (reply) {
         return { text: `${stats}\n\n${reply}` };

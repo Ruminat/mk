@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { CommonTableField } from "../../common/commonFields";
+import { CommonTableField } from "../../common/database/commonFields";
 
 /**
  * Stores hashed telegram user ID (from getTelegramUserIdSecureHash).

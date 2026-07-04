@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 // import { withProbability } from "../common/random/utils";
 // import { sentence } from "../models/SentenceBuilder";
 // import { Interjection } from "../models/SentenceBuilder/interjections";
-import { aiService } from "../../AI/service";
+import { aiService, AiRateLimitError } from "../../AI/service";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
 import { telegramDebugCommand } from "../commands/debug";
 import { telegramErrorCommand } from "../commands/error";
@@ -64,7 +64,7 @@ const getReply: TTelegramGetReplyFn = async (props) => {
   const prompt = getPromptForTelegramChat({ recentMessages });
 
   try {
-    const aiReply = await aiService.getDeepSeekReply({ prompt });
+    const aiReply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
     if (aiReply) {
       appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: aiReply });
       return {
@@ -76,6 +76,9 @@ const getReply: TTelegramGetReplyFn = async (props) => {
       };
     }
   } catch (error) {
+    if (error instanceof AiRateLimitError) {
+      return { text: "Слишком много сообщений подряд. Подожди немного и напиши снова." };
+    }
     console.log("AI chat reply failed:", error);
   }
 

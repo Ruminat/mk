@@ -17,7 +17,11 @@ const envSchema = object({
   TELEGRAM_BOT_WEBHOOK_PATH: string()
     .regex(/(\/\w+)+/)
     .optional(),
-  TELEGRAM_USER_ID_SECURE_HASH: string().optional(),
+  // 1-256 chars, only A-Z a-z 0-9 _ - (Telegram's constraint). Required in webhook mode.
+  TELEGRAM_BOT_WEBHOOK_SECRET: string()
+    .regex(/^[A-Za-z0-9_-]{1,256}$/)
+    .optional(),
+  TELEGRAM_USER_ID_SECURE_HASH: string().min(1, "TELEGRAM_USER_ID_SECURE_HASH is required"),
   ADMIN_TELEGRAM_LOGINS: string().optional(),
   DEEPSEEK_API_TOKEN: string().optional(),
 }).refine(
@@ -72,6 +76,7 @@ export function getEnvironmentVariables() {
       token: values.TELEGRAM_BOT_TOKEN,
       webhookDomain: values.TELEGRAM_BOT_WEBHOOK_DOMAIN,
       webhookPath: values.TELEGRAM_BOT_WEBHOOK_PATH,
+      webhookSecret: values.TELEGRAM_BOT_WEBHOOK_SECRET,
       telegramUserIdSecureHash: values.TELEGRAM_USER_ID_SECURE_HASH,
       adminTelegramLogins: parseAdminTelegramLogins(values.ADMIN_TELEGRAM_LOGINS),
     },

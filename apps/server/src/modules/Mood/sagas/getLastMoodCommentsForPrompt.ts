@@ -1,5 +1,5 @@
-import { howLongAgo } from "../../../common/dateUtils";
-import { formatPaddedMoodScoreDenominator } from "../../../common/moodFormat";
+import { howLongAgo } from "../../../common/date/dateUtils";
+import { formatPaddedMoodScoreDenominator } from "../../../common/mood/moodFormat";
 import { TSelectMoodEntry } from "../model";
 import { getMoodStats } from "./getMoodStats";
 

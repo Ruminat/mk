@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { unauthenticatedController } from "../../common/controller";
+import { unauthenticatedController } from "../../common/http/controller";
 import appRoot from "app-root-path";
 
 export const adminController = {

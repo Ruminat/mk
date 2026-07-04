@@ -1,7 +1,28 @@
+import { timingSafeEqual } from "crypto";
 import { Express } from "express";
 import TelegramBot from "node-telegram-bot-api";
-import { getEnvironmentVariables } from "../../common/environment";
+import { getEnvironmentVariables } from "../../common/config/environment";
 import { telegramOnMessage } from "./handlers/onMessage";
+
+/**
+ * Constant-time comparison of the secret Telegram echoes back in the
+ * `X-Telegram-Bot-Api-Secret-Token` header. Rejects mismatched lengths first
+ * (timingSafeEqual throws otherwise) and avoids leaking the secret via timing.
+ */
+function isValidWebhookSecret(provided: string | undefined, expected: string): boolean {
+  if (!provided) {
+    return false;
+  }
+
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(expected);
+
+  if (providedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(providedBuffer, expectedBuffer);
+}
 
 export type TMooDuckTelegramLifecycle = {
   shutdownTelegram: () => Promise<void>;
@@ -9,7 +30,7 @@ export type TMooDuckTelegramLifecycle = {
 
 export async function setupMooDuckTelegramBot(app: Express): Promise<TMooDuckTelegramLifecycle | undefined> {
   const {
-    telegramBot: { token, webhookDomain, webhookPath },
+    telegramBot: { token, webhookDomain, webhookPath, webhookSecret },
   } = getEnvironmentVariables();
 
   if (!token) {
@@ -19,17 +40,28 @@ export async function setupMooDuckTelegramBot(app: Express): Promise<TMooDuckTel
   }
 
   if (webhookDomain && webhookPath) {
+    if (!webhookSecret) {
+      throw new Error("TELEGRAM_BOT_WEBHOOK_SECRET is required when running the bot in webhook mode");
+    }
+
     const bot = new TelegramBot(token);
     const url = `${webhookDomain}${webhookPath}`;
 
     app.post(webhookPath, (req, res) => {
+      // Only Telegram knows the secret; anyone else POSTing to this path is rejected
+      // before we touch the body, the DB, or the (paid) AI.
+      if (!isValidWebhookSecret(req.header("x-telegram-bot-api-secret-token"), webhookSecret)) {
+        res.sendStatus(401);
+        return;
+      }
+
       bot.processUpdate(req.body);
       res.sendStatus(200);
     });
 
     try {
       await bot.deleteWebHook();
-      await bot.setWebHook(url);
+      await bot.setWebHook(url, { secret_token: webhookSecret });
 
       const info = await bot.getWebHookInfo();
       const me = await bot.getMe();

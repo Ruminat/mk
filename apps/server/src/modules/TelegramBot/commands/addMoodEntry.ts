@@ -61,7 +61,7 @@ export const telegramMoodEntry = {
     try {
       const entries = await moodService.listMoodEntries({ userId: telegramUserIdHash });
       const prompt = getPromptByMood({ entries, score, comment });
-      const reply = await aiService.getDeepSeekReply({ prompt });
+      const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
       if (reply) {
         result = {

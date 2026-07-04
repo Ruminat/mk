@@ -1,5 +1,5 @@
 import winston from "winston";
-import { getEnvironmentVariables } from "../../common/environment";
+import { getEnvironmentVariables } from "../../common/config/environment";
 
 const { isDev } = getEnvironmentVariables();
 

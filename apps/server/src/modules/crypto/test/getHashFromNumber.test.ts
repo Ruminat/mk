@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getHashFromNumber } from "./utils";
+import { getHashFromNumber } from "../utils";
 
 const SECRET = "test-secret-key";
 
-describe("getTelegramUserIdSecureHash", () => {
+describe("utils.ts / getHashFromNumber", () => {
   it("returns a 16-character string", () => {
     const hash = getHashFromNumber(123456789, { secret: SECRET });
     expect(hash).toHaveLength(16);

@@ -1,5 +1,25 @@
 import OpenAI from "openai";
-import { getEnvironmentVariables } from "../../common/environment";
+import { getEnvironmentVariables } from "../../common/config/environment";
+import { PerUserRateLimiter } from "../../common/rateLimiter/rateLimiter";
+import { ServiceError } from "../../services/errors/ServiceError";
+
+/** Thrown when a user has run out of AI quota for now. */
+export class AiRateLimitError extends ServiceError {
+  constructor() {
+    super("AI rate limit exceeded");
+    this.name = "AiRateLimitError";
+  }
+}
+
+/**
+ * Per-user throttle for the paid DeepSeek calls. Anyone can message the bot, so
+ * without this a single sender could burn the AI budget (and hammer the server).
+ * Allows up to 15 AI requests per minute per user.
+ */
+const aiRateLimiter = new PerUserRateLimiter({
+  points: 15,
+  durationSec: 60,
+});
 
 const getDeepSeekClient = () => {
   const apiKey = getEnvironmentVariables().deepseek.apiKey;
@@ -12,9 +32,19 @@ const getDeepSeekClient = () => {
 };
 
 export const aiService = {
-  getDeepSeekReply: async ({ prompt }: { prompt: string }): Promise<string | null> => {
+  getDeepSeekReply: async ({
+    prompt,
+    userIdHash,
+  }: {
+    prompt: string;
+    userIdHash: string;
+  }): Promise<string | null> => {
     if (process.env.RETURN_PROMPT_INSTEAD_OF_ACTUALLY_REQUESTING === "true") {
       return prompt;
+    }
+
+    if (!(await aiRateLimiter.tryConsume(userIdHash))) {
+      throw new AiRateLimitError();
     }
 
     const client = getDeepSeekClient();

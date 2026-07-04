@@ -46,3 +46,4 @@ apps/server/data/*.db
 # Misc
 .DS_Store
 *.pem
+ignored/

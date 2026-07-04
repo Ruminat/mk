@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import { getEnvironmentVariables } from "./common/environment";
+import { getEnvironmentVariables } from "./common/config/environment";
 import { rateLimiter } from "./middlewares/rateLimiter";
 import { adminRouter } from "./modules/Admin/route";
 import { authRouter } from "./modules/Auth/route";

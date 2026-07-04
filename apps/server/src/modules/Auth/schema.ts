@@ -10,10 +10,4 @@ export const TelegramAuthSchema = z.object({
   hash: z.string(),
 });
 
-export const EmailAuthSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
 export type TTelegramAuth = z.infer<typeof TelegramAuthSchema>;
-export type TEmailAuth = z.infer<typeof EmailAuthSchema>;

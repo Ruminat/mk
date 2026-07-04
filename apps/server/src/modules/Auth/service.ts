@@ -1,8 +1,8 @@
-import bcrypt from "bcrypt";
 import { createHash, createHmac } from "crypto";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
-import { getEnvironmentVariables } from "../../common/environment";
+import { getEnvironmentVariables } from "../../common/config/environment";
+import { getTelegramUserIdSecureHash } from "../../common/telegram/telegramUserId";
 import { db } from "../../db/client";
 import { ServiceError } from "../../services/errors/ServiceError";
 import { TInsertUser, TSelectUser, UserTable } from "./model";
@@ -17,11 +17,6 @@ interface TelegramAuthData {
   photo_url?: string;
   auth_date: number;
   hash: string;
-}
-
-interface EmailAuthData {
-  email: string;
-  password: string;
 }
 
 /**
@@ -78,7 +73,9 @@ export const authService = {
     }
 
     const telegramId = authData.id.toString();
-    const userId = `telegram_${telegramId}`;
+    // The user id is the same secure hash the Telegram bot stores mood entries
+    // under, so web and bot resolve to one and the same user.
+    const userId = getTelegramUserIdSecureHash(authData.id);
 
     // Check if user exists
     const existingUser = await db.select().from(UserTable).where(eq(UserTable.telegramId, telegramId)).limit(1);
@@ -94,7 +91,6 @@ export const authService = {
         telegramId,
         name: `${authData.first_name}${authData.last_name ? ` ${authData.last_name}` : ""}`,
         avatarUrl: authData.photo_url,
-        authProvider: "telegram",
       };
 
       const result = await db.insert(UserTable).values(newUser).returning();
@@ -102,69 +98,6 @@ export const authService = {
         throw new ServiceError("Failed to create user");
       }
       user = result[0];
-    }
-
-    const token = generateToken(user.id);
-
-    return { user, token };
-  },
-
-  /**
-   * Signs up a new user with email and password
-   */
-  signUpWithEmail: async (authData: EmailAuthData) => {
-    const { email, password } = authData;
-
-    // Check if user already exists
-    const existingUser = await db.select().from(UserTable).where(eq(UserTable.email, email)).limit(1);
-
-    if (existingUser.length > 0) {
-      throw new ServiceError("User with this email already exists");
-    }
-
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 12);
-    const userId = `email_${email}`;
-
-    const newUser: TInsertUser = {
-      id: userId,
-      email,
-      passwordHash,
-      authProvider: "email",
-    };
-
-    const result = await db.insert(UserTable).values(newUser).returning();
-    if (result.length !== 1) {
-      throw new ServiceError("Failed to create user");
-    }
-
-    const user = result[0];
-    const token = generateToken(user.id);
-
-    return { user, token };
-  },
-
-  /**
-   * Signs in an existing user with email and password
-   */
-  signInWithEmail: async (authData: EmailAuthData) => {
-    const { email, password } = authData;
-
-    const users = await db.select().from(UserTable).where(eq(UserTable.email, email)).limit(1);
-
-    if (users.length === 0) {
-      throw new ServiceError("Invalid email or password");
-    }
-
-    const user = users[0];
-
-    if (!user.passwordHash) {
-      throw new ServiceError("Invalid email or password");
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) {
-      throw new ServiceError("Invalid email or password");
     }
 
     const token = generateToken(user.id);

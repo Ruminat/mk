@@ -1,5 +1,5 @@
-import { howLongAgo } from "../../common/dateUtils";
-import { parseMoodEntryCreatedAtMs } from "../../common/moodFormat";
+import { howLongAgo } from "../../common/date/dateUtils";
+import { parseMoodEntryCreatedAtMs } from "../../common/mood/moodFormat";
 import type { TSelectMoodEntry } from "../Mood/model";
 import { moodScoreCode } from "./utils";
 

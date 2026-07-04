@@ -4,9 +4,10 @@ Create `apps/server/.env`. Variables are validated at startup via `common/enviro
 
 ## Required
 
-| Variable     | Description                   |
-| ------------ | ----------------------------- |
-| `JWT_SECRET` | Secret for signing JWT tokens |
+| Variable                       | Description                                                                                     |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `JWT_SECRET`                   | Secret for signing JWT tokens                                                                   |
+| `TELEGRAM_USER_ID_SECURE_HASH` | Secret used to derive the user identity hash (single source of truth for bot and web/API users) |
 
 ## Database
 
@@ -35,6 +36,6 @@ Either use **local DB** (dev only) or **Turso** (remote).
 | `TELEGRAM_BOT_TOKEN`           | Telegram bot token for auth                   |
 | `TELEGRAM_BOT_WEBHOOK_DOMAIN`  | Webhook base URL (e.g. `https://example.com`) |
 | `TELEGRAM_BOT_WEBHOOK_PATH`    | Webhook path (e.g. `/api/telegram/webhook`)   |
-| `TELEGRAM_USER_ID_SECURE_HASH` | Hash for encrypting Telegram user IDs         |
+| `TELEGRAM_BOT_WEBHOOK_SECRET`  | Secret token validated on every webhook request (`A-Z a-z 0-9 _ -`, 1-256 chars). **Required in webhook mode.** |
 | `ADMIN_TELEGRAM_LOGINS`        | Comma-separated Telegram **@usernames** (without `@`) allowed to use `/debug` |
 | `DEEPSEEK_API_TOKEN`           | API key for DeepSeek AI                       |

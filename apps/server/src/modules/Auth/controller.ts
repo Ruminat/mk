@@ -1,7 +1,16 @@
-import { unauthenticatedController, controller } from "../../common/controller";
-import { getValidModel } from "../../common/validation";
-import { TelegramAuthSchema, EmailAuthSchema } from "./schema";
+import { unauthenticatedController, controller } from "../../common/http/controller";
+import { getValidModel } from "../../common/http/validation";
+import { TelegramAuthSchema } from "./schema";
 import { authService } from "./service";
+import { TSelectUser } from "./model";
+
+function toPublicUser(user: TSelectUser) {
+  return {
+    id: user.id,
+    name: user.name,
+    avatarUrl: user.avatarUrl,
+  };
+}
 
 export const authController = {
   signInWithTelegram: unauthenticatedController(async (req) => {
@@ -11,51 +20,7 @@ export const authController = {
     return {
       status: 200,
       result: {
-        user: {
-          id: user.id,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          email: user.email,
-          authProvider: user.authProvider,
-        },
-        token,
-      },
-    };
-  }),
-
-  signUpWithEmail: unauthenticatedController(async (req) => {
-    const authData = getValidModel(EmailAuthSchema, req.body);
-    const { user, token } = await authService.signUpWithEmail(authData);
-
-    return {
-      status: 201,
-      result: {
-        user: {
-          id: user.id,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          email: user.email,
-          authProvider: user.authProvider,
-        },
-        token,
-      },
-    };
-  }),
-
-  signInWithEmail: unauthenticatedController(async (req) => {
-    const authData = getValidModel(EmailAuthSchema, req.body);
-    const { user, token } = await authService.signInWithEmail(authData);
-
-    return {
-      status: 200,
-      result: {
-        user: {
-          id: user.id,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          email: user.email,
-          authProvider: user.authProvider,
-        },
+        user: toPublicUser(user),
         token,
       },
     };
@@ -63,18 +28,10 @@ export const authController = {
 
   getMe: controller(async (req) => {
     // User is attached to request by auth middleware
-    const user = req.user;
-
     return {
       status: 200,
       result: {
-        user: {
-          id: user.id,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          email: user.email,
-          authProvider: user.authProvider,
-        },
+        user: toPublicUser(req.user),
       },
     };
   }),

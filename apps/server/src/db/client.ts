@@ -3,7 +3,7 @@ import { existsSync, mkdirSync } from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
 import { drizzle } from "drizzle-orm/libsql";
-import { getEnvironmentVariables } from "../common/environment";
+import { getEnvironmentVariables } from "../common/config/environment";
 
 const { useLocalDb, localDbPath, turso } = getEnvironmentVariables();
 

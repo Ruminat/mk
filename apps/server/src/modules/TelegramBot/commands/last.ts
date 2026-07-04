@@ -42,7 +42,7 @@ ${MoodPromptCommon.banPhrases}
 ${MoodPromptCommon.wordsLimit(AI_WORDS_MAX)}`;
 
     try {
-      const reply = await aiService.getDeepSeekReply({ prompt });
+      const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
       if (reply) {
         return { text: `${block}\n\n${reply.trim()}` };
