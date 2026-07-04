@@ -1,4 +1,5 @@
 import { getRandomInt } from "@mooduck/core";
+import he from "he";
 import { TTelegramCommandMethods } from "../definitions";
 import { getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
@@ -38,7 +39,7 @@ ${stats}`;
       const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
       if (reply) {
-        return { text: `${stats}\n\n${reply}` };
+        return { text: `${stats}\n\n${he.escape(reply)}` };
       }
     } catch (error) {
       console.log("AI reply failed:", error);

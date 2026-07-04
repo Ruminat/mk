@@ -22,10 +22,14 @@ existing point over piling on duplicates.
   implementation** — if a web/API flow diverges from it, change the other flow to
   match the bot, never the reverse.
 - **Prefer a proven library over a hand-rolled implementation for tricky or
-  critical logic.** When correctness/reliability matters (rate limiting, crypto,
-  time/state math), reach for a well-established library instead of writing custom
-  logic. (Origin: a hand-rolled token bucket was rejected in favour of
-  `rate-limiter-flexible`.)
+  critical logic.** When correctness/reliability matters — rate limiting, crypto,
+  time/state math, **and anything parsing/escaping/serializing a format**
+  (HTML/URL/SQL/JSON escaping, entity encoding) — reach for a well-established
+  library instead of writing custom `replace` chains or regexes. Do this even
+  when the hand-rolled version "looks obviously correct": formats have edge cases.
+  A thin named wrapper around the library is fine (keeps call sites and intent
+  clear). (Origins: a hand-rolled token bucket → `rate-limiter-flexible`; a
+  hand-rolled HTML escaper → `he`.)
 - **Never turn a folder into a trashbag.** Organize by meaning; don't pile
   unrelated files into `common/` (or any single folder). See folder structure
   below.

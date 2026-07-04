@@ -1,3 +1,4 @@
+import he from "he";
 import { howLongAgo } from "../../common/date/dateUtils";
 import { parseMoodEntryCreatedAtMs } from "../../common/mood/moodFormat";
 import type { TSelectMoodEntry } from "../Mood/model";
@@ -10,7 +11,7 @@ export function formatTelegramMoodEntryStatBullet(
   const scorePart = moodScoreCode(entry.value);
 
   if (entry.comment) {
-    return `— ${scorePart}: ${entry.comment} (${when})`;
+    return `— ${scorePart}: ${he.escape(entry.comment)} (${when})`;
   }
 
   return `— ${scorePart}: (${when})`;

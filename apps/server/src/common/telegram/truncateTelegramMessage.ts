@@ -17,5 +17,16 @@ export function truncateTelegramMessage(text: string, options?: TOptions): strin
   }
 
   const budget = Math.max(0, maxChars - suffix.length);
-  return `${text.slice(0, budget)}${suffix}`;
+  return `${stripDanglingHtmlEntity(text.slice(0, budget))}${suffix}`;
+}
+
+/**
+ * A slice may land in the middle of an escaped entity like `&lt;` or `&#x27;`,
+ * leaving a bare `&` tail that would break Telegram's HTML parser — the very
+ * failure the escaping is meant to prevent. Drop any incomplete trailing entity
+ * (a `&` followed only by entity chars, with no closing `;`). Complete entities
+ * end in `;` and are left untouched.
+ */
+function stripDanglingHtmlEntity(text: string): string {
+  return text.replace(/&[a-z0-9#]*$/i, "");
 }

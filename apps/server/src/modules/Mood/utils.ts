@@ -1,3 +1,5 @@
+import he from "he";
+
 export type TMoodScore = number;
 
 export type TMoodStatsEntry = {
@@ -35,7 +37,7 @@ export function getMoodStatsLists(
     .join("\n");
 
   const topEntriesList = stats.topEntries
-    .map((entry) => `— ${moodMarkup(entry.score)}: ${entry.comment}`)
+    .map((entry) => `— ${moodMarkup(entry.score)}: ${he.escape(entry.comment)}`)
     .join("\n");
 
   return { statsList, scoresList, topEntriesList };

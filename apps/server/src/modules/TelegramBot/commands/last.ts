@@ -1,3 +1,4 @@
+import he from "he";
 import { TTelegramCommandMethods } from "../definitions";
 import { formatTelegramMoodEntryStatBullet } from "../moodReplyFormat";
 import { getTelegramUserIdHash } from "../utils";
@@ -45,7 +46,7 @@ ${MoodPromptCommon.wordsLimit(AI_WORDS_MAX)}`;
       const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
       if (reply) {
-        return { text: `${block}\n\n${reply.trim()}` };
+        return { text: `${block}\n\n${he.escape(reply.trim())}` };
       }
     } catch (error) {
       console.log("AI reply failed:", error);

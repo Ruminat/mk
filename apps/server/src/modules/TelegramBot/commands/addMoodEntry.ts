@@ -6,6 +6,7 @@ import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
 import { getPromptByMood } from "../../Mood/prompts/getPromptByMood";
 import { notEmpty, randomFrom, stringToNumberOrUndefined } from "@mooduck/core";
+import he from "he";
 
 export const telegramMoodEntry = {
   test: ({ messageParsed }) => {
@@ -51,7 +52,7 @@ export const telegramMoodEntry = {
 
     appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: message });
 
-    const boring = `(${score}${comment ? ` + "${comment}"` : ""})`;
+    const boring = `(${score}${comment ? ` + "${he.escape(comment)}"` : ""})`;
     const defaultResults: TTelegramReply[] = [
       { text: `${boring}` },
       { text: `Понял, принял, обработал ${boring}` },
