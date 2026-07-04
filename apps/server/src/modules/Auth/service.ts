@@ -2,6 +2,7 @@ import { createHash, createHmac } from "crypto";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { getEnvironmentVariables } from "../../common/config/environment";
+import { isAdminLogin } from "../../common/telegram/isAdminLogin";
 import { getTelegramUserIdSecureHash } from "../../common/telegram/telegramUserId";
 import { db } from "../../db/client";
 import { ServiceError } from "../../services/errors/ServiceError";
@@ -43,20 +44,24 @@ function verifyTelegramAuth(data: TelegramAuthData): boolean {
   return isHashValid && isRecent;
 }
 
+type TTokenClaims = { userId: string; isAdmin: boolean };
+
 /**
- * Generates a JWT token for a user
+ * Generates a JWT token for a user. `isAdmin` is derived once at sign-in from the
+ * telegram username (available only in transit) and carried as a signed claim, so
+ * the username itself is never persisted.
  */
-function generateToken(userId: string): string {
-  return jwt.sign({ userId }, auth.jwtSecret, { expiresIn: "7d" });
+function generateToken(claims: TTokenClaims): string {
+  return jwt.sign(claims, auth.jwtSecret, { expiresIn: "7d" });
 }
 
 /**
- * Verifies a JWT token and returns the user ID
+ * Verifies a JWT token and returns its claims (user id + admin flag).
  */
-function verifyToken(token: string): string {
+function verifyToken(token: string): TTokenClaims {
   try {
-    const decoded = jwt.verify(token, auth.jwtSecret) as { userId: string };
-    return decoded.userId;
+    const decoded = jwt.verify(token, auth.jwtSecret) as { userId: string; isAdmin?: unknown };
+    return { userId: decoded.userId, isAdmin: decoded.isAdmin === true };
   } catch (error) {
     throw new ServiceError("Invalid or expired token");
   }
@@ -100,7 +105,10 @@ export const authService = {
       user = result[0];
     }
 
-    const token = generateToken(user.id);
+    // Admin status is decided here, from the in-transit telegram username, and
+    // baked into the signed token — the username is never persisted.
+    const isAdmin = isAdminLogin(authData.username);
+    const token = generateToken({ userId: user.id, isAdmin });
 
     return { user, token };
   },
@@ -115,16 +123,17 @@ export const authService = {
   },
 
   /**
-   * Verifies a JWT token and returns the user
+   * Verifies a JWT token and returns the user together with the admin flag
+   * carried in the token claims.
    */
-  verifyTokenAndGetUser: async (token: string): Promise<TSelectUser> => {
-    const userId = verifyToken(token);
+  verifyTokenAndGetUser: async (token: string): Promise<{ user: TSelectUser; isAdmin: boolean }> => {
+    const { userId, isAdmin } = verifyToken(token);
     const user = await authService.getUserById(userId);
 
     if (!user) {
       throw new ServiceError("User not found");
     }
 
-    return user;
+    return { user, isAdmin };
   },
 };

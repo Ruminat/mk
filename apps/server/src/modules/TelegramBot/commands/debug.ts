@@ -1,5 +1,5 @@
 import { TTelegramCommandMethods } from "../definitions";
-import { isAdminTelegramLogin } from "../isAdminTelegramLogin";
+import { isAdminLogin } from "../../../common/telegram/isAdminLogin";
 import { toggleTelegramBotDebug } from "../telegramBotDebugState";
 
 export const telegramDebugCommand = {
@@ -8,7 +8,7 @@ export const telegramDebugCommand = {
   },
 
   getReply: (props) => {
-    if (!isAdminTelegramLogin(props.message.from?.username)) {
+    if (!isAdminLogin(props.message.from?.username)) {
       return { text: "Эта команда только для администраторов." };
     }
 

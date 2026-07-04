@@ -1,10 +1,10 @@
 import { readFile } from "fs/promises";
-import { unauthenticatedController } from "../../common/http/controller";
+import { controller } from "../../common/http/controller";
 import appRoot from "app-root-path";
 
 export const adminController = {
-  // TODO: switch to controller
-  getDeployInfo: unauthenticatedController(async (req) => {
+  // Admin-only: guarded by `authenticate` + `requireAdmin` in the route.
+  getDeployInfo: controller(async (req) => {
     const deployInfo = await readFile(`${appRoot.path}/.deploy.info`, "utf8");
 
     return {

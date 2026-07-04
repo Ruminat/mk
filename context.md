@@ -21,6 +21,17 @@ existing point over piling on duplicates.
   (email/password was removed). The **Telegram bot flow is the reference
   implementation** — if a web/API flow diverges from it, change the other flow to
   match the bot, never the reverse.
+- **Never persist raw telegram identity — no `telegramId`, no `username` — in the
+  DB.** Identity keys are the HMAC hash (`getTelegramUserIdSecureHash`). A
+  username/id exists only *in transit* (bot update, Login Widget payload, JWT
+  session). Derived facts (e.g. admin status) are computed once from that
+  in-transit value and carried in the **signed JWT**, never written to a column.
+  See `plans.md` (§2 identity hashing, §3 encryption) for the full model.
+- **Admin authorization uses one source: `ADMIN_TELEGRAM_LOGINS`** (telegram
+  usernames), shared by the bot and the API — don't invent a second admin list.
+  On sign-in the API derives `isAdmin` from the in-transit username via
+  `isAdminLogin` and bakes it into the JWT; admin-only routes go through
+  `authenticate` + `requireAdmin` (which reads the token's `isAdmin` flag).
 - **Prefer a proven library over a hand-rolled implementation for tricky or
   critical logic.** When correctness/reliability matters — rate limiting, crypto,
   time/state math, **and anything parsing/escaping/serializing a format**

@@ -20,8 +20,10 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
   authService
     .verifyTokenAndGetUser(token)
-    .then((user) => {
-      (req as AuthenticatedRequest).user = user;
+    .then(({ user, isAdmin }) => {
+      const authedReq = req as AuthenticatedRequest;
+      authedReq.user = user;
+      authedReq.isAdmin = isAdmin;
       next();
     })
     .catch((error) => {
@@ -32,4 +34,18 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
         res.status(500).json({ error: "Internal server error" });
       }
     });
+}
+
+/**
+ * Express middleware to restrict a route to admins. Must run AFTER `authenticate`
+ * (it relies on `req.isAdmin`). The admin flag is derived from ADMIN_TELEGRAM_LOGINS
+ * at sign-in and carried in the JWT — the username itself is never stored.
+ */
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!(req as AuthenticatedRequest).isAdmin) {
+    res.status(403).json({ error: "Admin access required" });
+    return;
+  }
+
+  next();
 }

@@ -20,4 +20,7 @@ export type TSelectUser = typeof UserTable.$inferSelect;
 
 export type AuthenticatedRequest = Request & {
   user: TSelectUser;
+  // Derived at sign-in from the (in-transit) telegram username and carried in the
+  // JWT — the username itself is never stored. See requireAdmin / authService.
+  isAdmin: boolean;
 };
