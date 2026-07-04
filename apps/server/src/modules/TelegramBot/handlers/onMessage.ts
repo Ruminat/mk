@@ -59,14 +59,14 @@ const getReply: TTelegramGetReplyFn = async (props) => {
   }
 
   const telegramUserIdHash = getTelegramUserIdHash(props);
-  appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: userText });
-  const recentMessages = getRecentTelegramChatMessages(telegramUserIdHash);
+  await appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: userText });
+  const recentMessages = await getRecentTelegramChatMessages(telegramUserIdHash);
   const prompt = getPromptForTelegramChat({ recentMessages });
 
   try {
     const aiReply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
     if (aiReply) {
-      appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: aiReply });
+      await appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: aiReply });
       return {
         text: formatTelegramAiReplyText({
           prompt,

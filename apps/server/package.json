@@ -60,6 +60,7 @@
     "he": "^1.2.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "lru-cache": "^11.5.1",
     "morgan": "^1.10.1",
     "node-telegram-bot-api": "^0.67.0",
     "openai": "^4.77.0",

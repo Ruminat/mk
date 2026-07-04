@@ -30,6 +30,13 @@ existing point over piling on duplicates.
   A thin named wrapper around the library is fine (keeps call sites and intent
   clear). (Origins: a hand-rolled token bucket → `rate-limiter-flexible`; a
   hand-rolled HTML escaper → `he`.)
+- **State that must survive restarts has to be persisted.** In-memory structures
+  (caches, Maps) are wiped on every restart/release — anything a user would miss
+  after a redeploy (e.g. chat context) must be backed by durable storage (the DB).
+  Preferred shape: a **write-through cache** — the DB is the source of truth, an
+  in-memory cache sits in front for speed/bounded memory, and a cache miss
+  rehydrates from the DB. (Origin: the bot's chat history was in-memory only and
+  lost on every release.)
 - **Never turn a folder into a trashbag.** Organize by meaning; don't pile
   unrelated files into `common/` (or any single folder). See folder structure
   below.

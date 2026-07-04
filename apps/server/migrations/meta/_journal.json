@@ -15,6 +15,13 @@
       "when": 1783167895391,
       "tag": "0001_neat_the_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783198559507,
+      "tag": "0002_free_invaders",
+      "breakpoints": true
     }
   ]
 }

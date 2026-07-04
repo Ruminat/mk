@@ -50,7 +50,7 @@ export const telegramMoodEntry = {
       telegramUserIdHash,
     });
 
-    appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: message });
+    await appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: message });
 
     const boring = `(${score}${comment ? ` + "${he.escape(comment)}"` : ""})`;
     const defaultResults: TTelegramReply[] = [
@@ -72,7 +72,7 @@ export const telegramMoodEntry = {
             username: props.message.from?.username,
           }),
         };
-        appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: reply });
+        await appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: reply });
       }
     } catch (error) {
       console.log("AI reply failed:", error);
