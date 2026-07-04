@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { logger } from "../../services/logger";
 import { AuthenticatedRequest } from "../../modules/Auth/model";
+import { toErrorResponse } from "./toErrorResponse";
 
 type ControllerHandler<TResult, TRequest extends Request = Request> = (
   req: TRequest,
@@ -36,9 +37,14 @@ function createController<TResult, TRequest extends Request = Request>(
 
       res.status(status).json(result);
     } catch (error) {
-      logger.error("Controller error", error);
+      const { status, body } = toErrorResponse(error);
 
-      res.status(500).json({ error: "Internal server error" });
+      // Only genuine server faults are logged as errors; a 400 is the client's.
+      if (status >= 500) {
+        logger.error("Controller error", error);
+      }
+
+      res.status(status).json(body);
     }
   };
 }
