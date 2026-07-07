@@ -36,6 +36,13 @@ echo "🏗️ Building project..."
 # (CI already runs `pnpm codecheck`), which keeps the build within the VPS's RAM.
 MODE=prod pnpm build
 
+echo "🗄️ Applying database migrations..."
+# Runs drizzle-kit migrate against the prod (Turso) DB using apps/server/.env.
+# It's a no-op when there's nothing pending, so it's safe to run every deploy.
+# `set -e` means a failed migration aborts the deploy BEFORE the PM2 restart,
+# so we never bring the app up against a mismatched schema.
+MODE=prod pnpm db.migrate
+
 echo "🔄 Restarting with PM2..."
 pnpm run pm2.restart || echo "PM2 restart failed :("
 
