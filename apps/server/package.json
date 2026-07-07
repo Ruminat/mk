@@ -9,7 +9,6 @@
     "db.studio": "drizzle-kit studio",
     "db.push.local": "MODE=dev USE_LOCAL_DB=true drizzle-kit push",
     "db.migrate.local": "MODE=dev USE_LOCAL_DB=true drizzle-kit migrate",
-    "db.migrate.legacy-identity": "MODE=prod tsx src/scripts/migrateLegacyIdentity.ts",
     "db.studio.local": "MODE=dev USE_LOCAL_DB=true drizzle-kit studio",
     "build": "MODE=prod node ./esbuild.config.js",
     "dev": "MODE=dev TSX_DISABLE_CACHE=1 node --watch --watch-path=src --watch-path=../../packages --import tsx src/index.ts",

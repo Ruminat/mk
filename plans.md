@@ -109,7 +109,7 @@ Ensure **every persistent user key** is derived from the numeric **Telegram user
 - [x] Grep for `username` / `telegramLogin` shows no usage as a DB key or hash input (only admin/display/in-transit).
 - [x] No plain numeric `telegramId` persisted anywhere in the database (`users.telegram_id` column dropped — migration `0003_tough_dakota_north.sql`).
 - [x] Web sign-in and bot resolve to the same hash for the same person (sign-in now looks up/creates by `getTelegramUserIdSecureHash(authData.id)`).
-- [x] Existing prod data migrated or migration script documented and runnable — `pnpm db.migrate.legacy-identity` (dry-run by default, `--apply` to write); idempotent, verified end-to-end on a local DB including the merge-collision case.
+- [x] Existing prod data — N/A: there are no web users/entries, and bot data was always keyed by the secure hash (never `telegram_<id>`), so there is no legacy identity data to re-key. (A one-off re-key script was written and verified, then removed as dead code once we confirmed no legacy rows exist.)
 
 ---
 
