@@ -4,7 +4,7 @@ import { messages } from "../../../common/i18n/messages";
 import { TelegramInputError, TTelegramCommandMethods, TTelegramReply } from "../definitions";
 import { formatTelegramAiReplyText } from "../formatTelegramAiReplyText";
 import { appendTelegramChatMessage } from "../telegramUserChatHistory";
-import { getTelegramUserIdHash } from "../utils";
+import { getTelegramUserId, getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
 import { getPromptByMood } from "../../Mood/prompts/getPromptByMood";
@@ -44,14 +44,20 @@ export const telegramMoodEntry = {
       throw new TelegramInputError(messages(props.locale).bot.moodOutOfRange);
     }
 
+    const telegramId = getTelegramUserId(props);
     const telegramUserIdHash = getTelegramUserIdHash(props);
     await moodService.addMoodEntry({
       value: score,
       comment,
       telegramUserIdHash,
+      telegramId,
     });
 
-    await appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: message });
+    await appendTelegramChatMessage({
+      telegramUserIdHash,
+      telegramId,
+      entry: { role: "user", text: message },
+    });
 
     const bot = messages(props.locale).bot;
     const boring = `(${score}${comment ? ` + "${he.escape(comment)}"` : ""})`;
@@ -62,7 +68,7 @@ export const telegramMoodEntry = {
     let result: TTelegramReply = randomFrom(defaultResults);
 
     try {
-      const entries = await moodService.listMoodEntries({ userId: telegramUserIdHash });
+      const entries = await moodService.listMoodEntries({ userId: telegramUserIdHash, telegramId });
       const prompt = getPromptByMood({ entries, score, comment, locale: props.locale });
       const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
@@ -75,7 +81,11 @@ export const telegramMoodEntry = {
             locale: props.locale,
           }),
         };
-        await appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: reply });
+        await appendTelegramChatMessage({
+          telegramUserIdHash,
+          telegramId,
+          entry: { role: "assistant", text: reply },
+        });
       }
     } catch (error) {
       console.log("AI reply failed:", error);

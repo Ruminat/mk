@@ -10,7 +10,7 @@ import { Request } from "express";
  *
  * We deliberately store NO raw telegram identity here: not the numeric id, not
  * the username. The numeric id exists only in transit (login payload / bot
- * update) and is never persisted (see plans.md §2/§3). The username is
+ * update) and is never persisted. The username is
  * display/admin-only and must never be used as a storage key or hash input.
  */
 export const UserTable = sqliteTable("users", {
@@ -28,4 +28,8 @@ export type AuthenticatedRequest = Request & {
   // Derived at sign-in from the (in-transit) telegram username and carried in the
   // JWT — the username itself is never stored. See requireAdmin / authService.
   isAdmin: boolean;
+  // The numeric telegram id, carried in the JWT (never stored in the DB). Needed
+  // to derive the key that decrypts the user's mood comments / chat messages.
+  // Undefined for tokens issued before this claim existed.
+  telegramId?: number;
 };

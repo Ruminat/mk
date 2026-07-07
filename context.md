@@ -26,7 +26,6 @@ existing point over piling on duplicates.
   username/id exists only *in transit* (bot update, Login Widget payload, JWT
   session). Derived facts (e.g. admin status) are computed once from that
   in-transit value and carried in the **signed JWT**, never written to a column.
-  See `plans.md` (§2 identity hashing, §3 encryption) for the full model.
 - **Admin authorization uses one source: `ADMIN_TELEGRAM_LOGINS`** (telegram
   usernames), shared by the bot and the API — don't invent a second admin list.
   On sign-in the API derives `isAdmin` from the in-transit username via
@@ -54,8 +53,14 @@ existing point over piling on duplicates.
   user-facing strings live in `common/i18n` catalogs — `messages(locale)` for UI
   text, `prompts(locale)` for AI prompts (full parallel en+ru, model told to
   answer in the resolved language). Never hardcode a user-facing string in a
-  handler/command; add it to the catalog. Web/API defaults to English. See
-  `plans.md` §1.
+  handler/command; add it to the catalog. Web/API defaults to English.
+- **Keep function signatures small — prefer a single object argument.** More than
+  two positional parameters is bad, and it's worse when several share a type
+  (string/number/boolean): call sites like `f(hash, entry, id)` are easy to get
+  wrong and impossible to read without opening the definition. Take a single named
+  object instead — `f({ telegramUserIdHash, telegramId, entry })` — so every
+  argument is self-labelling and order stops mattering. (Origin: a 3-arg
+  `appendTelegramChatMessage(hash, entry, telegramId)` → one object argument.)
 - **Never turn a folder into a trashbag.** Organize by meaning; don't pile
   unrelated files into `common/` (or any single folder). See folder structure
   below.

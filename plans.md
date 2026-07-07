@@ -174,12 +174,17 @@ Non-sensitive fields (`value`, `role`, timestamps, hashes) stay plaintext.
 
 ### Acceptance criteria
 
-- [ ] Mood comments and chat messages are stored as ciphertext in the DB.
-- [ ] Plaintext is only ever held in memory during an active request that has `telegramId`.
-- [ ] No column in any table stores raw `telegramId`.
-- [ ] Encryption secret is separate from hash secret; both required at startup.
-- [ ] Unit tests cover encrypt/decrypt and tamper detection (GCM auth tag).
-- [ ] Documented migration path for existing plaintext rows.
+- [x] Mood comments and chat messages are stored as ciphertext in the DB. Single choke point per table: `moodService` (comment) and the `telegramUserChatHistory` wrapper (message text) — no code path writes those columns in plaintext.
+- [x] Plaintext is only ever held in memory during an active request that has `telegramId`. The key derives from the numeric id, obtained from `message.from.id` (bot) or the JWT `telegramId` claim (web/API); nothing is decryptable from the DB alone.
+- [x] No column in any table stores raw `telegramId` (`users.telegram_id` was dropped in §2, migration `0003`; the numeric id lives only in transit / in the signed JWT).
+- [x] Encryption secret is separate from hash secret; both required at startup — `TELEGRAM_USER_DATA_ENCRYPTION_SECRET` (fail-fast in `environment.ts`), documented in `docs/env.md`.
+- [x] Unit tests cover encrypt/decrypt round-trip, wrong-id/wrong-secret failure, and tamper detection (GCM auth tag) — `modules/crypto/test/userDataCrypto.test.ts`.
+- [x] Documented migration path for existing plaintext rows: values without the `v1:` version prefix are treated as legacy plaintext and returned unchanged on read, so old rows keep working; every new write is encrypted. No bulk re-encryption is possible retroactively (the numeric id needed to key it isn't stored) — acceptable here since prod has no web users and the encryption rollout starts from the deploy.
+
+### Implementation notes
+
+- **Crypto**: AES-256-GCM with a per-user key derived via HKDF-SHA256 from the numeric `telegramId` + `TELEGRAM_USER_DATA_ENCRYPTION_SECRET`. Blob layout `v1:base64(iv[12] | tag[16] | ciphertext)`. Pure core in `modules/crypto/userDataCryptoCore.ts` (env-independent, unit-tested); env-bound wrappers in `modules/crypto/userDataCrypto.ts`.
+- **Web/API decryption** (the §3 "Constraints" decision): the numeric `telegramId` is carried as a signed JWT claim (never stored in the DB or logged), so authenticated web requests can decrypt. Tokens issued before this claim get a `Telegram re-authentication required` error on comment reads/writes.
 
 ---
 

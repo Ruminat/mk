@@ -25,7 +25,7 @@ function isRussianLanguageCode(languageCode: string | undefined | null): boolean
 /**
  * Resolve the locale for a turn. Russian wins when EITHER the user's telegram
  * app language is Russian OR the message itself is written in Russian; otherwise
- * English. Mirrors the rules in plans.md §1.
+ * English.
  */
 export function resolveLocale(input: {
   languageCode?: string | undefined | null;

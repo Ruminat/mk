@@ -22,7 +22,9 @@ import {
   appendTelegramChatMessage,
   getRecentTelegramChatMessages,
 } from "../telegramUserChatHistory";
-import { getTelegramUserIdHash, telegramSendReply } from "../utils";
+import { getTelegramUserId, getTelegramUserIdHash, telegramSendReply } from "../utils";
+import { getTelegramUserIdSecureHash } from "../../../common/telegram/telegramUserId";
+import { encryptExistingRowsForUser } from "../tempEncryptExistingRows";
 
 const MAX_SYMBOLS = 1024;
 
@@ -60,13 +62,14 @@ const getReply: TTelegramGetReplyFn = async (props) => {
     throw new Error("Empty message text");
   }
 
+  const telegramId = getTelegramUserId(props);
   const telegramUserIdHash = getTelegramUserIdHash(props);
-  await appendTelegramChatMessage(telegramUserIdHash, {
-    role: "user",
-    text: userText,
+  await appendTelegramChatMessage({
+    telegramUserIdHash,
+    telegramId,
+    entry: { role: "user", text: userText },
   });
-  const recentMessages =
-    await getRecentTelegramChatMessages(telegramUserIdHash);
+  const recentMessages = await getRecentTelegramChatMessages({ telegramUserIdHash, telegramId });
   const prompt = getPromptForTelegramChat({ recentMessages, locale: props.locale });
 
   try {
@@ -75,9 +78,10 @@ const getReply: TTelegramGetReplyFn = async (props) => {
       userIdHash: telegramUserIdHash,
     });
     if (aiReply) {
-      await appendTelegramChatMessage(telegramUserIdHash, {
-        role: "assistant",
-        text: aiReply,
+      await appendTelegramChatMessage({
+        telegramUserIdHash,
+        telegramId,
+        entry: { role: "assistant", text: aiReply },
       });
       return {
         text: formatTelegramAiReplyText({
@@ -108,6 +112,17 @@ export function telegramOnMessage(bot: TelegramBot): void {
     if (!from) {
       console.log("\nReceived message without from, ignoring...");
       return;
+    }
+
+    // ⚠️ TEMPORARY: encrypt this user's pre-existing plaintext rows using their
+    // live numeric id. Remove once test + prod are migrated (see tempEncryptExistingRows.ts).
+    try {
+      await encryptExistingRowsForUser({
+        telegramUserIdHash: getTelegramUserIdSecureHash(from.id),
+        telegramId: from.id,
+      });
+    } catch (error) {
+      console.log("[temp encrypt migration] failed:", error);
     }
 
     const chatId = chat.id;

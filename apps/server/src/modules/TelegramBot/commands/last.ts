@@ -4,7 +4,7 @@ import { messages } from "../../../common/i18n/messages";
 import { prompts } from "../../../common/i18n/prompts";
 import { TTelegramCommandMethods } from "../definitions";
 import { formatTelegramMoodEntryStatBullet } from "../moodReplyFormat";
-import { getTelegramUserIdHash } from "../utils";
+import { getTelegramUserId, getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
 import type { TSelectMoodEntry } from "../../Mood/model";
@@ -23,7 +23,11 @@ export const telegramLastCommand = {
 
   getReply: async (props) => {
     const telegramUserIdHash = getTelegramUserIdHash(props);
-    const entries = await moodService.listMoodEntries({ userId: telegramUserIdHash, limit: LAST_LIMIT });
+    const entries = await moodService.listMoodEntries({
+      userId: telegramUserIdHash,
+      telegramId: getTelegramUserId(props),
+      limit: LAST_LIMIT,
+    });
 
     if (entries.length === 0) {
       return { text: messages(props.locale).last.empty };

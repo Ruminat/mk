@@ -8,6 +8,7 @@ Create `apps/server/.env`. Variables are validated at startup via `common/enviro
 | ------------------------------ | ----------------------------------------------------------------------------------------------- |
 | `JWT_SECRET`                   | Secret for signing JWT tokens                                                                   |
 | `TELEGRAM_USER_ID_SECURE_HASH` | Secret used to derive the user identity hash (single source of truth for bot and web/API users) |
+| `TELEGRAM_USER_DATA_ENCRYPTION_SECRET` | Secret used to encrypt user content at rest (mood comments, chat messages) via AES-256-GCM. **Must be different from `TELEGRAM_USER_ID_SECURE_HASH`.** Rotating it makes existing ciphertext undecryptable — treat as permanent and back it up. |
 
 ## Database
 

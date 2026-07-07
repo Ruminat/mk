@@ -35,10 +35,15 @@ export function telegramSendReply(bot: TelegramBot, props: TTelegramCommandProps
   }
 }
 
-export function getTelegramUserIdHash(props: TTelegramCommandProps): string {
+/** The raw numeric telegram id — needed to derive the per-user encryption key. */
+export function getTelegramUserId(props: TTelegramCommandProps): number {
   const telegramUserId = props.message.from?.id;
   if (telegramUserId === undefined) {
     throw new Error("No telegram user id in message");
   }
-  return getTelegramUserIdSecureHash(telegramUserId);
+  return telegramUserId;
+}
+
+export function getTelegramUserIdHash(props: TTelegramCommandProps): string {
+  return getTelegramUserIdSecureHash(getTelegramUserId(props));
 }

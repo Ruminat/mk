@@ -20,10 +20,11 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
   authService
     .verifyTokenAndGetUser(token)
-    .then(({ user, isAdmin }) => {
+    .then(({ user, isAdmin, telegramId }) => {
       const authedReq = req as AuthenticatedRequest;
       authedReq.user = user;
       authedReq.isAdmin = isAdmin;
+      authedReq.telegramId = telegramId;
       next();
     })
     .catch((error) => {

@@ -22,6 +22,12 @@ const envSchema = object({
     .regex(/^[A-Za-z0-9_-]{1,256}$/)
     .optional(),
   TELEGRAM_USER_ID_SECURE_HASH: string().min(1, "TELEGRAM_USER_ID_SECURE_HASH is required"),
+  // Separate secret from the identity hash: encrypts user content (mood comments,
+  // chat messages) at rest. Must never equal TELEGRAM_USER_ID_SECURE_HASH.
+  TELEGRAM_USER_DATA_ENCRYPTION_SECRET: string().min(
+    1,
+    "TELEGRAM_USER_DATA_ENCRYPTION_SECRET is required",
+  ),
   ADMIN_TELEGRAM_LOGINS: string().optional(),
   DEEPSEEK_API_TOKEN: string().optional(),
 }).refine(
@@ -79,6 +85,10 @@ export function getEnvironmentVariables() {
       webhookSecret: values.TELEGRAM_BOT_WEBHOOK_SECRET,
       telegramUserIdSecureHash: values.TELEGRAM_USER_ID_SECURE_HASH,
       adminTelegramLogins: parseAdminTelegramLogins(values.ADMIN_TELEGRAM_LOGINS),
+    },
+
+    crypto: {
+      userDataEncryptionSecret: values.TELEGRAM_USER_DATA_ENCRYPTION_SECRET,
     },
 
     deepseek: {

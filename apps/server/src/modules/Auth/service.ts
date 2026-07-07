@@ -44,24 +44,43 @@ function verifyTelegramAuth(data: TelegramAuthData): boolean {
   return isHashValid && isRecent;
 }
 
-type TTokenClaims = { userId: string; isAdmin: boolean };
+type TTokenClaims = {
+  userId: string;
+  isAdmin: boolean;
+  /**
+   * The numeric telegram id, kept ONLY in the signed token (never in the DB or
+   * logs). Web/API requests have no other way to obtain it, and it's needed to
+   * derive the per-user key that decrypts mood comments and chat messages
+   * Optional so tokens issued before this claim still verify.
+   */
+  telegramId?: number;
+};
 
 /**
  * Generates a JWT token for a user. `isAdmin` is derived once at sign-in from the
  * telegram username (available only in transit) and carried as a signed claim, so
- * the username itself is never persisted.
+ * the username itself is never persisted. `telegramId` is likewise carried in the
+ * token, not stored, so web reads can decrypt the user's content.
  */
 function generateToken(claims: TTokenClaims): string {
   return jwt.sign(claims, auth.jwtSecret, { expiresIn: "7d" });
 }
 
 /**
- * Verifies a JWT token and returns its claims (user id + admin flag).
+ * Verifies a JWT token and returns its claims (user id + admin flag + telegram id).
  */
 function verifyToken(token: string): TTokenClaims {
   try {
-    const decoded = jwt.verify(token, auth.jwtSecret) as { userId: string; isAdmin?: unknown };
-    return { userId: decoded.userId, isAdmin: decoded.isAdmin === true };
+    const decoded = jwt.verify(token, auth.jwtSecret) as {
+      userId: string;
+      isAdmin?: unknown;
+      telegramId?: unknown;
+    };
+    return {
+      userId: decoded.userId,
+      isAdmin: decoded.isAdmin === true,
+      telegramId: typeof decoded.telegramId === "number" ? decoded.telegramId : undefined,
+    };
   } catch (error) {
     throw new ServiceError("Invalid or expired token");
   }
@@ -79,7 +98,7 @@ export const authService = {
 
     // The user id IS the secure hash of the numeric telegram id — the same key
     // the bot stores mood entries and chat history under. We look up and create
-    // by this hash only; the raw numeric id is never persisted (plans.md §2/§3).
+    // by this hash only; the raw numeric id is never persisted.
     const userId = getTelegramUserIdSecureHash(authData.id);
 
     // Check if user exists
@@ -107,7 +126,7 @@ export const authService = {
     // Admin status is decided here, from the in-transit telegram username, and
     // baked into the signed token — the username is never persisted.
     const isAdmin = isAdminLogin(authData.username);
-    const token = generateToken({ userId: user.id, isAdmin });
+    const token = generateToken({ userId: user.id, isAdmin, telegramId: authData.id });
 
     return { user, token };
   },
@@ -125,14 +144,16 @@ export const authService = {
    * Verifies a JWT token and returns the user together with the admin flag
    * carried in the token claims.
    */
-  verifyTokenAndGetUser: async (token: string): Promise<{ user: TSelectUser; isAdmin: boolean }> => {
-    const { userId, isAdmin } = verifyToken(token);
+  verifyTokenAndGetUser: async (
+    token: string,
+  ): Promise<{ user: TSelectUser; isAdmin: boolean; telegramId?: number }> => {
+    const { userId, isAdmin, telegramId } = verifyToken(token);
     const user = await authService.getUserById(userId);
 
     if (!user) {
       throw new ServiceError("User not found");
     }
 
-    return { user, isAdmin };
+    return { user, isAdmin, telegramId };
   },
 };
