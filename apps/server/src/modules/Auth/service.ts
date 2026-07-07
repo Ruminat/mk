@@ -77,13 +77,13 @@ export const authService = {
       throw new ServiceError("Invalid Telegram authentication data");
     }
 
-    const telegramId = authData.id.toString();
-    // The user id is the same secure hash the Telegram bot stores mood entries
-    // under, so web and bot resolve to one and the same user.
+    // The user id IS the secure hash of the numeric telegram id — the same key
+    // the bot stores mood entries and chat history under. We look up and create
+    // by this hash only; the raw numeric id is never persisted (plans.md §2/§3).
     const userId = getTelegramUserIdSecureHash(authData.id);
 
     // Check if user exists
-    const existingUser = await db.select().from(UserTable).where(eq(UserTable.telegramId, telegramId)).limit(1);
+    const existingUser = await db.select().from(UserTable).where(eq(UserTable.id, userId)).limit(1);
 
     let user: TSelectUser;
 
@@ -93,7 +93,6 @@ export const authService = {
       // Create new user
       const newUser: TInsertUser = {
         id: userId,
-        telegramId,
         name: `${authData.first_name}${authData.last_name ? ` ${authData.last_name}` : ""}`,
         avatarUrl: authData.photo_url,
       };

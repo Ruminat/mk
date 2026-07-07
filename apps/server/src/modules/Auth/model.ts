@@ -4,14 +4,19 @@ import { Request } from "express";
 
 /**
  * Telegram is the single source of truth for identity. `id` is the secure hash
- * of the Telegram user id (see getTelegramUserIdSecureHash), which is also the
- * key mood entries are stored under — so the bot and the web/API share one user.
+ * of the numeric Telegram user id (see getTelegramUserIdSecureHash), which is
+ * also the key mood entries and chat history are stored under — so the bot and
+ * the web/API resolve to one and the same user.
+ *
+ * We deliberately store NO raw telegram identity here: not the numeric id, not
+ * the username. The numeric id exists only in transit (login payload / bot
+ * update) and is never persisted (see plans.md §2/§3). The username is
+ * display/admin-only and must never be used as a storage key or hash input.
  */
 export const UserTable = sqliteTable("users", {
   id: text("id").primaryKey().notNull(),
   name: text("name"),
   avatarUrl: text("avatar_url"),
-  telegramId: text("telegram_id"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
