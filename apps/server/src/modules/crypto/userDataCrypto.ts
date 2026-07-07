@@ -1,8 +1,6 @@
 import { getEnvironmentVariables } from "../../common/config/environment";
 import { decryptWithSecret, encryptWithSecret } from "./userDataCryptoCore";
 
-export { isEncrypted } from "./userDataCryptoCore";
-
 /**
  * Env-bound wrappers around the pure crypto core ({@link ./userDataCryptoCore}).
  * The encryption secret is separate from the identity-hash secret and required at

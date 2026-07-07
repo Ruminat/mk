@@ -1,5 +1,7 @@
 # Mooduck
 
+![MooDuck landing hero](apps/landing/docs/screenshot.png)
+
 Mooduck is a small mood journal: you log how you feel on a 1–10 scale, optionally add a short note, and review your history. Identity comes from **Telegram** (Mini App / web login and bot); the backend stores a **hashed Telegram user id**, not a full user profile.
 
 The repo is a **pnpm** + **Turborepo** monorepo.

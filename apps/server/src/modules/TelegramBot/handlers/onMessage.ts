@@ -23,8 +23,6 @@ import {
   getRecentTelegramChatMessages,
 } from "../telegramUserChatHistory";
 import { getTelegramUserId, getTelegramUserIdHash, telegramSendReply } from "../utils";
-import { getTelegramUserIdSecureHash } from "../../../common/telegram/telegramUserId";
-import { encryptExistingRowsForUser } from "../tempEncryptExistingRows";
 
 const MAX_SYMBOLS = 1024;
 
@@ -112,17 +110,6 @@ export function telegramOnMessage(bot: TelegramBot): void {
     if (!from) {
       console.log("\nReceived message without from, ignoring...");
       return;
-    }
-
-    // ⚠️ TEMPORARY: encrypt this user's pre-existing plaintext rows using their
-    // live numeric id. Remove once test + prod are migrated (see tempEncryptExistingRows.ts).
-    try {
-      await encryptExistingRowsForUser({
-        telegramUserIdHash: getTelegramUserIdSecureHash(from.id),
-        telegramId: from.id,
-      });
-    } catch (error) {
-      console.log("[temp encrypt migration] failed:", error);
     }
 
     const chatId = chat.id;

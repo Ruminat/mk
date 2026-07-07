@@ -110,13 +110,13 @@ describe("userDataCrypto.ts", () => {
     });
   });
 
-  describe("legacy plaintext passthrough", () => {
-    it("returns an un-prefixed value unchanged (rows written before encryption)", () => {
-      expect(decrypt("just a plain old comment")).toBe("just a plain old comment");
+  describe("rejects non-encrypted input (all stored content is encrypted)", () => {
+    it("throws on an un-prefixed value", () => {
+      expect(() => decrypt("just a plain old comment")).toThrow();
     });
 
-    it("returns an empty legacy value unchanged", () => {
-      expect(decrypt("")).toBe("");
+    it("throws on an empty string", () => {
+      expect(() => decrypt("")).toThrow();
     });
   });
 });

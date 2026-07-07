@@ -24,9 +24,9 @@ const IV_LENGTH = 12; // 96-bit nonce, the GCM standard
 const AUTH_TAG_LENGTH = 16; // 128-bit GCM tag
 
 /**
- * Marks a value as one of our encrypted blobs. Anything without this prefix is
- * treated as legacy plaintext and returned unchanged on decrypt — so rows written
- * before encryption was introduced keep working (new writes are always encrypted).
+ * Version tag on every encrypted blob. Lets the format evolve (v2, …) and lets
+ * decrypt reject anything that isn't a value we produced. All stored content is
+ * encrypted — there is no plaintext-passthrough.
  */
 const VERSION_PREFIX = "__v1:";
 
@@ -34,14 +34,6 @@ const VERSION_PREFIX = "__v1:";
 const HKDF_SALT = "mooduck:user-data:v1";
 
 type TCryptoParams = { telegramId: number; secret: string };
-
-/**
- * Whether a stored value is one of our encrypted blobs (vs. legacy plaintext
- * written before encryption existed). Used to drive lazy re-encryption on read.
- */
-export function isEncrypted(stored: string): boolean {
-  return stored.startsWith(VERSION_PREFIX);
-}
 
 /**
  * Deterministically derive a per-user 256-bit key from the numeric telegram id
@@ -83,16 +75,17 @@ export function encryptWithSecret(
 }
 
 /**
- * Decrypt a value produced by {@link encryptWithSecret}. A value without the
- * version prefix is assumed to be legacy plaintext and returned as-is. A tampered
- * blob or a wrong telegram id fails the GCM auth check and throws.
+ * Decrypt a value produced by {@link encryptWithSecret}. All stored content is
+ * encrypted, so a value without the version prefix is unexpected (corruption or a
+ * stray plaintext write) and throws. A tampered blob or a wrong telegram id fails
+ * the GCM auth check and throws.
  */
 export function decryptWithSecret(
   stored: string,
   params: TCryptoParams,
 ): string {
   if (!stored.startsWith(VERSION_PREFIX)) {
-    return stored; // legacy plaintext, written before encryption existed
+    throw new Error(`Expected an encrypted value with the "${VERSION_PREFIX}" prefix`);
   }
 
   const blob = Buffer.from(stored.slice(VERSION_PREFIX.length), "base64");
