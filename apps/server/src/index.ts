@@ -84,30 +84,32 @@ app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/mood", moodRouter);
 
-/**
- * 404 error handling
- **/
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.originalUrl} not found`,
-  });
-});
+// NOTE: the 404 catch-all and error handler are registered inside bootstrap(),
+// AFTER the Telegram webhook route is added — otherwise a webhook POST is
+// swallowed by the catch-all (Express matches middleware in registration order).
 
 /**
- * In case of an uncaught error
- **/
-
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Unhandled error:", error);
-
-  res.status(500).json({
-    success: false,
-    message: isDev ? error.message : "Internal server error",
-    ...(isDev && { stack: error.stack }),
+ * 404 + uncaught-error handlers. Registered last, after every route including
+ * the Telegram webhook (added asynchronously by setupMooDuckTelegramBot).
+ */
+function registerFallbackHandlers() {
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: `Route ${req.originalUrl} not found`,
+    });
   });
-});
+
+  app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error("Unhandled error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: isDev ? error.message : "Internal server error",
+      ...(isDev && { stack: error.stack }),
+    });
+  });
+}
 
 /**
  * Starting the server
@@ -117,6 +119,9 @@ let isShuttingDown = false;
 
 async function bootstrap() {
   const telegramLifecycle = await setupMooDuckTelegramBot(app);
+
+  // Must come after the webhook route above, or webhook POSTs hit the 404.
+  registerFallbackHandlers();
 
   const server = app
     .listen(port, "0.0.0.0", (error) => {
