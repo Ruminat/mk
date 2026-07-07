@@ -11,7 +11,7 @@ export const AddMoodRequestSchema = z.object({
   value: z.number().int().min(1).max(10),
   comment: z
     .string()
-    .max(MOOD_COMMENT_MAX_LENGTH, `Комментарий слишком длинный (максимум ${MOOD_COMMENT_MAX_LENGTH} символов)`)
+    .max(MOOD_COMMENT_MAX_LENGTH, `Comment is too long (maximum ${MOOD_COMMENT_MAX_LENGTH} characters)`)
     .optional(),
 });
 

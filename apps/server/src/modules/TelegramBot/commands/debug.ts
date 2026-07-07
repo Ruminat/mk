@@ -1,5 +1,6 @@
-import { TTelegramCommandMethods } from "../definitions";
+import { messages } from "../../../common/i18n/messages";
 import { isAdminLogin } from "../../../common/telegram/isAdminLogin";
+import { TTelegramCommandMethods } from "../definitions";
 import { toggleTelegramBotDebug } from "../telegramBotDebugState";
 
 export const telegramDebugCommand = {
@@ -8,11 +9,13 @@ export const telegramDebugCommand = {
   },
 
   getReply: (props) => {
+    const strings = messages(props.locale).debug;
+
     if (!isAdminLogin(props.message.from?.username)) {
-      return { text: "Эта команда только для администраторов." };
+      return { text: strings.adminOnly };
     }
 
     const enabled = toggleTelegramBotDebug();
-    return { text: enabled ? "Debug: включён" : "Debug: выключен" };
+    return { text: enabled ? strings.on : strings.off };
   },
 } satisfies TTelegramCommandMethods;

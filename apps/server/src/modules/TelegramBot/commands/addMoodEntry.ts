@@ -1,3 +1,6 @@
+import { notEmpty, randomFrom, stringToNumberOrUndefined } from "@mooduck/core";
+import he from "he";
+import { messages } from "../../../common/i18n/messages";
 import { TelegramInputError, TTelegramCommandMethods, TTelegramReply } from "../definitions";
 import { formatTelegramAiReplyText } from "../formatTelegramAiReplyText";
 import { appendTelegramChatMessage } from "../telegramUserChatHistory";
@@ -5,11 +8,9 @@ import { getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
 import { getPromptByMood } from "../../Mood/prompts/getPromptByMood";
-import { notEmpty, randomFrom, stringToNumberOrUndefined } from "@mooduck/core";
-import he from "he";
 
 export const telegramMoodEntry = {
-  test: ({ messageParsed }) => {
+  test: ({ messageParsed, locale }) => {
     if (!messageParsed) return false;
 
     if (!/^([1-9]|10)( .+)?$/.test(messageParsed)) {
@@ -27,7 +28,7 @@ export const telegramMoodEntry = {
     if (notEmpty(score)) {
       return true;
     } else {
-      throw new TelegramInputError("Нужно число от 1 до 10");
+      throw new TelegramInputError(messages(locale).bot.moodOutOfRange);
     }
   },
 
@@ -40,7 +41,7 @@ export const telegramMoodEntry = {
     const score = getValidMoodScoreOrUndefined(scoreString);
 
     if (!notEmpty(score)) {
-      throw new TelegramInputError("Нужно число от 1 до 10");
+      throw new TelegramInputError(messages(props.locale).bot.moodOutOfRange);
     }
 
     const telegramUserIdHash = getTelegramUserIdHash(props);
@@ -52,16 +53,17 @@ export const telegramMoodEntry = {
 
     await appendTelegramChatMessage(telegramUserIdHash, { role: "user", text: message });
 
+    const bot = messages(props.locale).bot;
     const boring = `(${score}${comment ? ` + "${he.escape(comment)}"` : ""})`;
     const defaultResults: TTelegramReply[] = [
-      { text: `${boring}` },
-      { text: `Понял, принял, обработал ${boring}` },
+      { text: bot.moodAckShort(boring) },
+      { text: bot.moodAckLong(boring) },
     ];
     let result: TTelegramReply = randomFrom(defaultResults);
 
     try {
       const entries = await moodService.listMoodEntries({ userId: telegramUserIdHash });
-      const prompt = getPromptByMood({ entries, score, comment });
+      const prompt = getPromptByMood({ entries, score, comment, locale: props.locale });
       const reply = await aiService.getDeepSeekReply({ prompt, userIdHash: telegramUserIdHash });
 
       if (reply) {
@@ -70,6 +72,7 @@ export const telegramMoodEntry = {
             prompt,
             reply,
             username: props.message.from?.username,
+            locale: props.locale,
           }),
         };
         await appendTelegramChatMessage(telegramUserIdHash, { role: "assistant", text: reply });

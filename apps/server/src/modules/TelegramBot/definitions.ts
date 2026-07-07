@@ -1,4 +1,5 @@
 import TelegramBot, { Chat } from "node-telegram-bot-api";
+import type { TLocale } from "../../common/i18n/locale";
 
 export class TelegramInputError extends Error {}
 
@@ -8,6 +9,8 @@ export type TTelegramCommandProps = {
   message: TelegramBot.Message;
   fromPart: string;
   messageParsed: string | undefined;
+  /** Resolved once per turn from the telegram language and message text. */
+  locale: TLocale;
 };
 
 export type TTelegramReplySingle =

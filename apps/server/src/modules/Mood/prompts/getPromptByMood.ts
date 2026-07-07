@@ -1,57 +1,32 @@
 import { getRandomInt } from "@mooduck/core";
+import type { TLocale } from "../../../common/i18n/locale";
+import { prompts } from "../../../common/i18n/prompts";
 import { TSelectMoodEntry } from "../model";
 import { getLastMoodCommentsForPrompt } from "../sagas/getLastMoodCommentsForPrompt";
-import { pickRandomPromptMode } from "./mode";
 
 type TProps = {
   entries: TSelectMoodEntry[];
   score: number;
   comment?: string;
+  locale: TLocale;
 };
 
 export function getPromptByMood(props: TProps): string {
-  const score = `${props.score}/10`;
+  const catalog = prompts(props.locale);
 
-  return `Представь, что тебя используют в чат-боте для записи настроения пользователя.
-Пришло сообщение о том, что у пользователя настроение ${score}.
+  const commentSection = props.comment ? catalog.moodCommentSection(props.comment) : "";
+  const recentComments = getLastMoodCommentsForPrompt(props.entries, props.locale) ?? "";
 
-${getComment(props)}
-
-Напиши ответ пользователю — реакцию на его настроение.
-Не предлагай кофе, пряники или печеньки — это банально и скучно.
-НИЧЕГО, КРОМЕ ОТВЕТА ПОЛЬЗОВАТЕЛЮ, ПИСАТЬ НЕ НАДО
-
-${getMode(props)}
-
-Нужен содержательный и краткий ответ — не больше ${getWordsLimit(props)} слов.
-Каждый раз ответ должен быть уникальным и интересным.
-
-${getLastMoodCommentsForPrompt(props.entries) ?? ""}
-
-ЕЩЁ РАЗ, НИЧЕГО, КРОМЕ ОТВЕТА ПОЛЬЗОВАТЕЛЮ, ПИСАТЬ НЕ НАДО`;
+  return catalog.moodPrompt({
+    score: `${props.score}/10`,
+    commentSection,
+    wordsLimit: getWordsLimit(props.score),
+    recentComments,
+  });
 }
 
-function getComment(props: TProps): string {
-  return props.comment
-    ? `Пользователь написал: "${props.comment}". Обыграй это в ответе — возможно, это ключ к его настроению!`
-    : "";
-}
-
-function getMode(props: TProps): string {
-  return pickRandomPromptMode();
-  // if (props.score >= 4) {
-  //   return pickRandomPromptMode();
-  // }
-
-  // if (props.score >= 2) {
-  //   return pickRandomPromptModeForGentleBand();
-  // }
-
-  // return PROMPT_MODE.friendly;
-}
-
-function getWordsLimit(props: TProps): number {
-  switch (props.score) {
+function getWordsLimit(score: number): number {
+  switch (score) {
     case 10:
     case 1:
       return getRandomInt(80, 120);

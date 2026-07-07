@@ -1,7 +1,7 @@
 /** Telegram `sendMessage` text length limit (UTF-16 code units, same as `.length` in JS for BMP-heavy text). */
 export const TELEGRAM_MESSAGE_MAX_CHARS = 4096;
 
-const DEFAULT_TRUNCATION_SUFFIX = "\n\n… (обрезано)";
+const DEFAULT_TRUNCATION_SUFFIX = "\n\n… (truncated)";
 
 type TOptions = {
   maxChars?: number;

@@ -1,9 +1,14 @@
 import { howLongAgo } from "../../../common/date/dateUtils";
+import type { TLocale } from "../../../common/i18n/locale";
+import { prompts } from "../../../common/i18n/prompts";
 import { formatPaddedMoodScoreDenominator } from "../../../common/mood/moodFormat";
 import { TSelectMoodEntry } from "../model";
 import { getMoodStats } from "./getMoodStats";
 
-export function getLastMoodCommentsForPrompt(entries: TSelectMoodEntry[]): string | undefined {
+export function getLastMoodCommentsForPrompt(
+  entries: TSelectMoodEntry[],
+  locale: TLocale,
+): string | undefined {
   const stats = getMoodStats({ entries, lastCommentedEntries: 5 });
 
   if (!stats) {
@@ -16,12 +21,12 @@ export function getLastMoodCommentsForPrompt(entries: TSelectMoodEntry[]): strin
     return undefined;
   }
 
-  return `Недавние комментарии пользователя. Прими их к сведению, но не упоминай их. Можешь обыграть интересные комментарии, но только если это будет в тему:
+  const renderedEntries = lastEntries
+    .map(
+      (entry) =>
+        `- ${formatPaddedMoodScoreDenominator(entry.score)}: ${entry.comment!} (${howLongAgo(Date.now() - entry.created, locale)})`,
+    )
+    .join("\n");
 
-${lastEntries
-  .map(
-    (entry) =>
-      `- ${formatPaddedMoodScoreDenominator(entry.score)}: ${entry.comment!} (${howLongAgo(Date.now() - entry.created)})`,
-  )
-  .join("\n")}`;
+  return prompts(locale).recentComments(renderedEntries);
 }

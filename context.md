@@ -48,6 +48,14 @@ existing point over piling on duplicates.
   in-memory cache sits in front for speed/bounded memory, and a cache miss
   rehydrates from the DB. (Origin: the bot's chat history was in-memory only and
   lost on every release.)
+- **Localization: English is primary, Russian is secondary.** Resolve the locale
+  once per turn (`resolveLocale`): Russian when the telegram `language_code`
+  starts with `ru` OR the message text reads as Russian; otherwise English. All
+  user-facing strings live in `common/i18n` catalogs — `messages(locale)` for UI
+  text, `prompts(locale)` for AI prompts (full parallel en+ru, model told to
+  answer in the resolved language). Never hardcode a user-facing string in a
+  handler/command; add it to the catalog. Web/API defaults to English. See
+  `plans.md` §1.
 - **Never turn a folder into a trashbag.** Organize by meaning; don't pile
   unrelated files into `common/` (or any single folder). See folder structure
   below.

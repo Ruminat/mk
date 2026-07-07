@@ -1,4 +1,6 @@
 import he from "he";
+import type { TLocale } from "../../common/i18n/locale";
+import { messages } from "../../common/i18n/messages";
 
 export type TMoodScore = number;
 
@@ -27,10 +29,15 @@ function round(value: number, decimals: number): number {
 
 export function getMoodStatsLists(
   stats: TMoodStats,
-  { moodMarkup = (score) => `${score}/10` }: { moodMarkup?: (score: TMoodScore) => string } = {}
+  {
+    moodMarkup = (score) => `${score}/10`,
+    locale,
+  }: { moodMarkup?: (score: TMoodScore) => string; locale: TLocale }
 ) {
-  const statsList = `— Среднее настроение: ${round(stats.avg, 2)}
-— Среднее отклонение: ${round(stats.std, 2)}`;
+  const strings = messages(locale).stat;
+
+  const statsList = `— ${strings.avgMood}: ${round(stats.avg, 2)}
+— ${strings.avgDeviation}: ${round(stats.std, 2)}`;
 
   const scoresList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     .map((score) => `— ${moodMarkup(score)}: ${stats.scores[score] ?? 0}`)

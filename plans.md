@@ -58,11 +58,11 @@ Notes on `language_code`:
 
 ### Acceptance criteria
 
-- [ ] Default bot experience is English for a user with `language_code: "en"` writing in English.
-- [ ] Bot responds in Russian when `language_code` starts with `ru`, even if the user writes in English.
-- [ ] Bot responds in Russian when the user writes in Russian, even if `language_code` is missing or non-Russian.
-- [ ] AI replies follow the same locale as bot UI strings in the same turn.
-- [ ] No hard-coded Russian (or English) strings left in bot handlers/commands — all go through the i18n layer.
+- [x] Default bot experience is English for a user with `language_code: "en"` writing in English.
+- [x] Bot responds in Russian when `language_code` starts with `ru`, even if the user writes in English.
+- [x] Bot responds in Russian when the user writes in Russian, even if `language_code` is missing or non-Russian.
+- [x] AI replies follow the same locale as bot UI strings in the same turn (prompts are localized per turn and instruct the model to answer in that language).
+- [x] No hard-coded Russian (or English) strings left in bot handlers/commands — all go through the `common/i18n` layer.
 
 ---
 
