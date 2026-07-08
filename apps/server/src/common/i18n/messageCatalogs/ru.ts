@@ -50,6 +50,10 @@ export const ru: TMessages = {
     topComments: "Топ интересных комментариев",
     avgMood: "Среднее настроение",
     avgDeviation: "Среднее отклонение",
+    chart: {
+      title: "История настроения",
+      caption: (count: number) => `Записей: ${count}`,
+    },
   },
 
   debug: {

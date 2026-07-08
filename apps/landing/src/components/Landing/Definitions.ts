@@ -58,7 +58,7 @@ export const FEATURES: Feature[] = [
     Icon: LockIcon,
     tone: "green",
     title: "Private by design",
-    body: "Your data stays private in Telegram. We don't store personal info.",
+    body: "Your notes are encrypted, never sold, and never tied to your name.",
   },
   {
     Icon: PencilSquareIcon,
@@ -111,26 +111,26 @@ export const PRIVACY_POINTS: PrivacyPoint[] = [
   {
     Icon: LockIcon,
     tone: "green",
-    title: "Private in Telegram",
-    body: "Your data stays in your Telegram account.",
+    title: "Encrypted and locked",
+    body: "Every note and message is encrypted before it's stored — kept under lock, safe from prying eyes.",
+  },
+  {
+    Icon: UserHeartIcon,
+    tone: "green",
+    title: "Not tied to your name",
+    body: "We don't keep your name or profile. Your moods aren't linked to who you are.",
   },
   {
     Icon: ShieldCheckIcon,
     tone: "green",
-    title: "No data selling",
+    title: "Never sold or shared",
     body: "We don't sell or share your data. Ever.",
   },
   {
     Icon: FileControlIcon,
     tone: "green",
-    title: "You're in control",
-    body: "Delete, export, or stop anytime.",
-  },
-  {
-    Icon: UserHeartIcon,
-    tone: "green",
-    title: "Safe & supportive",
-    body: "A judgment-free space to be real with yourself.",
+    title: "Always your call",
+    body: "Delete your history whenever you like — it's yours to keep or clear.",
   },
 ];
 

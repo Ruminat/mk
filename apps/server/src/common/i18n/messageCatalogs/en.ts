@@ -51,6 +51,10 @@ Available commands:
     topComments: "Top interesting comments",
     avgMood: "Average mood",
     avgDeviation: "Average deviation",
+    chart: {
+      title: "Your mood history",
+      caption: (count: number) => `Last ${count} check-ins`,
+    },
   },
 
   debug: {

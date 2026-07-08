@@ -30,6 +30,13 @@ export function telegramSendReply(bot: TelegramBot, props: TTelegramCommandProps
 
   if ("text" in reply) {
     bot.sendMessage(props.chatId, reply.text, { ...reply.options, parse_mode: "HTML" });
+  } else if ("photo" in reply) {
+    bot.sendPhoto(
+      props.chatId,
+      reply.photo,
+      { parse_mode: "HTML", ...reply.options },
+      { filename: "mood-history.png", contentType: "image/png" },
+    );
   } else {
     bot.sendSticker(props.chatId, reply.sticker, { ...reply.options });
   }

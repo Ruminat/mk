@@ -15,7 +15,8 @@ export type TTelegramCommandProps = {
 
 export type TTelegramReplySingle =
   | { text: string; options?: TelegramBot.SendMessageOptions }
-  | { sticker: string; options?: TelegramBot.SendStickerOptions };
+  | { sticker: string; options?: TelegramBot.SendStickerOptions }
+  | { photo: Buffer; options?: TelegramBot.SendPhotoOptions };
 export type TTelegramReply = TTelegramReplySingle | TTelegramReplySingle[];
 export type TTelegramGetReplyFn = (props: TTelegramCommandProps) => TTelegramReply | Promise<TTelegramReply>;
 
