@@ -43,25 +43,41 @@ export function moodChartPointCount(entries: TSelectMoodEntry[]): number {
   return Math.min(entries.length, MAX_POINTS);
 }
 
-/**
- * Short numeric date for the x-axis: "20.05" (ru) / "05/20" (en). Zero-padded so a
- * single-digit month can't be misread as a decimal next to the numeric y-axis, and
- * no month names → no font-coverage worries.
- */
-function formatDateLabel(createdAt: string | null, locale: TLocale): string {
-  const match = createdAt?.match(/^\d{4}-(\d{2})-(\d{2})/);
+// Hardcoded (not Intl) so the labels are identical on any host — minimal Node
+// builds ship a cut-down ICU that would render Russian months as English.
+const MONTHS_EN = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const MONTHS_RU = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+
+/** Parse SQLite's "YYYY-MM-DD HH:MM:SS" (UTC) to epoch ms; null if unparseable. */
+function parseCreatedAtMs(createdAt: string | null): number | null {
+  const match = createdAt?.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?/);
   if (!match) {
-    return "";
+    return null;
   }
-  const [, month, day] = match;
-  return locale === "ru" ? `${day}.${month}` : `${month}/${day}`;
+  const [, year, month, day, hour, minute, second] = match;
+  return Date.UTC(+year, +month - 1, +day, +(hour ?? 0), +(minute ?? 0), +(second ?? 0));
+}
+
+/** Human date for a time-axis tick: "may 15" (en) / "15 мая" (ru). Uses UTC to match the stored timestamps. */
+function formatTimeLabel(ms: number, locale: TLocale): string {
+  const date = new Date(ms);
+  const monthIndex = date.getUTCMonth();
+  const day = date.getUTCDate();
+  return locale === "ru" ? `${day} ${MONTHS_RU[monthIndex]}` : `${MONTHS_EN[monthIndex]} ${day}`;
 }
 
 export function renderMoodHistoryChart(entries: TSelectMoodEntry[], locale: TLocale): Buffer {
-  // Entries arrive newest-first; plot the most recent window oldest → newest.
-  const window = [...entries].slice(0, MAX_POINTS).reverse();
-  const values = window.map((entry) => entry.value);
-  const dates = window.map((entry) => formatDateLabel(entry.createdAt, locale));
+  // Entries arrive newest-first; plot the most recent window on a *time* axis so
+  // each point sits at its real timestamp — uneven gaps (an hour vs. a month) are
+  // shown honestly as narrow vs. wide spacing, not squashed to equal steps.
+  const points = [...entries]
+    .slice(0, MAX_POINTS)
+    .map((entry) => {
+      const ms = parseCreatedAtMs(entry.createdAt);
+      return ms === null ? null : ([ms, entry.value] as [number, number]);
+    })
+    .filter((point): point is [number, number] => point !== null)
+    .sort((a, b) => a[0] - b[0]);
 
   const chart = echarts.init(null, null, {
     renderer: "svg",
@@ -73,12 +89,11 @@ export function renderMoodHistoryChart(entries: TSelectMoodEntry[], locale: TLoc
   chart.setOption({
     backgroundColor: SURFACE,
     animation: false,
+    useUTC: true, // stored timestamps are UTC; keep ticks/labels in UTC too
     textStyle: { fontFamily: FONT_FAMILY },
     grid: { left: 44, right: 28, top: 28, bottom: 40 },
     xAxis: {
-      type: "category",
-      data: dates,
-      boundaryGap: false,
+      type: "time",
       axisTick: { show: false },
       axisLine: { lineStyle: { color: GRID } },
       splitLine: { show: false },
@@ -87,6 +102,7 @@ export function renderMoodHistoryChart(entries: TSelectMoodEntry[], locale: TLoc
         fontSize: 20,
         hideOverlap: true,
         margin: 14,
+        formatter: (value: number) => formatTimeLabel(value, locale),
       },
     },
     yAxis: {
@@ -102,13 +118,13 @@ export function renderMoodHistoryChart(entries: TSelectMoodEntry[], locale: TLoc
     series: [
       {
         type: "line",
-        data: values,
+        data: points,
         smooth: 0.35,
         symbol: "circle",
         symbolSize: 9,
         // Dots read nicely on a short series (the landing look); on a dense one
         // they clutter, so let the line speak for itself.
-        showSymbol: values.length <= 40,
+        showSymbol: points.length <= 40,
         lineStyle: { color: GOLD, width: 3, cap: "round", join: "round" },
         itemStyle: { color: "#fff", borderColor: GREEN, borderWidth: 2 },
         areaStyle: {
