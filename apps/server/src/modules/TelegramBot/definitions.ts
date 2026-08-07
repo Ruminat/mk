@@ -9,8 +9,12 @@ export type TTelegramCommandProps = {
   message: TelegramBot.Message;
   fromPart: string;
   messageParsed: string | undefined;
-  /** Resolved once per turn from the telegram language and message text. */
+  /** Resolved once per turn from the telegram language, the message text and the user's history. */
   locale: TLocale;
+  /** The raw numeric telegram id — never stored; it derives the per-user encryption key. */
+  telegramId: number;
+  /** The user's identity key (getTelegramUserIdSecureHash) — what everything is stored under. */
+  telegramUserIdHash: string;
 };
 
 export type TTelegramReplySingle =
@@ -25,4 +29,11 @@ export type TTelegramCommandMethods = {
   getReply: TTelegramGetReplyFn;
 };
 
-export type TTelegramCommand = "/start" | "/last" | "/stat" | "/settings" | "/help" | "/debug";
+export type TTelegramCommand =
+  | "/start"
+  | "/last"
+  | "/stat"
+  | "/settings"
+  | "/help"
+  | "/debug"
+  | "/forget-me";

@@ -23,15 +23,24 @@ function isRussianLanguageCode(languageCode: string | undefined | null): boolean
 }
 
 /**
- * Resolve the locale for a turn. Russian wins when EITHER the user's telegram
- * app language is Russian OR the message itself is written in Russian; otherwise
- * English.
+ * Resolve the locale for a turn. Russian wins when ANY of the signals says so:
+ * the user's telegram app language, the message itself, or anything they said
+ * earlier (`previousTexts`) — otherwise English.
+ *
+ * The last one is what keeps a conversation in one language: a bare "7" carries
+ * no language of its own, but "5 как-то грустно" a moment earlier does.
  */
 export function resolveLocale(input: {
   languageCode?: string | undefined | null;
   text?: string | undefined | null;
+  /** What the user said before, in any order — the conversation's memory. */
+  previousTexts?: readonly (string | undefined | null)[];
 }): TLocale {
-  if (isRussianLanguageCode(input.languageCode) || isRussianText(input.text)) {
+  if (
+    isRussianLanguageCode(input.languageCode) ||
+    isRussianText(input.text) ||
+    input.previousTexts?.some((previous) => isRussianText(previous))
+  ) {
     return "ru";
   }
   return DEFAULT_LOCALE;

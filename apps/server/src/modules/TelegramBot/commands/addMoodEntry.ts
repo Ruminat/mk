@@ -4,7 +4,6 @@ import { messages } from "../../../common/i18n/messages";
 import { TelegramInputError, TTelegramCommandMethods, TTelegramReply } from "../definitions";
 import { formatTelegramAiReplyText } from "../formatTelegramAiReplyText";
 import { appendTelegramChatMessage } from "../telegramUserChatHistory";
-import { getTelegramUserId, getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
 import { getPromptByMood } from "../../Mood/prompts/getPromptByMood";
@@ -44,8 +43,7 @@ export const telegramMoodEntry = {
       throw new TelegramInputError(messages(props.locale).bot.moodOutOfRange);
     }
 
-    const telegramId = getTelegramUserId(props);
-    const telegramUserIdHash = getTelegramUserIdHash(props);
+    const { telegramId, telegramUserIdHash } = props;
     await moodService.addMoodEntry({
       value: score,
       comment,

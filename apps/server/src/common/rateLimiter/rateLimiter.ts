@@ -30,4 +30,9 @@ export class PerUserRateLimiter {
       return false;
     }
   }
+
+  /** Drop everything remembered about `key` — its counter and its current window. */
+  async reset(key: string): Promise<void> {
+    await this.limiter.delete(key);
+  }
 }

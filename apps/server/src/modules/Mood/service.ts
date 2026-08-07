@@ -48,6 +48,17 @@ export const moodService = {
     }
   },
 
+  /**
+   * Delete every entry a user has. Unlike {@link deleteMoodEntry} it doesn't
+   * insist on hitting anything — a user with no entries is a valid, already-clean
+   * state — so it stays idempotent and safe to retry.
+   */
+  deleteAllMoodEntries: async ({ userId }: { userId: string }): Promise<number> => {
+    const response = await db.delete(MoodTable).where(eq(MoodTable.telegramUserIdHash, userId));
+
+    return response.rowsAffected;
+  },
+
   listMoodEntries: async ({
     userId,
     telegramId,

@@ -141,6 +141,18 @@ export const authService = {
   },
 
   /**
+   * Removes the user record itself. Identity is all this row holds, so deleting
+   * it is the last step of erasing a person — their content lives in the other
+   * modules and must already be gone. Idempotent: resolves `false` if there was
+   * nothing to delete.
+   */
+  deleteUser: async ({ userId }: { userId: string }): Promise<boolean> => {
+    const response = await db.delete(UserTable).where(eq(UserTable.id, userId));
+
+    return response.rowsAffected > 0;
+  },
+
+  /**
    * Verifies a JWT token and returns the user together with the admin flag
    * carried in the token claims.
    */

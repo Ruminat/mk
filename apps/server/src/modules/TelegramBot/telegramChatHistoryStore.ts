@@ -45,4 +45,12 @@ export const telegramChatHistoryDbStore: TTelegramChatHistoryStore = {
         ),
       );
   },
+
+  clear: async (telegramUserIdHash) => {
+    const response = await db
+      .delete(TelegramChatMessageTable)
+      .where(eq(TelegramChatMessageTable.telegramUserIdHash, telegramUserIdHash));
+
+    return response.rowsAffected;
+  },
 };

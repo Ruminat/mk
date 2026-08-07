@@ -1,6 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
 import { formatPaddedMoodScoreDenominator } from "../../common/mood/moodFormat";
-import { getTelegramUserIdSecureHash } from "../../common/telegram/telegramUserId";
 import { TTelegramCommandProps, TTelegramReply } from "./definitions";
 
 export function code(content: string): string {
@@ -40,17 +39,4 @@ export function telegramSendReply(bot: TelegramBot, props: TTelegramCommandProps
   } else {
     bot.sendSticker(props.chatId, reply.sticker, { ...reply.options });
   }
-}
-
-/** The raw numeric telegram id — needed to derive the per-user encryption key. */
-export function getTelegramUserId(props: TTelegramCommandProps): number {
-  const telegramUserId = props.message.from?.id;
-  if (telegramUserId === undefined) {
-    throw new Error("No telegram user id in message");
-  }
-  return telegramUserId;
-}
-
-export function getTelegramUserIdHash(props: TTelegramCommandProps): string {
-  return getTelegramUserIdSecureHash(getTelegramUserId(props));
 }

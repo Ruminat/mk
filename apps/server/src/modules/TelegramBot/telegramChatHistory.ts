@@ -21,6 +21,8 @@ export type TTelegramChatHistoryStore = {
   loadRecent: (telegramUserIdHash: string, limit: number) => Promise<TTelegramChatHistoryEntry[]>;
   /** Persist one message and keep only the user's most recent `keepLast`. */
   append: (telegramUserIdHash: string, entry: TTelegramChatHistoryEntry, keepLast: number) => Promise<void>;
+  /** Drop everything stored for a user; resolves with how many messages were removed. */
+  clear: (telegramUserIdHash: string) => Promise<number>;
 };
 
 /** A clock with a `now()` method, matching `lru-cache`'s `perf` option (injectable for tests). */
@@ -38,6 +40,8 @@ export type TTelegramChatHistoryOptions = {
 export type TTelegramChatHistory = {
   append: (telegramUserIdHash: string, entry: TTelegramChatHistoryEntry) => Promise<void>;
   getRecent: (telegramUserIdHash: string) => Promise<readonly TTelegramChatHistoryEntry[]>;
+  /** Erase a user's history everywhere; resolves with how many messages were removed. */
+  clear: (telegramUserIdHash: string) => Promise<number>;
 };
 
 /**
@@ -96,5 +100,13 @@ export function createTelegramChatHistory(options: TTelegramChatHistoryOptions =
     return load(telegramUserIdHash);
   }
 
-  return { append, getRecent };
+  async function clear(telegramUserIdHash: string): Promise<number> {
+    // Durable rows first: dropping the cache before them would let a concurrent
+    // read rehydrate it from the very rows we're about to delete.
+    const removed = store ? await store.clear(telegramUserIdHash) : 0;
+    cache.delete(telegramUserIdHash);
+    return removed;
+  }
+
+  return { append, getRecent, clear };
 }

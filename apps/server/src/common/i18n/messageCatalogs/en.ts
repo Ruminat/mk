@@ -36,7 +36,16 @@ Available commands:
 - /start — get started with me,
 - /last — see your last 10 entries,
 - /stat — get statistics on your entries,
+- /forget-me — delete everything I know about you,
 - /help — show this message`,
+  },
+
+  forgetMe: {
+    confirm: (phrase: string) => `This deletes everything I know about you: every mood entry, our whole conversation, and your account. There's no undo and no backup.
+
+Send <code>${phrase}</code> to confirm — anything else cancels it.`,
+    done: ({ moodEntries, chatMessages }: { moodEntries: number; chatMessages: number }) =>
+      `Done — you're gone. Deleted ${moodEntries} mood ${moodEntries === 1 ? "entry" : "entries"} and ${chatMessages} ${chatMessages === 1 ? "message" : "messages"}. Send a mood whenever you want to start over.`,
   },
 
   last: {

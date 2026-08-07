@@ -39,4 +39,23 @@ describe("resolveLocale.ts / resolveLocale", () => {
     expect(resolveLocale({ languageCode: "en", text: "отличный день" })).toBe("ru");
     expect(resolveLocale({ languageCode: undefined, text: "плохо" })).toBe("ru");
   });
+
+  describe("memory of earlier messages", () => {
+    it("should be Russian for a bare score when an earlier message was Russian", () => {
+      expect(resolveLocale({ text: "7", previousTexts: ["5 как-то грустно..."] })).toBe("ru");
+    });
+
+    it("should stay Russian for a command that carries no language of its own", () => {
+      expect(resolveLocale({ text: "/stat", previousTexts: ["8 навернул пельменей"] })).toBe("ru");
+    });
+
+    it("should find the Russian message anywhere in the history", () => {
+      expect(resolveLocale({ text: "7", previousTexts: ["8", "5 грустно", "6"] })).toBe("ru");
+    });
+
+    it("should stay English when nothing in the history is Russian", () => {
+      expect(resolveLocale({ text: "7", previousTexts: ["8 great day", "5", undefined] })).toBe("en");
+      expect(resolveLocale({ text: "7", previousTexts: [] })).toBe("en");
+    });
+  });
 });

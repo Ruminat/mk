@@ -1,10 +1,11 @@
 import TelegramBot from "node-telegram-bot-api";
-import { resolveLocale } from "../../../common/i18n/resolveLocale";
 import { messages } from "../../../common/i18n/messages";
+import { getTelegramUserIdSecureHash } from "../../../common/telegram/telegramUserId";
 import { aiService, AiRateLimitError } from "../../AI/service";
 import { telegramMoodEntry } from "../commands/addMoodEntry";
 import { telegramDebugCommand } from "../commands/debug";
 import { telegramErrorCommand } from "../commands/error";
+import { telegramForgetMeCommand } from "../commands/forgetMe";
 import { telegramHelpCommand } from "../commands/help";
 import { telegramLastCommand } from "../commands/last";
 import { telegramStartCommand } from "../commands/start";
@@ -14,19 +15,28 @@ import {
   type TTelegramCommandProps,
   type TTelegramGetReplyFn,
 } from "../definitions";
+import { forgetMeConfirmations } from "../forgetMeConfirmations";
 import { logTelegram } from "../logging/utils";
 import { formatTelegramAiReplyText } from "../formatTelegramAiReplyText";
 import { getPromptForTelegramChat } from "../prompts/getPromptForTelegramChat";
+import { resolveTelegramLocale } from "../resolveTelegramLocale";
 import { getErrorSticker, getUnknownSticker } from "../stickers/presets";
 import {
   appendTelegramChatMessage,
   getRecentTelegramChatMessages,
 } from "../telegramUserChatHistory";
-import { getTelegramUserId, getTelegramUserIdHash, telegramSendReply } from "../utils";
+import { telegramSendReply } from "../utils";
 
 const MAX_SYMBOLS = 1024;
 
 const getReply: TTelegramGetReplyFn = async (props) => {
+  // First, ahead of everything else: a pending "forget me" confirmation has to be
+  // the very next thing the user sends, so nothing can slip in and keep it armed.
+  if (telegramForgetMeCommand.test(props)) {
+    return telegramForgetMeCommand.getReply(props);
+  }
+  forgetMeConfirmations.clear(props.telegramUserIdHash);
+
   if (telegramStartCommand.test(props)) {
     return telegramStartCommand.getReply();
   }
@@ -60,8 +70,7 @@ const getReply: TTelegramGetReplyFn = async (props) => {
     throw new Error("Empty message text");
   }
 
-  const telegramId = getTelegramUserId(props);
-  const telegramUserIdHash = getTelegramUserIdHash(props);
+  const { telegramId, telegramUserIdHash } = props;
   await appendTelegramChatMessage({
     telegramUserIdHash,
     telegramId,
@@ -117,9 +126,13 @@ export function telegramOnMessage(bot: TelegramBot): void {
     const messageParsed = message.text
       ? message.text.toLowerCase().replace(/ё/g, "е").trim()
       : message.text;
-    const locale = resolveLocale({
+    const telegramId = from.id;
+    const telegramUserIdHash = getTelegramUserIdSecureHash(telegramId);
+    const locale = await resolveTelegramLocale({
       languageCode: from.language_code,
       text: message.text,
+      telegramId,
+      telegramUserIdHash,
     });
 
     const commandProps = {
@@ -129,6 +142,8 @@ export function telegramOnMessage(bot: TelegramBot): void {
       fromPart,
       messageParsed,
       locale,
+      telegramId,
+      telegramUserIdHash,
     } satisfies TTelegramCommandProps;
 
     try {

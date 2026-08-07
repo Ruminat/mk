@@ -47,3 +47,16 @@ export async function getRecentTelegramChatMessages({
     text: decryptUserData(entry.text, telegramId),
   }));
 }
+
+/**
+ * Forget a user's conversation entirely — the stored rows and the cached copy
+ * alike. No `telegramId` needed: nothing is read back, only dropped. Idempotent;
+ * resolves with how many messages were removed.
+ */
+export function clearTelegramChatHistory({
+  telegramUserIdHash,
+}: {
+  telegramUserIdHash: string;
+}): Promise<number> {
+  return defaultHistory.clear(telegramUserIdHash);
+}

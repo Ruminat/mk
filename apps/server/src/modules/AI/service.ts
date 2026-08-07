@@ -55,4 +55,12 @@ export const aiService = {
 
     return completion?.choices?.[0]?.message?.content ?? null;
   },
+
+  /**
+   * Drop the throttling state held under a user's hash. Nothing personal lives
+   * in it, but "delete everything about me" shouldn't leave a counter behind.
+   */
+  forgetUser: async (userIdHash: string): Promise<void> => {
+    await aiRateLimiter.reset(userIdHash);
+  },
 };

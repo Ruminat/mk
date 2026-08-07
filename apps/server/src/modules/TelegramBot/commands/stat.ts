@@ -3,7 +3,6 @@ import he from "he";
 import { messages } from "../../../common/i18n/messages";
 import { prompts } from "../../../common/i18n/prompts";
 import { TTelegramCommandMethods, TTelegramReplySingle } from "../definitions";
-import { getTelegramUserId, getTelegramUserIdHash } from "../utils";
 import { moodService } from "../../Mood/service";
 import { aiService } from "../../AI/service";
 import { getMoodStatReply } from "../../Mood/sagas/getMoodStatReply";
@@ -19,10 +18,10 @@ export const telegramStatCommand = {
   },
 
   getReply: async (props) => {
-    const telegramUserIdHash = getTelegramUserIdHash(props);
+    const { telegramUserIdHash } = props;
     const entries = await moodService.listMoodEntries({
       userId: telegramUserIdHash,
-      telegramId: getTelegramUserId(props),
+      telegramId: props.telegramId,
     });
 
     const stats = getMoodStatReply(entries, props.locale);

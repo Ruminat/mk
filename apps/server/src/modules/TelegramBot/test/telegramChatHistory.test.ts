@@ -38,6 +38,11 @@ function makeFakeStore(seed: Record<string, TTelegramChatHistoryEntry[]> = {}) {
       }
       data.set(hash, arr);
     },
+    clear: async (hash) => {
+      const removed = data.get(hash)?.length ?? 0;
+      data.delete(hash);
+      return removed;
+    },
   };
 
   return { data, appendCalls, store };
@@ -192,6 +197,51 @@ describe("telegramUserChatHistory.ts / createTelegramChatHistory", () => {
       const restarted = makeHistory({ store: backing.store, maxMessagesPerUser: 2 });
 
       expect(texts(await restarted.getRecent("user-1"))).toEqual(["3", "4"]);
+    });
+  });
+
+  describe("clear — erasing a user (/forget-me)", () => {
+    it("should remove the history from both the store and the cache", async () => {
+      const backing = makeFakeStore();
+      const history = makeHistory({ store: backing.store });
+
+      await history.append("user-1", userMessage("a"));
+      await history.append("user-1", userMessage("b"));
+
+      expect(await history.clear("user-1")).toBe(2);
+
+      expect(backing.data.get("user-1")).toBeUndefined();
+      // Nothing left to rehydrate from, so the cleared history stays empty.
+      expect(await history.getRecent("user-1")).toEqual([]);
+    });
+
+    it("should leave other users untouched", async () => {
+      const backing = makeFakeStore();
+      const history = makeHistory({ store: backing.store });
+
+      await history.append("user-1", userMessage("a"));
+      await history.append("user-2", userMessage("b"));
+
+      await history.clear("user-1");
+
+      expect(texts(await history.getRecent("user-2"))).toEqual(["b"]);
+    });
+
+    it("should be a no-op for a user with no history", async () => {
+      const history = makeHistory({ store: makeFakeStore().store });
+
+      expect(await history.clear("nobody")).toBe(0);
+    });
+
+    it("should start a clean history when the user comes back", async () => {
+      const backing = makeFakeStore();
+      const history = makeHistory({ store: backing.store });
+
+      await history.append("user-1", userMessage("before"));
+      await history.clear("user-1");
+      await history.append("user-1", userMessage("after"));
+
+      expect(texts(await history.getRecent("user-1"))).toEqual(["after"]);
     });
   });
 });
