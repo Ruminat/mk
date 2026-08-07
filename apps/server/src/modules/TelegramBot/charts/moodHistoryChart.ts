@@ -48,16 +48,6 @@ export function moodChartPointCount(entries: TSelectMoodEntry[]): number {
 const MONTHS_EN = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 const MONTHS_RU = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
 
-/** Parse SQLite's "YYYY-MM-DD HH:MM:SS" (UTC) to epoch ms; null if unparseable. */
-function parseCreatedAtMs(createdAt: string | null): number | null {
-  const match = createdAt?.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?/);
-  if (!match) {
-    return null;
-  }
-  const [, year, month, day, hour, minute, second] = match;
-  return Date.UTC(+year, +month - 1, +day, +(hour ?? 0), +(minute ?? 0), +(second ?? 0));
-}
-
 /** Human date for a time-axis tick: "may 15" (en) / "15 мая" (ru). Uses UTC to match the stored timestamps. */
 function formatTimeLabel(ms: number, locale: TLocale): string {
   const date = new Date(ms);
@@ -72,11 +62,9 @@ export function renderMoodHistoryChart(entries: TSelectMoodEntry[], locale: TLoc
   // shown honestly as narrow vs. wide spacing, not squashed to equal steps.
   const points = [...entries]
     .slice(0, MAX_POINTS)
-    .map((entry) => {
-      const ms = parseCreatedAtMs(entry.createdAt);
-      return ms === null ? null : ([ms, entry.value] as [number, number]);
-    })
-    .filter((point): point is [number, number] => point !== null)
+    // A point can't be placed on a time axis without a time, so drop it.
+    .filter((entry) => entry.createdAt !== null)
+    .map((entry) => [entry.createdAt!.getTime(), entry.value] as [number, number])
     .sort((a, b) => a[0] - b[0]);
 
   const chart = echarts.init(null, null, {

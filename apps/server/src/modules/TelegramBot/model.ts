@@ -14,7 +14,7 @@ export const TelegramChatMessageTable = sqliteTable(
     telegramUserIdHash: text("telegram_user_id_hash").notNull(),
     role: text("role", { enum: ["user", "assistant"] }).notNull(),
     text: text("text").notNull(),
-    createdAt: CommonTableField.createdAt.default(sql`CURRENT_TIMESTAMP`),
+    createdAt: CommonTableField.createdAt().default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => [index("telegram_chat_messages_user_idx").on(table.telegramUserIdHash)],
 );

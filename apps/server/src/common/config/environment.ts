@@ -11,7 +11,6 @@ const envSchema = object({
   LOCAL_DB_PATH: string().optional(),
   TURSO_CONNECTION_URL: string().optional(),
   TURSO_AUTH_TOKEN: string().optional(),
-  JWT_SECRET: string(),
   TELEGRAM_BOT_TOKEN: string().optional(),
   TELEGRAM_BOT_WEBHOOK_DOMAIN: url().optional(),
   TELEGRAM_BOT_WEBHOOK_PATH: string()
@@ -71,11 +70,6 @@ export function getEnvironmentVariables() {
     turso: {
       url: values.TURSO_CONNECTION_URL ?? "",
       authToken: values.TURSO_AUTH_TOKEN ?? "",
-    },
-
-    auth: {
-      jwtSecret: values.JWT_SECRET,
-      telegramBotToken: values.TELEGRAM_BOT_TOKEN,
     },
 
     telegramBot: {

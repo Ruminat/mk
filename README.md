@@ -2,19 +2,19 @@
 
 ![MooDuck landing hero](apps/landing/docs/screenshot.png)
 
-Mooduck is a small mood journal: you log how you feel on a 1–10 scale, optionally add a short note, and review your history. Identity comes from **Telegram** (Mini App / web login and bot); the backend stores a **hashed Telegram user id**, not a full user profile.
+Mooduck is a small mood journal: you log how you feel on a 1–10 scale, optionally add a short note, and review your history. It lives entirely in a **Telegram bot**; the backend stores a **hashed Telegram user id**, not a user profile, and encrypts everything you write.
 
 The repo is a **pnpm** + **Turborepo** monorepo.
+
+> **No web app right now.** There used to be a React SPA and an HTTP API behind it; both were removed, and a web client will be written from scratch later. The server today serves exactly two routes: the Telegram webhook and `/health`.
 
 ## Repository layout
 
 | Path | Role |
 |------|------|
-| `apps/web` | **mooduck-web** — React 19 + Vite SPA (Gravity UI, Telegram auth widget) |
 | `apps/landing` | **mooduck-landing** — React 19 + Next.js (App Router) marketing site, Tailwind CSS v4 + CSS Modules; built as a static export (`out/`) served by nginx |
-| `apps/server` | **mooduck-server** — Express API, Drizzle ORM, SQLite (Turso in production or a local file in dev) |
+| `apps/server` | **mooduck-server** — the Telegram bot: Express (webhook only), Drizzle ORM, SQLite (Turso in production or a local file in dev) |
 | `packages/core` | Shared non-UI utilities (`Null`, `Number`, `Random`, …) |
-| `packages/react` | Shared React helpers (e.g. `useFn`) |
 
 ## Prerequisites
 
@@ -29,15 +29,16 @@ pnpm install
 
 ## Environment
 
-Server configuration is validated in `apps/server/src/common/environment.ts`. At minimum you need:
+Server configuration is validated in `apps/server/src/common/config/environment.ts` (see also `apps/server/docs/env.md`). At minimum you need:
 
-- **`JWT_SECRET`** — signing secret for API tokens
+- **`TELEGRAM_USER_ID_SECURE_HASH`** — secret the user identity hash is derived from
+- **`TELEGRAM_USER_DATA_ENCRYPTION_SECRET`** — secret that encrypts mood comments and chat messages at rest. Must differ from the one above, and rotating it makes existing data undecryptable
 - **Database** — either Turso (`TURSO_CONNECTION_URL`, `TURSO_AUTH_TOKEN`) or, in dev only, `USE_LOCAL_DB=true` with optional `LOCAL_DB_PATH` (defaults to `data/local.db` under the server app)
 
 Optional but used when you enable those features:
 
-- **Telegram** — `TELEGRAM_BOT_TOKEN`, webhook settings, `TELEGRAM_USER_ID_SECURE_HASH` (see the same file for exact names and shapes)
-- **DeepSeek** — `DEEPSEEK_API_TOKEN` for AI-assisted replies in the Telegram bot flow
+- **Telegram** — `TELEGRAM_BOT_TOKEN` plus the webhook settings (without a token the bot simply doesn't start)
+- **DeepSeek** — `DEEPSEEK_API_TOKEN` for AI-assisted replies
 
 Copy or create `.env` under `apps/server` as you normally would for local work.
 
@@ -45,10 +46,9 @@ Copy or create `.env` under `apps/server` as you normally would for local work.
 
 | Script | What it does |
 |--------|----------------|
-| `pnpm dev` | Runs Turborepo `dev` (web + server and related packages, with `MODE=dev`) |
-| `pnpm dev.web` | Dev for the web app only |
+| `pnpm dev` | Runs Turborepo `dev` (server + landing and related packages, with `MODE=dev`) |
 | `pnpm dev.landing` | Dev for the Next.js landing site only (`http://localhost:3002`) |
-| `pnpm dev.server` | Dev for the API only |
+| `pnpm dev.server` | Dev for the bot server only |
 | `pnpm dev.local` | Server dev with **`USE_LOCAL_DB=true`** (local SQLite file) |
 | `pnpm build` | Production build (`MODE=prod`) |
 | `pnpm typecheck` | Typecheck across the workspace |

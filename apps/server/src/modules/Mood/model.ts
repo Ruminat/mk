@@ -6,9 +6,11 @@ import { CommonTableField } from "../../common/database/commonFields";
  * Stores hashed telegram user ID (from getTelegramUserIdSecureHash).
  * No user registration - only the hash is persisted.
  *
- * Every read here is "this one user's entries" — /stat, /last, the mood prompt,
- * locale detection — so the user column is indexed; without it each of those
- * scans the whole table.
+ * Every read here is "this one user's newest entries first" — /stat, /last, the
+ * mood prompt, locale detection. The index covers both halves of that: the hash
+ * narrows to the user, and `created_at` next to it means SQLite walks the index
+ * backwards instead of sorting the result. `id` is the rowid and rides along at
+ * the end of the index, so the `id DESC` tiebreak comes free.
  */
 export const MoodTable = sqliteTable(
   "mood_entries",
@@ -17,9 +19,9 @@ export const MoodTable = sqliteTable(
     value: integer("value").notNull(),
     comment: text("comment"),
     telegramUserIdHash: text("telegram_user_id_hash").notNull(),
-    createdAt: CommonTableField.createdAt.default(sql`CURRENT_TIMESTAMP`),
+    createdAt: CommonTableField.createdAt().default(sql`CURRENT_TIMESTAMP`),
   },
-  (table) => [index("mood_entries_user_idx").on(table.telegramUserIdHash)],
+  (table) => [index("mood_entries_user_created_idx").on(table.telegramUserIdHash, table.createdAt)],
 );
 
 export type TInsertMoodEntry = typeof MoodTable.$inferInsert;

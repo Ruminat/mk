@@ -1,14 +1,11 @@
 import compression from "compression";
-import cors from "cors";
 import { randomUUID } from "crypto";
 import express, { NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import { getEnvironmentVariables } from "./common/config/environment";
+import { assertDatabaseReachable, closeDatabase } from "./db/client";
 import { rateLimiter } from "./middlewares/rateLimiter";
-import { adminRouter } from "./modules/Admin/route";
-import { authRouter } from "./modules/Auth/route";
-import { moodRouter } from "./modules/Mood/route";
 import { setupMooDuckTelegramBot } from "./modules/TelegramBot";
 
 export const app = express();
@@ -22,18 +19,11 @@ const { port, isDev, useLocalDb } = getEnvironmentVariables();
  * App middlewares
  **/
 
-// CORS settings
-app.use(
-  cors({
-    origin: isDev ? "*" : ["https://shrek-labs.ru", "https://mooduck.shrek-labs.ru"],
-    credentials: true,
-    optionsSuccessStatus: 200,
-  }),
-);
+// No CORS: nothing calls this server from a browser. Telegram posts the webhook
+// server-to-server, and the landing site is static and served by nginx.
 
 // Rate limiter
-app.use(rateLimiter.default);
-app.use("/api/auth", rateLimiter.auth);
+app.use(rateLimiter);
 
 // Adding X-Request-ID to every request, so we can always track them
 app.use((req: Request & { id?: string }, res: Response, next) => {
@@ -65,24 +55,14 @@ app.use(
   }),
 );
 
-// No cache for api calls
-app.use("/api", (req, res, next) => {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  res.setHeader("Surrogate-Control", "no-store");
-  next();
-});
-
 /**
  * App routes
+ *
+ * Only these two: MooDuck is a Telegram bot, and the webhook route itself is
+ * added by setupMooDuckTelegramBot() during bootstrap.
  **/
 
 app.get("/health", (req, res) => res.status(200).json({ status: "OK" }));
-
-app.use("/api/auth", authRouter);
-app.use("/api/admin", adminRouter);
-app.use("/api/mood", moodRouter);
 
 // NOTE: the 404 catch-all and error handler are registered inside bootstrap(),
 // AFTER the Telegram webhook route is added — otherwise a webhook POST is
@@ -118,6 +98,10 @@ function registerFallbackHandlers() {
 let isShuttingDown = false;
 
 async function bootstrap() {
+  // Fail here rather than on the first person to message the bot: everything the
+  // bot does needs the database, so coming up without one only hides the problem.
+  await assertDatabaseReachable();
+
   const telegramLifecycle = await setupMooDuckTelegramBot(app);
 
   // Must come after the webhook route above, or webhook POSTs hit the 404.
@@ -161,6 +145,12 @@ async function bootstrap() {
       await telegramLifecycle?.shutdownTelegram();
     } catch (error) {
       console.error("Telegram shutdown error:", error);
+    }
+
+    try {
+      await closeDatabase();
+    } catch (error) {
+      console.error("Database shutdown error:", error);
     }
 
     // Without this, keep-alive HTTP sockets can keep the process alive for tens of seconds;

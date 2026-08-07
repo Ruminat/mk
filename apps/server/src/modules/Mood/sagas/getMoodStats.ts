@@ -1,4 +1,3 @@
-import { parseMoodEntryCreatedAtMs } from "../../../common/mood/moodFormat";
 import { TSelectMoodEntry } from "../model";
 import type { TMoodScore, TMoodStats, TMoodStatsEntry } from "../utils";
 import { getMoodInterest } from "../utils";
@@ -13,7 +12,9 @@ function toMoodEntry(entry: TSelectMoodEntry): TMoodStatsEntry {
   return {
     score: entry.value as TMoodScore,
     comment: entry.comment ?? undefined,
-    created: parseMoodEntryCreatedAtMs(entry.createdAt),
+    // An unreadable timestamp is treated as "just now" — it only affects ordering
+    // and the "how long ago" label, and dropping the entry would skew the stats.
+    created: entry.createdAt?.getTime() ?? Date.now(),
   };
 }
 
