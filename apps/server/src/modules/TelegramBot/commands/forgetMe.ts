@@ -3,33 +3,42 @@ import { TTelegramCommandMethods, TTelegramCommandProps } from "../definitions";
 import { FORGET_ME_CONFIRMATION_PHRASE, forgetMeConfirmations } from "../forgetMeConfirmations";
 import { forgetUser } from "../sagas/forgetUser";
 
-const FORGET_ME_COMMAND = "/forget-me";
+/**
+ * Camel case rather than `/forget-me`: Telegram only highlights a command up to
+ * the first dash, so the hyphenated form shows up as a half-linked `/forget`.
+ */
+const FORGET_ME_COMMAND = "/forgetMe";
+/** How the command reaches us — `messageParsed` is lowercased before any command sees it. */
+const FORGET_ME_COMMAND_PARSED = FORGET_ME_COMMAND.toLowerCase();
 
-/** True only when this exact message is the confirmation of a request we're waiting on. */
-function isConfirmation(props: TTelegramCommandProps): boolean {
-  return (
-    props.messageParsed === FORGET_ME_CONFIRMATION_PHRASE &&
-    forgetMeConfirmations.isPending(props.telegramUserIdHash)
-  );
+function isCommand(props: TTelegramCommandProps): boolean {
+  return props.messageParsed === FORGET_ME_COMMAND_PARSED;
 }
 
 /**
- * `/forget-me` — wipes everything MooDuck knows about the sender.
+ * `/forgetMe` — wipes everything MooDuck knows about the sender.
  *
  * Two steps, because there is no undo and no backup: the command only arms the
  * request, and the deletion happens when the user sends the confirmation phrase
- * back. Sending `/forget-me` again just re-arms it.
+ * back. Sending `/forgetMe` again just re-arms it.
  */
 export const telegramForgetMeCommand = {
-  test: (props) => props.messageParsed === FORGET_ME_COMMAND || isConfirmation(props),
+  // The confirmation phrase is claimed whether or not anything is armed. Letting
+  // it fall through would mean the one thing a person types to erase themselves
+  // gets stored in the message table and answered by the AI.
+  test: (props) => isCommand(props) || props.messageParsed === FORGET_ME_CONFIRMATION_PHRASE,
 
   getReply: async (props) => {
     const strings = messages(props.locale).forgetMe;
 
-    if (!isConfirmation(props)) {
+    if (isCommand(props)) {
       forgetMeConfirmations.request(props.telegramUserIdHash);
 
       return { text: strings.confirm(FORGET_ME_CONFIRMATION_PHRASE) };
+    }
+
+    if (!forgetMeConfirmations.isPending(props.telegramUserIdHash)) {
+      return { text: strings.nothingToConfirm(FORGET_ME_COMMAND) };
     }
 
     // Disarm first: whatever happens next, this confirmation is spent.

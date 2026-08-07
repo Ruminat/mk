@@ -80,11 +80,14 @@ const banPhrases = `Avoid clichés and bureaucratic language. Avoid these phrase
 
 const wordsLimit = (limit: number) => `Limit: up to ${limit} words.`;
 
+const replyLanguage = `Language: we take this user to be an English speaker, so English is the default — but go by the language they actually write in: if they write to you in Russian, answer in Russian; if they write in English, answer in English.`;
+
 export const enPrompts: TPromptCatalog = {
   personality,
   role,
   banPhrases,
   wordsLimit,
+  replyLanguage,
 
   moodCommentSection: (comment) =>
     `The user wrote: "${comment}". Play with it in your reply — it might be the key to their mood!`,
@@ -103,7 +106,7 @@ ${personality}
 
 Keep it substantive and short — no more than ${limit} words.
 Every reply must be unique and interesting.
-Reply in English.
+${replyLanguage}
 
 ${recentComments}
 
@@ -125,7 +128,7 @@ ${personality}
 
 Keep it substantive and short — no more than ${limit} words.
 Every reply must be unique and interesting.
-Reply in English.
+${replyLanguage}
 
 ONCE AGAIN, WRITE NOTHING EXCEPT THE REPLY TO THE USER`,
 
@@ -139,7 +142,7 @@ Write one short remark (1–2 sentences) on how this mood streak looks — no ad
 ${personality}
 ${banPhrases}
 ${wordsLimit(limit)}
-Reply in English.`,
+${replyLanguage}`,
 
   statPrompt: ({ stats, wordsLimit: limit }) =>
     `${role}
@@ -149,7 +152,7 @@ ${personality}
 Provide only the reply to the user and nothing else.
 ${banPhrases}
 ${wordsLimit(limit)}
-Reply in English.
+${replyLanguage}
 
 ${stats}`,
 

@@ -29,7 +29,7 @@ export type TForgetMeConfirmations = {
 };
 
 /**
- * Tracks who is awaiting confirmation of `/forget-me`.
+ * Tracks who is awaiting confirmation of `/forgetMe`.
  *
  * Deliberately in-memory and short-lived: a confirmation that outlives a restart
  * — or an hour of silence — isn't a confirmation of anything any more, and this

@@ -36,4 +36,4 @@ export type TTelegramCommand =
   | "/settings"
   | "/help"
   | "/debug"
-  | "/forget-me";
+  | "/forgetMe";

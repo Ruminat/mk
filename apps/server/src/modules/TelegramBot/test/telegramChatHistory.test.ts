@@ -241,7 +241,7 @@ describe("telegramUserChatHistory.ts / createTelegramChatHistory", () => {
     });
   });
 
-  describe("clear — erasing a user (/forget-me)", () => {
+  describe("clear — erasing a user (/forgetMe)", () => {
     it("should remove the history from both the store and the cache", async () => {
       const backing = makeFakeStore();
       const history = makeHistory({ store: backing.store });

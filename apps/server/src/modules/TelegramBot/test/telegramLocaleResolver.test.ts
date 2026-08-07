@@ -186,7 +186,7 @@ describe("telegramLocaleResolver.ts / createTelegramLocaleResolver", () => {
     });
   });
 
-  describe("forget — erasing a user (/forget-me)", () => {
+  describe("forget — erasing a user (/forgetMe)", () => {
     it("should work the locale out from scratch after the user is forgotten", async () => {
       const resolver = createTelegramLocaleResolver();
       const { sources, calls } = makeSources(["5 грустно"]);

@@ -13,6 +13,12 @@ export type TPromptCatalog = {
   banPhrases: string;
   /** "Limit: up to N words." */
   wordsLimit: (limit: number) => string;
+  /**
+   * Which language to answer in. States the locale we resolved for this user as
+   * the default, and tells the model to follow the language they actually write
+   * in — our guess is only a guess, and someone may switch for a message or two.
+   */
+  replyLanguage: string;
 
   /** The "the user wrote: …" clause for a mood entry, or "" when no comment. */
   moodCommentSection: (comment: string) => string;

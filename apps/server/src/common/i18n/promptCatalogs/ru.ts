@@ -84,11 +84,14 @@ const banPhrases = `Избегай клише и канцелярита. Изб�
 
 const wordsLimit = (limit: number) => `Лимит: до ${limit} слов.`;
 
+const replyLanguage = `Язык: мы считаем, что этот пользователь говорит по-русски, поэтому русский — язык по умолчанию, но ориентируйся на тот язык, на котором он пишет на самом деле: пишет тебе по-русски — отвечай по-русски, пишет по-английски — отвечай по-английски.`;
+
 export const ruPrompts: TPromptCatalog = {
   personality,
   role,
   banPhrases,
   wordsLimit,
+  replyLanguage,
 
   moodCommentSection: (comment) =>
     `Пользователь написал: "${comment}". Обыграй это в ответе — возможно, это ключ к его настроению!`,
@@ -107,7 +110,7 @@ ${personality}
 
 Нужен содержательный и краткий ответ — не больше ${limit} слов.
 Каждый раз ответ должен быть уникальным и интересным.
-Отвечай по-русски.
+${replyLanguage}
 
 ${recentComments}
 
@@ -142,7 +145,7 @@ ${personality}
 
 Нужен содержательный и краткий ответ — не больше ${limit} слов.
 Каждый раз ответ должен быть уникальным и интересным.
-Отвечай по-русски.
+${replyLanguage}
 
 ЕЩЁ РАЗ, НИЧЕГО, КРОМЕ ОТВЕТА ПОЛЬЗОВАТЕЛЮ, ПИСАТЬ НЕ НАДО`,
 
@@ -156,7 +159,7 @@ ${block}
 ${personality}
 ${banPhrases}
 ${wordsLimit(limit)}
-Отвечай по-русски.`,
+${replyLanguage}`,
 
   statPrompt: ({ stats, wordsLimit: limit }) =>
     `${role}
@@ -166,7 +169,7 @@ ${personality}
 Предоставь только ответ пользователю и больше ничего.
 ${banPhrases}
 ${wordsLimit(limit)}
-Отвечай по-русски.
+${replyLanguage}
 
 ${stats}`,
 
