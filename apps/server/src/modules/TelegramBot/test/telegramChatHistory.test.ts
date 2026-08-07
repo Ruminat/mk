@@ -26,9 +26,13 @@ function makeFakeStore(seed: Record<string, TTelegramChatHistoryEntry[]> = {}) {
     Object.entries(seed).map(([key, value]) => [key, [...value]]),
   );
   const appendCalls: { hash: string; entry: TTelegramChatHistoryEntry; keepLast: number }[] = [];
+  const loadCalls: string[] = [];
 
   const store: TTelegramChatHistoryStore = {
-    loadRecent: async (hash, limit) => (data.get(hash) ?? []).slice(-limit),
+    loadRecent: async (hash, limit) => {
+      loadCalls.push(hash);
+      return (data.get(hash) ?? []).slice(-limit);
+    },
     append: async (hash, entry, keepLast) => {
       appendCalls.push({ hash, entry, keepLast });
       const arr = data.get(hash) ?? [];
@@ -45,7 +49,7 @@ function makeFakeStore(seed: Record<string, TTelegramChatHistoryEntry[]> = {}) {
     },
   };
 
-  return { data, appendCalls, store };
+  return { data, appendCalls, loadCalls, store };
 }
 
 function makeHistory(options: TTelegramChatHistoryOptions = {}) {
@@ -197,6 +201,43 @@ describe("telegramUserChatHistory.ts / createTelegramChatHistory", () => {
       const restarted = makeHistory({ store: backing.store, maxMessagesPerUser: 2 });
 
       expect(texts(await restarted.getRecent("user-1"))).toEqual(["3", "4"]);
+    });
+  });
+
+  describe("one store read per turn", () => {
+    // A turn reads the history to pick the locale, appends the user's message and
+    // reads it again to build the prompt. Only the first of those may hit the store.
+    it("should hit the store once across a whole turn", async () => {
+      const backing = makeFakeStore({ "user-1": [userMessage("earlier")] });
+      const history = makeHistory({ store: backing.store });
+
+      await history.getRecent("user-1");
+      await history.append("user-1", userMessage("7"));
+      await history.getRecent("user-1");
+
+      expect(backing.loadCalls).toEqual(["user-1"]);
+    });
+
+    it("should hit the store once for a user who has no history yet", async () => {
+      const backing = makeFakeStore();
+      const history = makeHistory({ store: backing.store });
+
+      await history.getRecent("newcomer");
+      await history.append("newcomer", userMessage("7"));
+      await history.getRecent("newcomer");
+
+      // Nothing to load is worth caching too, or every read would ask again.
+      expect(backing.loadCalls).toEqual(["newcomer"]);
+    });
+
+    it("should still see the message appended during the turn", async () => {
+      const backing = makeFakeStore({ "user-1": [userMessage("earlier")] });
+      const history = makeHistory({ store: backing.store });
+
+      await history.getRecent("user-1");
+      await history.append("user-1", userMessage("7"));
+
+      expect(texts(await history.getRecent("user-1"))).toEqual(["earlier", "7"]);
     });
   });
 

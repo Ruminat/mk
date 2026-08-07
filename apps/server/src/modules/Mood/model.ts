@@ -1,18 +1,26 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { CommonTableField } from "../../common/database/commonFields";
 
 /**
  * Stores hashed telegram user ID (from getTelegramUserIdSecureHash).
  * No user registration - only the hash is persisted.
+ *
+ * Every read here is "this one user's entries" — /stat, /last, the mood prompt,
+ * locale detection — so the user column is indexed; without it each of those
+ * scans the whole table.
  */
-export const MoodTable = sqliteTable("mood_entries", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  value: integer("value").notNull(),
-  comment: text("comment"),
-  telegramUserIdHash: text("telegram_user_id_hash").notNull(),
-  createdAt: CommonTableField.createdAt.default(sql`CURRENT_TIMESTAMP`),
-});
+export const MoodTable = sqliteTable(
+  "mood_entries",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    value: integer("value").notNull(),
+    comment: text("comment"),
+    telegramUserIdHash: text("telegram_user_id_hash").notNull(),
+    createdAt: CommonTableField.createdAt.default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [index("mood_entries_user_idx").on(table.telegramUserIdHash)],
+);
 
 export type TInsertMoodEntry = typeof MoodTable.$inferInsert;
 export type TSelectMoodEntry = typeof MoodTable.$inferSelect;

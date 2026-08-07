@@ -77,9 +77,10 @@ export function createTelegramChatHistory(options: TTelegramChatHistoryOptions =
     }
 
     const loaded = store ? await store.loadRecent(telegramUserIdHash, maxMessagesPerUser) : [];
-    if (loaded.length > 0) {
-      cache.set(telegramUserIdHash, loaded);
-    }
+    // "This user has nothing" is cached too. A turn reads the history more than
+    // once (to pick the locale, then to build the prompt), and without this a
+    // first-time user would hit the store on every one of those reads.
+    cache.set(telegramUserIdHash, loaded);
     return loaded;
   }
 

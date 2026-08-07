@@ -1,0 +1,1 @@
+CREATE INDEX `mood_entries_user_idx` ON `mood_entries` (`telegram_user_id_hash`);
