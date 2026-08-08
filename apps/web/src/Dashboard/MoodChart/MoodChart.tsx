@@ -26,10 +26,15 @@ export function MoodChart({ option, ariaLabel }: MoodChartProps) {
     const chart = echarts.init(container, null, { renderer: "svg" });
     chartRef.current = chart;
 
-    const resize = () => chart.resize();
-    window.addEventListener("resize", resize);
+    // ECharts fixes its canvas to whatever the container measured at init, so it
+    // has to be told when that changes. Watching the element rather than the
+    // window catches every cause — rotation, the card being re-laid out, the
+    // grid collapsing to one column — not just a viewport resize.
+    const observer = new ResizeObserver(() => chart.resize());
+    observer.observe(container);
+
     return () => {
-      window.removeEventListener("resize", resize);
+      observer.disconnect();
       chart.dispose();
       chartRef.current = null;
     };

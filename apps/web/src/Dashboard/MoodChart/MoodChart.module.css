@@ -1,4 +1,14 @@
 .chart {
   width: 100%;
+  /* Never contribute a minimum width: the plot follows the card, not the other
+     way round. Without this the SVG can hold the card open wider than the page. */
+  min-width: 0;
   height: 260px;
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .chart {
+    height: 200px;
+  }
 }

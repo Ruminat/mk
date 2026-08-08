@@ -26,7 +26,9 @@
 
 .row {
   display: flex;
-  align-items: center;
+  /* Notes wrap to two lines, so the badge and the timestamp line up with the
+     first line rather than floating in the middle of the row. */
+  align-items: flex-start;
   gap: 14px;
   padding: 14px 0;
   border-top: 1px solid var(--color-border-cream);
@@ -56,15 +58,28 @@
   min-width: 0;
   color: var(--color-body);
   font-size: 15px;
+  line-height: 1.45;
+
+  /*
+   * `anywhere`, not `break-word`: only `anywhere` also shrinks the element's
+   * min-content width, which is what stops an unbroken run of text — a long
+   * word, a pasted URL — from setting the card's minimum size.
+   */
+  overflow-wrap: anywhere;
+
+  /* Long notes are clamped rather than left to run, so rows stay scannable. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .time {
   flex: none;
   color: var(--color-muted);
   font-size: 13.5px;
+  line-height: 1.45;
   white-space: nowrap;
 }
 

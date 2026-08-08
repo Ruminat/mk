@@ -5,6 +5,7 @@ import type { TWebMessages } from "@/I18n/Catalogs/En";
 import { MOOD_CHART_MIN_POINTS } from "../Definitions";
 import { buildMoodChartOption, selectChartPoints } from "../MoodChart/BuildMoodChartOption";
 import { MoodChart } from "../MoodChart/MoodChart";
+import { useCompactChart } from "../MoodChart/UseCompactChart";
 import styles from "./MoodChartCard.module.css";
 
 interface MoodChartCardProps {
@@ -16,7 +17,11 @@ interface MoodChartCardProps {
 
 export function MoodChartCard({ messages, locale, entries, loading }: MoodChartCardProps) {
   const m = messages.chart;
-  const option = useMemo(() => buildMoodChartOption(entries, locale), [entries, locale]);
+  const compact = useCompactChart();
+  const option = useMemo(
+    () => buildMoodChartOption(entries, locale, { compact }),
+    [entries, locale, compact],
+  );
   const canPlot = !loading && selectChartPoints(entries).length >= MOOD_CHART_MIN_POINTS;
 
   return (

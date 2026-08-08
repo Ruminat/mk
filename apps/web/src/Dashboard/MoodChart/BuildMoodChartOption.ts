@@ -25,19 +25,31 @@ export function selectChartPoints(entries: readonly TMoodEntry[]): [number, numb
     .sort((a, b) => a[0] - b[0]);
 }
 
-export function buildMoodChartOption(entries: readonly TMoodEntry[], locale: TLocale): EChartsOption {
+export type TMoodChartOptions = {
+  /** Draw for a phone: smaller type, thinner line, tighter margins. */
+  compact?: boolean;
+};
+
+export function buildMoodChartOption(
+  entries: readonly TMoodEntry[],
+  locale: TLocale,
+  { compact = false }: TMoodChartOptions = {},
+): EChartsOption {
   const points = selectChartPoints(entries);
   // A browser has full ICU, so use Intl for the axis labels (local, localized) —
   // this deliberately diverges from the bot, which hardcodes month tables because
   // minimal Node builds ship a cut-down ICU.
   const dateFormatter = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
+  const labelSize = compact ? 10 : 12;
 
   return {
     backgroundColor: "transparent",
     animation: false,
     useUTC: false, // a browser user wants dates in their own timezone
     textStyle: { fontFamily: FONT_FAMILY },
-    grid: { left: 36, right: 18, top: 18, bottom: 28 },
+    grid: compact
+      ? { left: 26, right: 10, top: 12, bottom: 22 }
+      : { left: 36, right: 18, top: 18, bottom: 28 },
     xAxis: {
       type: "time",
       axisTick: { show: false },
@@ -45,9 +57,9 @@ export function buildMoodChartOption(entries: readonly TMoodEntry[], locale: TLo
       splitLine: { show: false },
       axisLabel: {
         color: LABEL_INK,
-        fontSize: 12,
+        fontSize: labelSize,
         hideOverlap: true,
-        margin: 12,
+        margin: compact ? 8 : 12,
         formatter: (value: number) => dateFormatter.format(new Date(value)),
       },
     },
@@ -58,7 +70,7 @@ export function buildMoodChartOption(entries: readonly TMoodEntry[], locale: TLo
       interval: 2, // guide lines at 0 / 2 / 4 / 6 / 8 / 10
       axisTick: { show: false },
       axisLine: { show: false },
-      axisLabel: { color: LABEL_INK, fontSize: 12, margin: 10 },
+      axisLabel: { color: LABEL_INK, fontSize: labelSize, margin: compact ? 6 : 10 },
       splitLine: { lineStyle: { color: GRID, width: 1 } },
     },
     series: [
@@ -67,9 +79,9 @@ export function buildMoodChartOption(entries: readonly TMoodEntry[], locale: TLo
         data: points,
         smooth: 0.35,
         symbol: "circle",
-        symbolSize: 8,
+        symbolSize: compact ? 5 : 8,
         showSymbol: points.length <= 40,
-        lineStyle: { color: GOLD, width: 3, cap: "round", join: "round" },
+        lineStyle: { color: GOLD, width: compact ? 2 : 3, cap: "round", join: "round" },
         itemStyle: { color: "#fff", borderColor: GREEN, borderWidth: 2 },
         areaStyle: {
           color: {

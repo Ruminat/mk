@@ -45,3 +45,39 @@ describe("buildMoodChartOption", () => {
     ]);
   });
 });
+
+describe("buildMoodChartOption / compact", () => {
+  const entries = [entry(2, 5, T2), entry(1, 7, T1)];
+
+  it("should draw smaller type and a thinner line on a phone", () => {
+    const wide = buildMoodChartOption(entries, "en");
+    const narrow = buildMoodChartOption(entries, "en", { compact: true });
+
+    const size = (option: ReturnType<typeof buildMoodChartOption>) =>
+      (option.yAxis as { axisLabel: { fontSize: number } }).axisLabel.fontSize;
+    const lineWidth = (option: ReturnType<typeof buildMoodChartOption>) =>
+      (option.series as [{ lineStyle: { width: number } }])[0].lineStyle.width;
+
+    expect(size(narrow)).toBeLessThan(size(wide));
+    expect(lineWidth(narrow)).toBeLessThan(lineWidth(wide));
+  });
+
+  it("should leave less room for axis margins on a phone", () => {
+    const wide = buildMoodChartOption(entries, "en").grid as { left: number };
+    const narrow = buildMoodChartOption(entries, "en", { compact: true }).grid as { left: number };
+
+    expect(narrow.left).toBeLessThan(wide.left);
+  });
+
+  it("should default to the roomy layout when nothing is passed", () => {
+    // Compared field by field rather than with toEqual: the option carries an
+    // axis `formatter` closure, which is a fresh function on every call.
+    const implicit = buildMoodChartOption(entries, "en");
+    const explicit = buildMoodChartOption(entries, "en", { compact: false });
+
+    expect(implicit.grid).toEqual(explicit.grid);
+    expect((implicit.yAxis as { axisLabel: unknown }).axisLabel).toEqual(
+      (explicit.yAxis as { axisLabel: unknown }).axisLabel,
+    );
+  });
+});

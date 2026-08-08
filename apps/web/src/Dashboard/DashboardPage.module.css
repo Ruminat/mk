@@ -19,6 +19,16 @@
   align-items: start;
 }
 
+/*
+ * Grid items are `min-width: auto` by default, so a column refuses to shrink
+ * below its content's minimum. Notes are free text, so one long entry would set
+ * that minimum, widen the Recent column, squeeze the chart to a sliver and push
+ * the whole page wider than the viewport.
+ */
+.bottom > * {
+  min-width: 0;
+}
+
 @media (max-width: 900px) {
   .bottom {
     grid-template-columns: 1fr;
