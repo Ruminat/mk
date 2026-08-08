@@ -1,5 +1,5 @@
 import TelegramBot, { Chat } from "node-telegram-bot-api";
-import type { TLocale } from "../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 
 export class TelegramInputError extends Error {}
 

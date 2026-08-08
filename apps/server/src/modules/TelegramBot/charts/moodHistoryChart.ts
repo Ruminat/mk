@@ -2,7 +2,7 @@ import { Resvg } from "@resvg/resvg-js";
 import * as echarts from "echarts";
 import { existsSync } from "fs";
 import path from "path";
-import type { TLocale } from "../../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import type { TSelectMoodEntry } from "../../Mood/model";
 
 /**

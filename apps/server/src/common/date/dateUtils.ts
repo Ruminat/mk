@@ -1,4 +1,4 @@
-import type { TLocale } from "../i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import { messages } from "../i18n/messages";
 
 export function howLongAgo(ms: number, locale: TLocale): string {

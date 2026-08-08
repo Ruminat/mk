@@ -1,21 +1,25 @@
 import Image from "next/image";
+import type { TLandingMessages } from "@/I18n/Catalogs/En";
 import { GITHUB_URL, TELEGRAM_URL } from "../Definitions";
 import { GithubIcon, HeartSolidIcon, LockIcon, TelegramIcon } from "../Icons";
 import styles from "./Hero.module.css";
 
-export function Hero() {
+interface HeroProps {
+  messages: TLandingMessages;
+}
+
+export function Hero({ messages }: HeroProps) {
+  const { hero, cta } = messages;
+
   return (
     <section className={styles.hero}>
       <div className={styles.intro}>
         <h1 className={styles.title}>
-          A calm place to&nbsp;listen to yourself.
+          {hero.titleLead}&nbsp;{hero.titleTail}
           <HeartSolidIcon className={styles.titleHeart} />
         </h1>
 
-        <p className={styles.subtitle}>
-          MooDuck is a private Telegram mood journal that helps you check in, add short notes, and
-          notice patterns over time — gently and without pressure.
-        </p>
+        <p className={styles.subtitle}>{hero.subtitle}</p>
 
         <div className={styles.actions}>
           <a
@@ -25,7 +29,7 @@ export function Hero() {
             rel="noopener noreferrer"
           >
             <TelegramIcon className={styles.buttonIcon} />
-            Open in Telegram
+            {cta.openInTelegram}
           </a>
           <a
             className={`${styles.button} ${styles.buttonSecondary}`}
@@ -34,13 +38,13 @@ export function Hero() {
             rel="noopener noreferrer"
           >
             <GithubIcon className={styles.buttonIcon} />
-            View on GitHub
+            {cta.viewOnGithub}
           </a>
         </div>
 
         <p className={styles.note}>
           <LockIcon className={styles.noteIcon} />
-          Private by design. Your check-ins are yours.
+          {hero.privacyNote}
         </p>
       </div>
 
@@ -53,7 +57,7 @@ export function Hero() {
           </svg>
           <Image
             src="/heroMascot.webp"
-            alt="MooDuck mascot — a scholarly duck holding a journal"
+            alt={hero.mascotAlt}
             fill
             priority
             sizes="(max-width: 768px) 300px, 430px"

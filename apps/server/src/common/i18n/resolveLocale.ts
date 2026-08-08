@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, type TLocale } from "./locale";
+import { DEFAULT_LOCALE, type TLocale } from "@mooduck/core";
 
 /**
  * Heuristic: does this text read as Russian? True when Cyrillic letters are

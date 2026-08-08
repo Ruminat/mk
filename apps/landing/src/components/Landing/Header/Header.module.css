@@ -63,6 +63,39 @@
   color: var(--color-accent);
 }
 
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  flex: none;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--color-surface-raised);
+  border: 1.5px solid var(--color-border-blue);
+}
+
+.switcherLink {
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-soft);
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.switcherLink:hover {
+  color: var(--color-accent);
+}
+
+.switcherLink[data-active="true"] {
+  color: #fff;
+  background: var(--color-brand);
+}
+
 .cta {
   display: inline-flex;
   align-items: center;
@@ -74,7 +107,6 @@
   padding: 11px 20px;
   border-radius: 999px;
   white-space: nowrap;
-  margin-left: auto;
   flex: none;
   transition:
     background 0.2s,

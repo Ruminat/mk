@@ -1,5 +1,5 @@
 import { getRandomInt } from "@mooduck/core";
-import type { TLocale } from "../../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import { prompts } from "../../../common/i18n/prompts";
 import { TSelectMoodEntry } from "../model";
 import { getLastMoodCommentsForPrompt } from "../sagas/getLastMoodCommentsForPrompt";

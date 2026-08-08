@@ -1,4 +1,4 @@
-import type { TLocale } from "../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import { moodService } from "../Mood/service";
 import { createTelegramLocaleResolver } from "./telegramLocaleResolver";
 import { getRecentTelegramChatMessages } from "./telegramUserChatHistory";

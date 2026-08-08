@@ -1,5 +1,5 @@
 import he from "he";
-import type { TLocale } from "../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import { messages } from "../../common/i18n/messages";
 
 export type TMoodScore = number;

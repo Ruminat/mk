@@ -26,7 +26,8 @@ const FRAME_WIDTH = 1200;
 const FRAME_HEIGHT = 660;
 
 test("generate README hero screenshot", async ({ page, baseURL }) => {
-  const appUrl = new URL("/", baseURL).href;
+  // The README screenshot stays English; the landing lives at /en now.
+  const appUrl = new URL("/en", baseURL).href;
   const outputPath = path.resolve(process.cwd(), "docs/screenshot.png");
 
   await page.setContent(`

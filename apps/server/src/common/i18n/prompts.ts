@@ -1,4 +1,4 @@
-import type { TLocale } from "./locale";
+import type { TLocale } from "@mooduck/core";
 import { enPrompts } from "./promptCatalogs/en";
 import type { TPromptCatalog } from "./promptCatalogs/promptCatalog";
 import { ruPrompts } from "./promptCatalogs/ru";

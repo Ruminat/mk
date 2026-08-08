@@ -7,7 +7,7 @@
  * variables via `var(--color-*)`.
  */
 @theme {
-  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-nunito), system-ui, sans-serif;
   --font-script: var(--font-caveat), cursive;
 

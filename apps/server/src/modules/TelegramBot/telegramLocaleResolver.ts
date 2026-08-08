@@ -1,5 +1,5 @@
 import { LRUCache } from "lru-cache";
-import { DEFAULT_LOCALE, type TLocale } from "../../common/i18n/locale";
+import { DEFAULT_LOCALE, type TLocale } from "@mooduck/core";
 import { resolveLocale } from "../../common/i18n/resolveLocale";
 
 /** How long a locale worked out from a user's history stays good for. */

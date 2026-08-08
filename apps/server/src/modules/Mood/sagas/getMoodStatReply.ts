@@ -1,4 +1,4 @@
-import type { TLocale } from "../../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import { messages } from "../../../common/i18n/messages";
 import { moodScoreCode } from "../../TelegramBot/utils";
 import { getMoodStats } from "./getMoodStats";

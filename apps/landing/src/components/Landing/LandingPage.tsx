@@ -1,3 +1,5 @@
+import type { TLocale } from "@mooduck/core";
+import { landingMessages } from "@/I18n/Messages";
 import { FeatureCards } from "./FeatureCards/FeatureCards";
 import { FinalCta } from "./FinalCta/FinalCta";
 import { Footer } from "./Footer/Footer";
@@ -8,10 +10,16 @@ import { Privacy } from "./Privacy/Privacy";
 import { ProductPreview } from "./ProductPreview/ProductPreview";
 import styles from "./LandingPage.module.css";
 
-export function LandingPage() {
+interface LandingPageProps {
+  locale: TLocale;
+}
+
+export function LandingPage({ locale }: LandingPageProps) {
+  const messages = landingMessages(locale);
+
   return (
     <div id="top" className={styles.page}>
-      <Header />
+      <Header locale={locale} messages={messages} />
 
       <main className={styles.card}>
         <svg
@@ -38,13 +46,13 @@ export function LandingPage() {
           />
         </svg>
 
-        <Hero />
-        <FeatureCards />
-        <ProductPreview />
-        <HowItWorks />
-        <Privacy />
-        <FinalCta />
-        <Footer />
+        <Hero messages={messages} />
+        <FeatureCards messages={messages} />
+        <ProductPreview messages={messages} />
+        <HowItWorks messages={messages} />
+        <Privacy messages={messages} />
+        <FinalCta messages={messages} />
+        <Footer messages={messages} />
       </main>
     </div>
   );

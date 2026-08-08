@@ -1,9 +1,16 @@
 import Image from "next/image";
+import type { TLandingMessages } from "@/I18n/Catalogs/En";
 import { GITHUB_URL, TELEGRAM_URL } from "../Definitions";
 import { GithubIcon, LockIcon, TelegramIcon } from "../Icons";
 import styles from "./FinalCta.module.css";
 
-export function FinalCta() {
+interface FinalCtaProps {
+  messages: TLandingMessages;
+}
+
+export function FinalCta({ messages }: FinalCtaProps) {
+  const { finalCta, cta } = messages;
+
   return (
     <section className={styles.section}>
       <svg className={styles.waves} viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden>
@@ -12,12 +19,12 @@ export function FinalCta() {
       </svg>
 
       <span className={styles.mascot}>
-        <Image src="/ctaMascot.webp" alt="MooDuck mascot" fill sizes="96px" className={styles.cover} />
+        <Image src="/ctaMascot.webp" alt="" fill sizes="96px" className={styles.cover} />
       </span>
 
       <div className={styles.copy}>
-        <h2 className={styles.title}>You deserve a space that&apos;s just for you.</h2>
-        <p className={styles.body}>Start your gentle mood journey with MooDuck.</p>
+        <h2 className={styles.title}>{finalCta.title}</h2>
+        <p className={styles.body}>{finalCta.body}</p>
 
         <div className={styles.actions}>
           <a
@@ -27,7 +34,7 @@ export function FinalCta() {
             rel="noopener noreferrer"
           >
             <TelegramIcon className={styles.buttonIcon} />
-            Open in Telegram
+            {cta.openInTelegram}
           </a>
           <a
             className={`${styles.button} ${styles.buttonGhost}`}
@@ -36,13 +43,13 @@ export function FinalCta() {
             rel="noopener noreferrer"
           >
             <GithubIcon className={styles.buttonIcon} />
-            View on GitHub
+            {cta.viewOnGithub}
           </a>
         </div>
 
         <p className={styles.signoff}>
           <LockIcon className={styles.signoffIcon} />
-          Private. Low pressure. Always here for you.
+          {finalCta.signoff}
         </p>
       </div>
     </section>

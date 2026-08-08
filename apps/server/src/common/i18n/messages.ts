@@ -1,4 +1,4 @@
-import type { TLocale } from "./locale";
+import type { TLocale } from "@mooduck/core";
 import { en, type TMessages } from "./messageCatalogs/en";
 import { ru } from "./messageCatalogs/ru";
 

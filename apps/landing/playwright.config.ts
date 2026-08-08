@@ -18,7 +18,9 @@ export default defineConfig({
 
   webServer: {
     command: `pnpm exec next dev --port ${PORT}`,
-    url: `http://localhost:${PORT}`,
+    // Poll a real page: "/" is an nginx redirect, not a Next route, so it 404s
+    // under `output: export` and would never signal readiness.
+    url: `http://localhost:${PORT}/en`,
     reuseExistingServer: !process.env["CI"],
     timeout: 120_000,
   },

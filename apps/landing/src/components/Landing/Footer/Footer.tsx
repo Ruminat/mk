@@ -1,9 +1,10 @@
+import type { TLandingMessages } from "@/I18n/Catalogs/En";
 import styles from "./Footer.module.css";
 
-export function Footer() {
-  return (
-    <footer className={styles.footer}>
-      Made with care by a solo builder · Open source · Built with kindness
-    </footer>
-  );
+interface FooterProps {
+  messages: TLandingMessages;
+}
+
+export function Footer({ messages }: FooterProps) {
+  return <footer className={styles.footer}>{messages.footer.text}</footer>;
 }

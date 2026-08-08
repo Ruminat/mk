@@ -1,5 +1,5 @@
 import { howLongAgo } from "../../../common/date/dateUtils";
-import type { TLocale } from "../../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import { prompts } from "../../../common/i18n/prompts";
 import { formatPaddedMoodScoreDenominator } from "../../../common/mood/moodFormat";
 import { TSelectMoodEntry } from "../model";

@@ -1,6 +1,6 @@
 import he from "he";
 import { howLongAgo } from "../../common/date/dateUtils";
-import type { TLocale } from "../../common/i18n/locale";
+import type { TLocale } from "@mooduck/core";
 import type { TSelectMoodEntry } from "../Mood/model";
 import { moodScoreCode } from "./utils";
 

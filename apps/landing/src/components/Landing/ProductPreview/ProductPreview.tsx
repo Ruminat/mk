@@ -1,32 +1,37 @@
 import Image from "next/image";
+import type { TLandingMessages } from "@/I18n/Catalogs/En";
 import {
   CHAT_MESSAGES,
   MOOD_ENTRIES,
   MOOD_HISTORY_VALUES,
   PREVIEW_POINTS,
   TELEGRAM_URL,
-  type ChatMessage,
+  type ChatSide,
 } from "../Definitions";
 import { BackArrowIcon, DotsVerticalIcon } from "../Icons";
 import styles from "./ProductPreview.module.css";
 
-export function ProductPreview() {
+interface ProductPreviewProps {
+  messages: TLandingMessages;
+}
+
+export function ProductPreview({ messages }: ProductPreviewProps) {
+  const { preview } = messages;
+
   return (
     <section className={styles.section}>
       <div className={styles.intro}>
-        <span className={styles.eyebrow}>Product preview</span>
-        <h2 className={styles.title}>Check in. Reflect. Grow with kindness.</h2>
-        <p className={styles.body}>
-          MooDuck meets you where you are — with simple conversations and meaningful insights.
-        </p>
+        <span className={styles.eyebrow}>{preview.eyebrow}</span>
+        <h2 className={styles.title}>{preview.title}</h2>
+        <p className={styles.body}>{preview.body}</p>
 
         <ul className={styles.points}>
           {PREVIEW_POINTS.map((point) => (
-            <li key={point.text} className={styles.point}>
+            <li key={point.id} className={styles.point}>
               <span className={styles.pointIconWrap} data-tone={point.tone}>
                 <point.Icon className={styles.pointIcon} />
               </span>
-              {point.text}
+              {preview.points[point.id]}
             </li>
           ))}
         </ul>
@@ -36,37 +41,45 @@ export function ProductPreview() {
         <header className={styles.chatHeader}>
           <BackArrowIcon className={styles.backIcon} />
           <span className={styles.avatar}>
-            <Image src="/chatAvatar.webp" alt="MooDuck" fill sizes="38px" className={styles.cover} />
+            <Image src="/chatAvatar.webp" alt="" fill sizes="38px" className={styles.cover} />
           </span>
           <div className={styles.chatMeta}>
-            <span className={styles.chatName}>MooDuck</span>
-            <span className={styles.chatStatus}>bot</span>
+            <span className={styles.chatName}>{preview.chatName}</span>
+            <span className={styles.chatStatus}>{preview.chatStatus}</span>
           </div>
           <DotsVerticalIcon className={styles.menuIcon} />
         </header>
 
         <div className={styles.messages}>
-          {CHAT_MESSAGES.map((message, index) => (
-            <ChatBubble key={index} message={message} />
+          {CHAT_MESSAGES.map((message) => (
+            <ChatBubble
+              key={message.id}
+              side={message.side}
+              time={message.time}
+              text={preview.chat[message.id]}
+            />
           ))}
         </div>
       </div>
 
       <div className={styles.history}>
-        <h3 className={styles.historyTitle}>Your mood history</h3>
-        <p className={styles.historyCaption}>Past 14 days</p>
+        <h3 className={styles.historyTitle}>{preview.historyTitle}</h3>
+        <p className={styles.historyCaption}>{preview.historyCaption}</p>
 
-        <MoodChart />
+        <MoodChart ariaLabel={preview.chartAriaLabel} labels={preview.chartLabels} />
 
-        <h4 className={styles.entriesTitle}>Recent entries</h4>
+        <h4 className={styles.entriesTitle}>{preview.entriesTitle}</h4>
         <ul className={styles.entries}>
-          {MOOD_ENTRIES.map((entry) => (
-            <li key={entry.date} className={styles.entry}>
-              <span className={styles.entryDate}>{entry.date}</span>
-              <span className={styles.entryScore}>{entry.score}</span>
-              <span className={styles.entryNote}>{entry.note}</span>
-            </li>
-          ))}
+          {MOOD_ENTRIES.map((entry) => {
+            const copy = preview.entries[entry.id];
+            return (
+              <li key={entry.id} className={styles.entry}>
+                <span className={styles.entryDate}>{copy.date}</span>
+                <span className={styles.entryScore}>{entry.score}</span>
+                <span className={styles.entryNote}>{copy.note}</span>
+              </li>
+            );
+          })}
         </ul>
 
         <a
@@ -75,7 +88,7 @@ export function ProductPreview() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          View all history
+          {preview.viewAll}
         </a>
       </div>
     </section>
@@ -83,23 +96,30 @@ export function ProductPreview() {
 }
 
 interface ChatBubbleProps {
-  message: ChatMessage;
+  side: ChatSide;
+  time: string;
+  text: string;
 }
 
-function ChatBubble({ message }: ChatBubbleProps) {
+function ChatBubble({ side, time, text }: ChatBubbleProps) {
   return (
-    <div className={styles.bubble} data-side={message.side}>
-      <span className={styles.bubbleText}>{message.text}</span>
+    <div className={styles.bubble} data-side={side}>
+      <span className={styles.bubbleText}>{text}</span>
       <span className={styles.bubbleTime}>
-        {message.time}
-        {message.side === "user" ? <span className={styles.checks}> ✓✓</span> : null}
+        {time}
+        {side === "user" ? <span className={styles.checks}> ✓✓</span> : null}
       </span>
     </div>
   );
 }
 
+interface MoodChartProps {
+  ariaLabel: string;
+  labels: readonly string[];
+}
+
 /** Static demo line chart of the past 14 days of mood scores. */
-function MoodChart() {
+function MoodChart({ ariaLabel, labels }: MoodChartProps) {
   const width = 280;
   const height = 130;
   const padX = 8;
@@ -118,7 +138,7 @@ function MoodChart() {
         viewBox={`0 0 ${width} ${height}`}
         className={styles.chartSvg}
         role="img"
-        aria-label="Line chart of mood scores over the past 14 days"
+        aria-label={ariaLabel}
       >
         {[0, 5, 10].map((value) => (
           <line
@@ -136,10 +156,9 @@ function MoodChart() {
         ))}
       </svg>
       <figcaption className={styles.chartLabels} aria-hidden>
-        <span>May 5</span>
-        <span>May 10</span>
-        <span>May 15</span>
-        <span>May 20</span>
+        {labels.map((label) => (
+          <span key={label}>{label}</span>
+        ))}
       </figcaption>
     </figure>
   );

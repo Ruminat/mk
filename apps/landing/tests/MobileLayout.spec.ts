@@ -26,7 +26,8 @@ const TOLERANCE_PX = 1;
 
 async function openPage(page: Page, viewport: Viewport) {
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
-  await page.goto("/");
+  // The landing lives at /en and /ru now; "/" is an nginx redirect, not a page.
+  await page.goto("/en");
   // Web fonts change text metrics; wait for them so overflow checks are real.
   await page.evaluate(() => document.fonts.ready);
 }

@@ -8,7 +8,8 @@
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "build": "node esbuild.config.js && tsc --emitDeclarationOnly",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "exports": {
     ".": {
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.27.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }

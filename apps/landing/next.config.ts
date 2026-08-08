@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // `@mooduck/core` is resolved to its TypeScript source (tsconfig `paths`), so
+  // Next has to run it through its own compiler rather than treating it as a
+  // prebuilt dependency.
+  transpilePackages: ["@mooduck/core"],
+
   // Fully static marketing site: emit plain HTML/CSS/JS into `out/` so nginx can
   // serve it directly (no Node runtime, no `next start`, no sharp on the box).
   output: "export",
