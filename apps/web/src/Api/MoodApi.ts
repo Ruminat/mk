@@ -8,10 +8,20 @@ import {
 } from "@mooduck/contracts";
 import { apiRequest } from "./ApiClient";
 
+export interface ListEntriesParams {
+  limit?: number;
+  /** How many newer entries to skip — the "load older" page cursor. */
+  offset?: number;
+}
+
 export const moodApi = {
-  /** Newest-first window; one request feeds the chart, both tiles and Recent. */
-  listEntries: async (limit: number = LIST_MOOD_ENTRIES_MAX): Promise<TMoodEntry[]> => {
-    const { entries } = await apiRequest(`/api/mood/entries?limit=${limit}`, MoodEntriesResponseSchema);
+  /** Newest-first page; the first one feeds the chart, the tiles and Recent. */
+  listEntries: async ({
+    limit = LIST_MOOD_ENTRIES_MAX,
+    offset = 0,
+  }: ListEntriesParams = {}): Promise<TMoodEntry[]> => {
+    const query = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    const { entries } = await apiRequest(`/api/mood/entries?${query}`, MoodEntriesResponseSchema);
     return entries;
   },
 

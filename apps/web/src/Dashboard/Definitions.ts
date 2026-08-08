@@ -1,9 +1,6 @@
 /** How many of the newest entries the chart plots (per the design). */
 export const CHART_POINTS = 30;
 
-/** How many rows the Recent card shows. */
-export const RECENT_LIMIT = 10;
-
 /** The chart needs at least this many points to be worth drawing (mirrors the bot). */
 export const MOOD_CHART_MIN_POINTS = 2;
 

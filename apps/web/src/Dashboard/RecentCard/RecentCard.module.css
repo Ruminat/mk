@@ -24,6 +24,31 @@
   flex-direction: column;
 }
 
+/*
+ * Beside the chart (the two-column layout starts one pixel past where `.bottom`
+ * stops stacking), a long history scrolls inside the card instead of stretching
+ * the page far below the chart. Stacked, the card is the last thing on the page
+ * and the page's own scroll is the natural one — so no cap there.
+ */
+@media (min-width: 901px) {
+  .list {
+    max-height: 600px;
+    overflow-y: auto;
+    /* Don't hand the leftover scroll to the page when the list hits its end. */
+    overscroll-behavior: contain;
+    /* Reserve the scrollbar's width always, so rows don't shift when it appears. */
+    scrollbar-gutter: stable;
+  }
+}
+
+/* The load-older sentinel: also what the spinner text and the retry sit in. */
+.more {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0 2px;
+  border-top: 1px solid var(--color-border-cream);
+}
+
 .row {
   display: flex;
   /* Notes wrap to two lines, so the badge and the timestamp line up with the

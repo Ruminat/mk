@@ -219,12 +219,16 @@ why the quick way exists.
 | `POST` | `/api/auth/telegram` | signed Login Widget payload |
 | `GET` | `/api/auth/session` | — |
 | `POST` | `/api/auth/logout` | — |
-| `GET` | `/api/mood/entries?limit=360` | — |
+| `GET` | `/api/mood/entries?limit=360&offset=0` | — |
 | `POST` | `/api/mood/entries` | `{ "value": 1..10, "comment": "optional" }` |
 
 `POST /api/auth/telegram` is the one route that mints a session, and it's the same one the
 real login page uses — the widget hands its verified payload to the browser, which posts it
 here. That's why signing a payload yourself is enough to log in locally.
+
+`offset` is what the Recent list pages with when you scroll past the first 360 entries. To
+see that path locally you need more than 360 rows, and the write throttle (20/min) rules out
+seeding them through the API — insert them straight into `data/local.db` instead.
 
 With a cookie jar:
 

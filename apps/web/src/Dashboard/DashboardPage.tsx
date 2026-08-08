@@ -53,7 +53,7 @@ export function DashboardPage({ user, locale, onLocaleChange, onLoggedOut }: Das
           average={dashboard.stats.average}
           count={dashboard.stats.count}
           streak={dashboard.streak}
-          hasEntries={dashboard.entries.length > 0}
+          hasEntries={dashboard.statWindow.length > 0}
           loading={dashboard.loading}
         />
 
@@ -61,16 +61,20 @@ export function DashboardPage({ user, locale, onLocaleChange, onLoggedOut }: Das
           <MoodChartCard
             messages={messages}
             locale={locale}
-            entries={dashboard.entries}
+            entries={dashboard.statWindow}
             loading={dashboard.loading}
           />
           <RecentCard
             messages={messages}
             locale={locale}
-            entries={dashboard.recent}
+            entries={dashboard.entries}
             loading={dashboard.loading}
             loadError={dashboard.loadError}
             onRetry={dashboard.reload}
+            hasMore={dashboard.hasMore}
+            loadingMore={dashboard.loadingMore}
+            loadMoreError={dashboard.loadMoreError}
+            onLoadMore={dashboard.loadMore}
           />
         </div>
       </div>

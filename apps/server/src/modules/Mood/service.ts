@@ -49,14 +49,21 @@ export const moodService = {
     return response.rowsAffected;
   },
 
+  /**
+   * A newest-first page. `offset` exists for the web's "load older" scroll; the
+   * bot never passes it. The sort is a total order (`id` breaks any `created_at`
+   * tie), so paging by offset can't reshuffle rows between requests.
+   */
   listMoodEntries: async ({
     userId,
     telegramId,
     limit = LIST_MOOD_ENTRIES_MAX,
+    offset = 0,
   }: {
     userId: string;
     telegramId: number;
     limit?: number;
+    offset?: number;
   }) => {
     const cappedLimit = Math.min(limit, LIST_MOOD_ENTRIES_MAX);
     const response = await db
@@ -67,7 +74,8 @@ export const moodService = {
       // is fixed-width, so sorting it as text is already chronological — and
       // wrapping the column in a function would rule out the index.
       .orderBy(desc(MoodTable.createdAt), desc(MoodTable.id))
-      .limit(cappedLimit);
+      .limit(cappedLimit)
+      .offset(offset);
 
     return response.map((row) => decryptEntry(row, telegramId));
   },

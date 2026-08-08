@@ -29,7 +29,7 @@ export const webMoodController = {
 
     const query = ListMoodEntriesQuerySchema.safeParse(req.query);
     if (!query.success) {
-      sendApiError(res, 400, "invalid_input", "Invalid limit");
+      sendApiError(res, 400, "invalid_input", "Invalid limit or offset");
       return;
     }
 
@@ -37,6 +37,7 @@ export const webMoodController = {
       userId: session.hash,
       telegramId: session.tgId,
       ...(query.data.limit !== undefined ? { limit: query.data.limit } : {}),
+      ...(query.data.offset !== undefined ? { offset: query.data.offset } : {}),
     });
 
     res.status(200).json({ entries: rows.map(toWireEntry) });
