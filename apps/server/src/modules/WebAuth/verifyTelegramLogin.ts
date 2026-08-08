@@ -19,7 +19,14 @@ import { createHash, createHmac, timingSafeEqual } from "crypto";
 const DEFAULT_MAX_AGE_SECONDS = 15 * 60;
 const MAX_NAME_LENGTH = 256;
 const MAX_PHOTO_URL_LENGTH = 2048;
-const ALLOWED_PHOTO_HOSTS = ["t.me", "telegram.org"];
+/**
+ * Hosts an avatar may come from. `telesco.pe` is Telegram's userpic CDN and is
+ * not optional: `https://t.me/i/userpic/320/x.jpg` is a 302 to
+ * `https://cdn4.telesco.pe/file/…`, so the browser ends up there either way.
+ * Keep this in sync with `img-src` in nginx/landing.config — dropping the host
+ * here yields no avatar at all, omitting it there yields a CSP-blocked one.
+ */
+const ALLOWED_PHOTO_HOSTS = ["t.me", "telegram.org", "telesco.pe"];
 
 export type TVerifiedLogin = {
   id: number;

@@ -40,14 +40,9 @@
   min-width: 0;
 }
 
+/* The initials layer: always rendered, and what shows until a photo decodes. */
 .avatar {
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--color-border-cream);
-  flex: none;
-}
-
-.avatarFallback {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -58,7 +53,18 @@
   color: #fff;
   font-size: 15px;
   font-weight: 700;
+  border: 2px solid var(--color-border-cream);
+  overflow: hidden;
   flex: none;
+}
+
+/* Covers the initials once it loads; transparent (so they show) until then. */
+.avatarImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .name {

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { TLocale } from "@mooduck/core";
 import type { TSessionUser } from "@mooduck/contracts";
 import iconUrl from "@/assets/icon.png";
@@ -39,27 +38,30 @@ interface AvatarProps {
   alt: string;
 }
 
-/** Telegram avatar with an initials fallback when the (third-party) image fails. */
+/**
+ * The Telegram avatar sits on top of the initials rather than replacing them.
+ *
+ * The picture comes from Telegram's CDN, which some networks can't reach — and a
+ * request that hangs never fires `error`, so swapping on `onError` leaves the
+ * slot empty for as long as the browser keeps waiting. Layering means the
+ * initials are what's on screen until (and unless) the image actually decodes.
+ * `alt=""` for the same reason: a broken image must draw nothing, not squeeze a
+ * sentence into a 40px circle.
+ */
 function Avatar({ user, alt }: AvatarProps) {
-  const [failed, setFailed] = useState(false);
-
-  if (user.photo && !failed) {
-    return (
-      <img
-        className={styles.avatar}
-        src={user.photo}
-        alt={alt}
-        width={40}
-        height={40}
-        referrerPolicy="no-referrer"
-        onError={() => setFailed(true)}
-      />
-    );
-  }
-
   return (
-    <span className={styles.avatarFallback} aria-hidden>
-      {initials(user.name)}
+    <span className={styles.avatar} role="img" aria-label={alt}>
+      <span aria-hidden>{initials(user.name)}</span>
+      {user.photo ? (
+        <img
+          className={styles.avatarImage}
+          src={user.photo}
+          alt=""
+          width={40}
+          height={40}
+          referrerPolicy="no-referrer"
+        />
+      ) : null}
     </span>
   );
 }

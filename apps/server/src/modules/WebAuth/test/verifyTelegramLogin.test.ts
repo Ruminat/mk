@@ -93,4 +93,28 @@ describe("verifyTelegramLogin", () => {
       expect(result.user.photoUrl).toBeUndefined();
     }
   });
+
+  it("should keep an avatar served straight off Telegram's userpic CDN", () => {
+    // t.me/i/userpic/… 302s here, and Telegram sometimes hands back the CDN URL
+    // directly; rejecting it means the header falls back to initials forever.
+    const url = "https://cdn4.telesco.pe/file/abc123.jpg";
+    const payload = sign({ ...validFields(), photo_url: url }, FAKE_TOKEN);
+    const result = verifyTelegramLogin(payload, FAKE_TOKEN, { now: NOW });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.user.photoUrl).toBe(url);
+    }
+  });
+
+  it("should not be fooled by a host that merely ends with a Telegram name", () => {
+    const payload = sign(
+      { ...validFields(), photo_url: "https://nottelesco.pe/file/x.jpg" },
+      FAKE_TOKEN,
+    );
+    const result = verifyTelegramLogin(payload, FAKE_TOKEN, { now: NOW });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.user.photoUrl).toBeUndefined();
+    }
+  });
 });
