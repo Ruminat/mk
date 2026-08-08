@@ -45,6 +45,8 @@ export function createWebAuthController(config: TWebAuthConfig) {
         return;
       }
 
+      logDroppedAvatarHost(body, result.user.photoUrl);
+
       // Same identity function the bot uses, so the person's web and bot data are
       // one dataset. The numeric id lives only in the sealed cookie from here on.
       const hash = getTelegramUserIdSecureHash(result.user.id);
@@ -78,6 +80,32 @@ export function createWebAuthController(config: TWebAuthConfig) {
       res.status(204).end();
     },
   };
+}
+
+/**
+ * Says so when a verified login carried an avatar URL that we then threw away.
+ *
+ * `ALLOWED_PHOTO_HOSTS` is a list of Telegram's hostnames, and Telegram is free
+ * to serve userpics from a name that isn't on it — in which case the avatar
+ * silently never appears and looks like a front-end bug. Only the host is
+ * logged: it's all that's needed to extend the list, and the rest of the URL is
+ * a per-user token that has no business in a log file.
+ */
+function logDroppedAvatarHost(body: unknown, keptPhotoUrl: string | undefined): void {
+  if (keptPhotoUrl !== undefined) {
+    return;
+  }
+  const raw = (body as { photo_url?: unknown }).photo_url;
+  if (typeof raw !== "string" || raw.length === 0) {
+    return;
+  }
+  let host: string;
+  try {
+    host = new URL(raw).host;
+  } catch {
+    host = "(unparseable)";
+  }
+  console.log(`⚠️ Dropped a Telegram avatar from an unexpected host: ${host}`);
 }
 
 function reissue(session: TSessionPayload, now: number): TSessionPayload {

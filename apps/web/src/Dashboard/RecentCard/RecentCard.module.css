@@ -86,18 +86,14 @@
   line-height: 1.45;
 
   /*
+   * Notes are shown in full — a journal entry cut off at two lines is the half
+   * you can't read. The card scrolls, so length costs rows, not layout.
+   *
    * `anywhere`, not `break-word`: only `anywhere` also shrinks the element's
    * min-content width, which is what stops an unbroken run of text — a long
    * word, a pasted URL — from setting the card's minimum size.
    */
   overflow-wrap: anywhere;
-
-  /* Long notes are clamped rather than left to run, so rows stay scannable. */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
 }
 
 .time {
