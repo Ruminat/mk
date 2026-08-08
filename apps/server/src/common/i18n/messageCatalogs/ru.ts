@@ -1,15 +1,21 @@
+import { RU_PLURALS, countRu } from "@mooduck/core";
 import type { TMessages } from "./en";
 
-/** Russian UI catalog — secondary locale. Must match the shape of `en`. */
+/**
+ * Russian UI catalog — secondary locale. Must match the shape of `en`.
+ *
+ * Counts go through `countRu` so the noun agrees with the number ("1 день",
+ * "3 дня", "11 дней"); the web catalog says the same words the same way.
+ */
 export const ru: TMessages = {
   common: {
     truncatedSuffix: "\n\n… (обрезано)",
   },
 
   time: {
-    daysAgo: (n: number) => `${n} дн. назад`,
-    hoursAgo: (n: number) => `${n} ч. назад`,
-    minutesAgo: (n: number) => `${n} мин. назад`,
+    daysAgo: (n: number) => `${countRu(n, RU_PLURALS.day)} назад`,
+    hoursAgo: (n: number) => `${countRu(n, RU_PLURALS.hour)} назад`,
+    minutesAgo: (n: number) => `${countRu(n, RU_PLURALS.minute)} назад`,
     justNow: "только что",
   },
 

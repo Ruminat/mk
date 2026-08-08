@@ -21,10 +21,18 @@ describe("formatRelativeTime — English", () => {
 describe("formatRelativeTime — Russian", () => {
   it("should read the whole table", () => {
     expect(formatRelativeTime(at(30 * 1000), "ru", NOW)).toBe("только что");
-    expect(formatRelativeTime(at(3 * MINUTE), "ru", NOW)).toBe("3 мин. назад");
-    expect(formatRelativeTime(at(2 * HOUR), "ru", NOW)).toBe("2 ч. назад");
+    expect(formatRelativeTime(at(3 * MINUTE), "ru", NOW)).toBe("3 минуты назад");
+    expect(formatRelativeTime(at(2 * HOUR), "ru", NOW)).toBe("2 часа назад");
     expect(formatRelativeTime(at(25 * HOUR), "ru", NOW)).toBe("вчера");
-    expect(formatRelativeTime(at(3 * DAY), "ru", NOW)).toBe("3 дн. назад");
+    expect(formatRelativeTime(at(3 * DAY), "ru", NOW)).toBe("3 дня назад");
+  });
+
+  it("should agree with the number, not just append a noun", () => {
+    // The cases a naive `${n} дней` gets wrong.
+    expect(formatRelativeTime(at(21 * DAY), "ru", NOW)).toBe("21 день назад");
+    expect(formatRelativeTime(at(11 * DAY), "ru", NOW)).toBe("11 дней назад");
+    expect(formatRelativeTime(at(1 * MINUTE), "ru", NOW)).toBe("1 минута назад");
+    expect(formatRelativeTime(at(5 * HOUR), "ru", NOW)).toBe("5 часов назад");
   });
 });
 

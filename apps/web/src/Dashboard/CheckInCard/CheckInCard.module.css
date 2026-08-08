@@ -58,7 +58,7 @@
   opacity: 0.6;
 }
 
-.save {
+.send {
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -80,11 +80,11 @@
     transform 0.1s;
 }
 
-.save:hover:not(:disabled) {
+.send:hover:not(:disabled) {
   background: var(--color-brand-deep);
 }
 
-.save:disabled {
+.send:disabled {
   opacity: 0.75;
   cursor: default;
 }
@@ -135,7 +135,7 @@
     flex-direction: column;
   }
 
-  .save {
+  .send {
     min-height: 48px;
   }
 }

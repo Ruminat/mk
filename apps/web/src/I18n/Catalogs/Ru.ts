@@ -1,10 +1,12 @@
+import { RU_PLURALS, countRu } from "@mooduck/core";
 import type { TWebMessages } from "./En";
 
 /**
  * Russian web catalog. Typed as `TWebMessages`, so a forgotten key is a compile
- * error. Tone follows the bot's `ru.ts`: informal «ты», warm, unhurried. The
- * abbreviated time forms ("мин.", "ч.", "дн.") sidestep Russian plural agreement
- * on purpose, exactly as the bot does.
+ * error. Tone follows the bot's `ru.ts`: informal «ты», warm, unhurried.
+ *
+ * Counts are spelled out ("3 дня", not "3 дн.") and go through `countRu`, which
+ * handles the agreement — a bare `${n} дней` would print "1 дней" and "22 дней".
  */
 export const ru: TWebMessages = {
   app: {
@@ -32,9 +34,9 @@ export const ru: TWebMessages = {
     scoreLabel: (score: number) => `Настроение ${score} из 10`,
     noteLabel: "Заметка (по желанию)",
     notePlaceholder: "Добавь заметку (по желанию)",
-    save: "Сохранить",
-    saving: "Сохраняю…",
-    saveError: "Не получилось сохранить. Попробуй ещё раз.",
+    send: "Отправить",
+    sending: "Отправляю…",
+    sendError: "Не получилось отправить. Попробуй ещё раз.",
     pickScoreFirst: "Сначала выбери, как ты.",
   },
 
@@ -43,7 +45,7 @@ export const ru: TWebMessages = {
     checkIns: "Записей",
     streak: "Серия",
     empty: "—",
-    streakValue: (days: number) => `${days} дн.`,
+    streakValue: (days: number) => countRu(days, RU_PLURALS.day),
   },
 
   chart: {
@@ -65,9 +67,9 @@ export const ru: TWebMessages = {
 
   time: {
     justNow: "только что",
-    minutesAgo: (minutes: number) => `${minutes} мин. назад`,
-    hoursAgo: (hours: number) => `${hours} ч. назад`,
+    minutesAgo: (minutes: number) => `${countRu(minutes, RU_PLURALS.minute)} назад`,
+    hoursAgo: (hours: number) => `${countRu(hours, RU_PLURALS.hour)} назад`,
     yesterday: "вчера",
-    daysAgo: (days: number) => `${days} дн. назад`,
+    daysAgo: (days: number) => `${countRu(days, RU_PLURALS.day)} назад`,
   },
 };

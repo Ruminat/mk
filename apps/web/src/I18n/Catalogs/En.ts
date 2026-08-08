@@ -29,9 +29,9 @@ export const en = {
     scoreLabel: (score: number) => `Mood ${score} of 10`,
     noteLabel: "Note (optional)",
     notePlaceholder: "Add a note (optional)",
-    save: "Save check-in",
-    saving: "Saving…",
-    saveError: "Couldn't save your check-in. Try again.",
+    send: "Send",
+    sending: "Sending…",
+    sendError: "Couldn't send your check-in. Try again.",
     pickScoreFirst: "Pick how you feel first.",
   },
 

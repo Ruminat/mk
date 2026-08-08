@@ -43,14 +43,14 @@ export function CheckInCard({ messages, saving, saveError, onSubmit }: CheckInCa
           maxLength={MOOD_COMMENT_MAX_LENGTH}
           disabled={saving}
         />
-        <button type="button" className={styles.save} onClick={() => void form.save()} disabled={saving}>
+        <button type="button" className={styles.send} onClick={() => void form.save()} disabled={saving}>
           {saving ? (
             <>
               <span className={styles.spinner} aria-hidden />
-              {m.saving}
+              {m.sending}
             </>
           ) : (
-            m.save
+            m.send
           )}
         </button>
       </div>
@@ -62,7 +62,7 @@ export function CheckInCard({ messages, saving, saveError, onSubmit }: CheckInCa
       ) : null}
       {saveError ? (
         <p className={styles.error} role="alert">
-          {m.saveError}
+          {m.sendError}
         </p>
       ) : null}
     </section>
