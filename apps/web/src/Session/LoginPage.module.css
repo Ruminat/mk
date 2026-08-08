@@ -63,6 +63,18 @@
   justify-content: center;
 }
 
+/*
+ * The login button is an iframe served by Telegram, so it's styled from the
+ * outside or not at all. Firefox's UA stylesheet gives every iframe a 2px inset
+ * border, which reads as a hard rectangle drawn around the rounded button;
+ * `color-scheme` keeps the widget on its light theme even if the rest of the
+ * browser is dark.
+ */
+.button iframe {
+  border: 0;
+  color-scheme: light;
+}
+
 .unavailable {
   margin: 4px 0 0;
   font-size: 13.5px;

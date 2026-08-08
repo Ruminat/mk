@@ -10,6 +10,18 @@ body {
   padding: 0;
 }
 
+/*
+ * The app is light-only — cream page, navy ink, no dark variant.
+ *
+ * Saying so matters beyond form controls: an embedded iframe resolves
+ * `prefers-color-scheme` against its embedder's used colour scheme, so without
+ * this the Telegram login widget renders its dark theme on a user whose OS is
+ * dark, and a black panel appears in the middle of a cream card.
+ */
+html {
+  color-scheme: light;
+}
+
 body {
   min-height: 100vh;
   background: var(--color-page);
