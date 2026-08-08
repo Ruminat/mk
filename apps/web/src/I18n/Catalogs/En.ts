@@ -14,6 +14,7 @@ export const en = {
     prompt: "Sign in with Telegram to see your check-ins.",
     widgetUnavailable:
       "The Telegram login button couldn't load. Refresh the page, or open MooDuck from the bot.",
+    failed: "That sign-in didn't go through. Try again.",
   },
 
   header: {

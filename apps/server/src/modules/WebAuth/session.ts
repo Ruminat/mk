@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { decryptWithSecret, encryptWithSecret } from "../crypto/userDataCryptoCore";
+import { readCookie, serializeCookie } from "./cookies";
 
 /**
  * The session cookie *is* the session — there is no session table. It carries the
@@ -78,44 +79,28 @@ export function shouldRenewSession(payload: TSessionPayload, now: number): boole
   return now - issuedAt > RENEW_AFTER_MS;
 }
 
-/** Parse the one cookie we care about from a raw `Cookie` header (no dependency). */
+/** Parse the session cookie out of a raw `Cookie` header. */
 export function readSessionCookie(cookieHeader: string | undefined): string | undefined {
-  if (!cookieHeader) {
-    return undefined;
-  }
-  for (const part of cookieHeader.split(";")) {
-    const eq = part.indexOf("=");
-    if (eq === -1) {
-      continue;
-    }
-    const name = part.slice(0, eq).trim();
-    if (name === SESSION_COOKIE_NAME) {
-      return decodeURIComponent(part.slice(eq + 1).trim());
-    }
-  }
-  return undefined;
+  return readCookie(cookieHeader, SESSION_COOKIE_NAME);
 }
 
 /** Serialize the Set-Cookie header for a fresh session. */
 export function serializeSessionCookie(value: string, secure: boolean): string {
-  return buildCookie(encodeURIComponent(value), SESSION_TTL_SECONDS, secure);
+  return sessionCookie(value, SESSION_TTL_SECONDS, secure);
 }
 
 /** Serialize the Set-Cookie header that clears the session (logout). */
 export function serializeClearedSessionCookie(secure: boolean): string {
-  return buildCookie("", 0, secure);
+  return sessionCookie("", 0, secure);
 }
 
-function buildCookie(value: string, maxAgeSeconds: number, secure: boolean): string {
-  const parts = [
-    `${SESSION_COOKIE_NAME}=${value}`,
-    "HttpOnly",
-    "SameSite=Strict",
-    "Path=/",
-    `Max-Age=${maxAgeSeconds}`,
-  ];
-  if (secure) {
-    parts.push("Secure");
-  }
-  return parts.join("; ");
+function sessionCookie(value: string, maxAgeSeconds: number, secure: boolean): string {
+  // Strict, not Lax: every request that needs the session is same-origin fetch
+  // from our own page, so there is no flow that legitimately arrives cross-site.
+  return serializeCookie(SESSION_COOKIE_NAME, value, {
+    maxAgeSeconds,
+    secure,
+    sameSite: "Strict",
+    path: "/",
+  });
 }

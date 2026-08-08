@@ -17,6 +17,7 @@ export const ru: TWebMessages = {
     prompt: "Войди через Telegram, чтобы увидеть свои записи.",
     widgetUnavailable:
       "Кнопка входа через Telegram не загрузилась. Обнови страницу или открой MooDuck из бота.",
+    failed: "Войти не получилось. Попробуй ещё раз.",
   },
 
   header: {

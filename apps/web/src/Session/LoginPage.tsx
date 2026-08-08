@@ -1,35 +1,52 @@
 import { useCallback, useState } from "react";
 import type { TLocale } from "@mooduck/core";
-import type { TSessionUser } from "@mooduck/contracts";
 import iconUrl from "@/assets/icon.png";
-import { authApi } from "@/Api/AuthApi";
 import { LocaleSwitcher } from "@/I18n/LocaleSwitcher";
 import { webMessages } from "@/I18n/Messages";
 import { TelegramLoginButton } from "./TelegramLoginButton";
 import styles from "./LoginPage.module.css";
 
+const LOGIN_RESULT_PARAM = "login";
+const LOGIN_FAILED = "failed";
+
+function consumeLoginFailure(): boolean {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get(LOGIN_RESULT_PARAM) !== LOGIN_FAILED) {
+    return false;
+  }
+
+  params.delete(LOGIN_RESULT_PARAM);
+  const query = params.toString();
+  window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+
+  return true;
+}
+
+/**
+ * A failed callback sends the browser back to `/app/?login=failed`. Read that
+ * once per page load and strip it, so the message doesn't outlive a refresh.
+ *
+ * At module scope rather than in a hook on purpose: this consumes something it
+ * then destroys, and StrictMode double-invokes both lazy initialisers and effects
+ * in development, so neither would run it exactly once.
+ */
+const loginFailed = consumeLoginFailure();
+
 interface LoginPageProps {
   locale: TLocale;
   onLocaleChange: (locale: TLocale) => void;
-  onAuthenticated: (user: TSessionUser) => void;
 }
 
-/** Anonymous state: a small centred card with the Telegram login button. */
-export function LoginPage({ locale, onLocaleChange, onAuthenticated }: LoginPageProps) {
+/**
+ * Anonymous state: a small centred card with the Telegram login button.
+ *
+ * There is no success path to handle here. The widget navigates away to the auth
+ * callback, which sets the session cookie and sends the browser back to `/app/`,
+ * where `useSession` picks it up on the next mount.
+ */
+export function LoginPage({ locale, onLocaleChange }: LoginPageProps) {
   const m = webMessages(locale);
   const [unavailable, setUnavailable] = useState(false);
-
-  const handleAuth = useCallback(
-    async (payload: Record<string, unknown>) => {
-      try {
-        const user = await authApi.loginWithTelegram(payload);
-        onAuthenticated(user);
-      } catch {
-        setUnavailable(true);
-      }
-    },
-    [onAuthenticated],
-  );
 
   const handleUnavailable = useCallback(() => setUnavailable(true), []);
 
@@ -46,9 +63,10 @@ export function LoginPage({ locale, onLocaleChange, onAuthenticated }: LoginPage
         <p className={styles.prompt}>{m.login.prompt}</p>
 
         <div className={styles.button}>
-          <TelegramLoginButton onAuth={handleAuth} onUnavailable={handleUnavailable} />
+          <TelegramLoginButton onUnavailable={handleUnavailable} />
         </div>
 
+        {loginFailed ? <p className={styles.unavailable}>{m.login.failed}</p> : null}
         {unavailable ? <p className={styles.unavailable}>{m.login.widgetUnavailable}</p> : null}
       </section>
     </main>

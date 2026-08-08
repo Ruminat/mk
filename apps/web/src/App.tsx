@@ -14,7 +14,7 @@ const DashboardPage = lazy(() =>
 /** Session gate: loading spinner → login screen → dashboard. */
 export function App() {
   const { locale, setLocale } = useLocale();
-  const { state, setAuthenticated, setAnonymous } = useSession();
+  const { state, setAnonymous } = useSession();
 
   const loading = (
     <div className={styles.loading} role="status">
@@ -27,7 +27,7 @@ export function App() {
   }
 
   if (state.status === "anonymous") {
-    return <LoginPage locale={locale} onLocaleChange={setLocale} onAuthenticated={setAuthenticated} />;
+    return <LoginPage locale={locale} onLocaleChange={setLocale} />;
   }
 
   return (
