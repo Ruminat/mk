@@ -1,12 +1,17 @@
 import { SessionResponseSchema, type TSessionUser } from "@mooduck/contracts";
 import { apiRequest, apiRequestNoContent } from "./ApiClient";
 
-/**
- * No login call here: the Telegram widget navigates the browser to
- * `/api/auth/telegram/callback`, which sets the cookie and redirects back, so the
- * app never posts credentials itself.
- */
 export const authApi = {
+  /**
+   * Exchange a verified Telegram Login Widget payload for a session cookie.
+   * Same-origin POST, so the cookie it sets is usable immediately and there is no
+   * CSRF exposure to guard against — a cross-origin caller can't reach it at all.
+   */
+  loginWithTelegram: async (payload: Record<string, unknown>): Promise<TSessionUser> => {
+    const { user } = await apiRequest("/api/auth/telegram", SessionResponseSchema, { method: "POST", body: payload });
+    return user;
+  },
+
   /** Current session, or a thrown `ApiError` (401) when there isn't one. */
   getSession: async (): Promise<TSessionUser> => {
     const { user } = await apiRequest("/api/auth/session", SessionResponseSchema);

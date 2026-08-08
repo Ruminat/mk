@@ -216,21 +216,15 @@ why the quick way exists.
 
 | Method | Path | Body |
 |---|---|---|
-| `GET` | `/api/auth/telegram/callback` | signed fields in the query, plus `state` |
 | `POST` | `/api/auth/telegram` | signed Login Widget payload |
 | `GET` | `/api/auth/session` | — |
 | `POST` | `/api/auth/logout` | — |
 | `GET` | `/api/mood/entries?limit=360` | — |
 | `POST` | `/api/mood/entries` | `{ "value": 1..10, "comment": "optional" }` |
 
-The **callback** is what the browser actually uses: the widget navigates to it with
-Telegram's signed fields appended. It also requires a `state` nonce matching a cookie the
-page wrote, so it's awkward to drive by hand — which is what the `POST` is for.
-
-The **`POST`** takes the same payload as JSON and runs the same verification. Nothing in the
-app calls it; it exists so local work doesn't need a public domain and a tunnel. It isn't a
-second way in — it demands the identical Telegram HMAC, and being a JSON `POST` with no CORS
-it can't be triggered from another origin at all.
+`POST /api/auth/telegram` is the one route that mints a session, and it's the same one the
+real login page uses — the widget hands its verified payload to the browser, which posts it
+here. That's why signing a payload yourself is enough to log in locally.
 
 With a cookie jar:
 

@@ -9,17 +9,14 @@ export type TSessionState =
 
 export interface UseSessionResult {
   state: TSessionState;
+  setAuthenticated: (user: TSessionUser) => void;
   setAnonymous: () => void;
 }
 
 /**
  * Probes `GET /api/auth/session` on mount: a valid cookie ⇒ authenticated, a 401
- * (or any failure) ⇒ anonymous.
- *
- * There is no `setAuthenticated`: logging in is a full navigation through the
- * Telegram auth callback, so the app remounts and this probe is what discovers
- * the new session. Logout and any mid-session 401 call `setAnonymous` to drop
- * back to the login screen.
+ * (or any failure) ⇒ anonymous. Login and logout flip the state directly, and a
+ * mid-session 401 elsewhere calls `setAnonymous` to drop back to the login screen.
  */
 export function useSession(): UseSessionResult {
   const [state, setState] = useState<TSessionState>({ status: "loading" });
@@ -39,7 +36,8 @@ export function useSession(): UseSessionResult {
     };
   }, []);
 
+  const setAuthenticated = useCallback((user: TSessionUser) => setState({ status: "authenticated", user }), []);
   const setAnonymous = useCallback(() => setState({ status: "anonymous" }), []);
 
-  return { state, setAnonymous };
+  return { state, setAuthenticated, setAnonymous };
 }
