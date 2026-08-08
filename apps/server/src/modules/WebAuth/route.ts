@@ -17,6 +17,7 @@ export function createWebAuthRouter(config: TWebAuthConfig): Router {
   router.post("/telegram", authRateLimiter, requireJsonBody, controller.loginWithTelegram);
 
   router.get("/session", requireSession, controller.getSession);
+  router.get("/avatar", requireSession, controller.getAvatar);
   router.post("/logout", requireSession, controller.logout);
 
   return router;

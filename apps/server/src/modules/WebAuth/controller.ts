@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import type { TSessionUser } from "@mooduck/contracts";
 import { getTelegramUserIdSecureHash } from "../../common/telegram/telegramUserId";
 import { sendApiError } from "../WebApi/apiError";
+import { fetchAvatar } from "./fetchAvatar";
 import type { AuthenticatedWebRequest } from "./requireSession";
+import { fetchTelegramAvatar } from "./telegramAvatar";
 import {
   mintSessionPayload,
   sealSession,
@@ -75,11 +77,54 @@ export function createWebAuthController(config: TWebAuthConfig) {
       res.status(200).json({ user: toSessionUser(session) });
     },
 
+    /**
+     * Serves the session's Telegram avatar from our own origin.
+     *
+     * The URL itself never leaves the server, so `img-src 'self'` is enough, the
+     * browser never contacts Telegram's CDN (which some networks block, and
+     * which would otherwise see the reader's IP on every page load), and a
+     * failure is an immediate error the `<img>` can react to rather than a
+     * request that hangs.
+     */
+    getAvatar: async (req: Request, res: Response): Promise<void> => {
+      const { session } = req as AuthenticatedWebRequest;
+      if (!session.photo) {
+        sendAvatarError(res, 404, "No avatar for this session");
+        return;
+      }
+
+      // Bot API first: `api.telegram.org` is a host this process is already
+      // known to reach, whereas the CDN the login payload points at is only a
+      // hope. The CDN is still worth a try if the API has nothing for us.
+      const viaApi = await fetchTelegramAvatar(session.tgId, config.botToken);
+      const result = viaApi.ok ? viaApi : await fetchAvatar(session.photo);
+      if (!result.ok) {
+        sendAvatarError(res, 502, `Could not fetch the avatar (${result.reason})`);
+        return;
+      }
+
+      res.setHeader("Content-Type", result.avatar.contentType);
+      // `private`: this is one person's picture behind their session cookie, so
+      // it must never land in a shared cache.
+      res.setHeader("Cache-Control", "private, max-age=86400");
+      res.status(200).send(result.avatar.body);
+    },
+
     logout: (_req: Request, res: Response): void => {
       res.setHeader("Set-Cookie", serializeClearedSessionCookie(config.secureCookies));
       res.status(204).end();
     },
   };
+}
+
+/**
+ * A failed avatar must not be remembered: the CDN being unreachable now says
+ * nothing about the next page load, and a cached 502 would keep the initials up
+ * long after the network recovered.
+ */
+function sendAvatarError(res: Response, status: number, message: string): void {
+  res.setHeader("Cache-Control", "no-store");
+  sendApiError(res, status, "internal", message);
 }
 
 /**
@@ -120,6 +165,7 @@ function reissue(session: TSessionPayload, now: number): TSessionPayload {
   );
 }
 
+/** The client is told whether there's a picture, never where it lives. */
 function toSessionUser(payload: TSessionPayload): TSessionUser {
-  return payload.photo ? { name: payload.name, photo: payload.photo } : { name: payload.name };
+  return { name: payload.name, hasPhoto: payload.photo !== undefined };
 }

@@ -218,6 +218,7 @@ why the quick way exists.
 |---|---|---|
 | `POST` | `/api/auth/telegram` | signed Login Widget payload |
 | `GET` | `/api/auth/session` | — |
+| `GET` | `/api/auth/avatar` | — (the session's Telegram avatar, fetched server-side) |
 | `POST` | `/api/auth/logout` | — |
 | `GET` | `/api/mood/entries?limit=360&offset=0` | — |
 | `POST` | `/api/mood/entries` | `{ "value": 1..10, "comment": "optional" }` |

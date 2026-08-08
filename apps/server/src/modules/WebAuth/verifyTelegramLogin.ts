@@ -20,11 +20,14 @@ const DEFAULT_MAX_AGE_SECONDS = 15 * 60;
 const MAX_NAME_LENGTH = 256;
 const MAX_PHOTO_URL_LENGTH = 2048;
 /**
- * Hosts an avatar may come from. `telesco.pe` is Telegram's userpic CDN and is
- * not optional: `https://t.me/i/userpic/320/x.jpg` is a 302 to
- * `https://cdn4.telesco.pe/file/…`, so the browser ends up there either way.
- * Keep this in sync with `img-src` in nginx/landing.config — dropping the host
- * here yields no avatar at all, omitting it there yields a CSP-blocked one.
+ * Hosts an avatar may come from. This is the SSRF guard for `/api/auth/avatar`,
+ * which fetches whatever URL ends up in the session — so the list bounds where
+ * the server can be made to send a request, and nothing outside Telegram's own
+ * names belongs on it. `telesco.pe` is Telegram's userpic CDN, which
+ * `t.me/i/userpic/…` redirects to and which it sometimes returns directly.
+ *
+ * A host Telegram starts using that isn't here means no avatar at all, so the
+ * login logs the host it rejected (see `controller.ts`) rather than going quiet.
  */
 const ALLOWED_PHOTO_HOSTS = ["t.me", "telegram.org", "telesco.pe"];
 

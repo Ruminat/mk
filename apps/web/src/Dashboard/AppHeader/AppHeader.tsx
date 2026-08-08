@@ -1,5 +1,5 @@
 import type { TLocale } from "@mooduck/core";
-import type { TSessionUser } from "@mooduck/contracts";
+import { AVATAR_PATH, type TSessionUser } from "@mooduck/contracts";
 import iconUrl from "@/assets/icon.png";
 import type { TWebMessages } from "@/I18n/Catalogs/En";
 import { LocaleSwitcher } from "@/I18n/LocaleSwitcher";
@@ -39,28 +39,19 @@ interface AvatarProps {
 }
 
 /**
- * The Telegram avatar sits on top of the initials rather than replacing them.
+ * The avatar sits on top of the initials rather than replacing them.
  *
- * The picture comes from Telegram's CDN, which some networks can't reach — and a
- * request that hangs never fires `error`, so swapping on `onError` leaves the
- * slot empty for as long as the browser keeps waiting. Layering means the
- * initials are what's on screen until (and unless) the image actually decodes.
- * `alt=""` for the same reason: a broken image must draw nothing, not squeeze a
- * sentence into a 40px circle.
+ * It comes from our own origin — the server fetches it from Telegram — so this
+ * is a same-origin request that either arrives or fails outright. Layering means
+ * the initials are what's on screen until it decodes, and `alt=""` means a
+ * failure draws nothing rather than squeezing a sentence into a 40px circle.
  */
 function Avatar({ user, alt }: AvatarProps) {
   return (
     <span className={styles.avatar} role="img" aria-label={alt}>
       <span aria-hidden>{initials(user.name)}</span>
-      {user.photo ? (
-        <img
-          className={styles.avatarImage}
-          src={user.photo}
-          alt=""
-          width={40}
-          height={40}
-          referrerPolicy="no-referrer"
-        />
+      {user.hasPhoto ? (
+        <img className={styles.avatarImage} src={AVATAR_PATH} alt="" width={40} height={40} />
       ) : null}
     </span>
   );

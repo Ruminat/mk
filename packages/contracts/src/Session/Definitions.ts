@@ -20,12 +20,19 @@ export type TTelegramLoginPayload = z.infer<typeof TelegramLoginPayloadSchema>;
 /**
  * The only user profile the web ever exposes. It lives in the sealed session
  * cookie and is never persisted — no `users` table, no numeric id at rest.
+ *
+ * `hasPhoto`, not the URL: the avatar is served back through `/api/auth/avatar`,
+ * so the Telegram URL stays on the server and the browser never talks to
+ * Telegram's CDN (see {@link AVATAR_PATH}).
  */
 export const SessionUserSchema = z.object({
   name: z.string(),
-  photo: z.string().optional(),
+  hasPhoto: z.boolean(),
 });
 export type TSessionUser = z.infer<typeof SessionUserSchema>;
+
+/** Where the session's Telegram avatar is served from, same-origin. */
+export const AVATAR_PATH = "/api/auth/avatar";
 
 /** Response for `POST /api/auth/telegram` and `GET /api/auth/session`. */
 export const SessionResponseSchema = z.object({
