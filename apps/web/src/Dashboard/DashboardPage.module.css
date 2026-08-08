@@ -1,0 +1,26 @@
+.page {
+  min-height: 100vh;
+  padding: clamp(16px, 3vw, 28px);
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 22px);
+}
+
+/* Chart and Recent sit side by side (~55/45) on desktop, stack when narrow. */
+.bottom {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(16px, 2vw, 22px);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .bottom {
+    grid-template-columns: 1fr;
+  }
+}

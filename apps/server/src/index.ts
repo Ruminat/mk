@@ -7,6 +7,7 @@ import { getEnvironmentVariables } from "./common/config/environment";
 import { assertDatabaseReachable, closeDatabase } from "./db/client";
 import { rateLimiter } from "./middlewares/rateLimiter";
 import { setupMooDuckTelegramBot } from "./modules/TelegramBot";
+import { registerWebApi } from "./modules/WebApi/registerWebApi";
 
 export const app = express();
 
@@ -103,6 +104,11 @@ async function bootstrap() {
   await assertDatabaseReachable();
 
   const telegramLifecycle = await setupMooDuckTelegramBot(app);
+
+  // Mount the web API after the Telegram webhook and BEFORE the fallback handlers
+  // below — Express matches in registration order, so an /api route registered
+  // after the 404 catch-all would never be reached.
+  registerWebApi(app);
 
   // Must come after the webhook route above, or webhook POSTs hit the 404.
   registerFallbackHandlers();

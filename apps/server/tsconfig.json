@@ -4,6 +4,7 @@
     "noEmit": false,
     "outDir": "dist",
     "paths": {
+      "@mooduck/contracts": ["../../packages/contracts/src"],
       "@mooduck/core": ["../../packages/core/src"]
     }
   },

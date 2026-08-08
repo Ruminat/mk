@@ -1,0 +1,34 @@
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--color-surface-raised);
+  border: 1.5px solid var(--color-border-blue);
+}
+
+.link {
+  padding: 5px 9px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-soft);
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.link:hover {
+  color: var(--color-accent);
+}
+
+.link[data-active="true"] {
+  color: #fff;
+  background: var(--color-brand);
+}

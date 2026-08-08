@@ -44,6 +44,7 @@
   "packageManager": "pnpm@9.0.0",
   "dependencies": {
     "@libsql/client": "^0.15.15",
+    "@mooduck/contracts": "workspace:*",
     "@mooduck/core": "workspace:*",
     "@resvg/resvg-js": "^2.6.2",
     "compression": "^1.8.1",

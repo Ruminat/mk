@@ -6,15 +6,17 @@ Mooduck is a small mood journal: you log how you feel on a 1–10 scale, optiona
 
 The repo is a **pnpm** + **Turborepo** monorepo.
 
-> **No web app right now.** There used to be a React SPA and an HTTP API behind it; both were removed, and a web client will be written from scratch later. The server today serves exactly two routes: the Telegram webhook and `/health`.
+There is also a **web app** at `mooduck.shrek-labs.dev/app` — a second front door onto the exact same data. It authenticates **only** through the Telegram Login Widget, and writes through the same `moodService` with the same identity hash and encryption as the bot, so a check-in made on the web shows up in the bot's `/last` and vice versa. Both the landing and the web app ship in **English and Russian**.
 
 ## Repository layout
 
 | Path | Role |
 |------|------|
-| `apps/landing` | **mooduck-landing** — React 19 + Next.js (App Router) marketing site, Tailwind CSS v4 + CSS Modules; built as a static export (`out/`) served by nginx |
-| `apps/server` | **mooduck-server** — the Telegram bot: Express (webhook only), Drizzle ORM, SQLite (Turso in production or a local file in dev) |
-| `packages/core` | Shared non-UI utilities (`Null`, `Number`, `Random`, …) |
+| `apps/landing` | **mooduck-landing** — React 19 + Next.js (App Router) marketing site, Tailwind CSS v4 + CSS Modules; localized (`/en`, `/ru`) static export (`out/`) served by nginx |
+| `apps/web` | **mooduck-web** — the dashboard: Vite + React 19, CSS Modules, ECharts; Telegram-only auth; built to `dist/` and served by nginx at `/app` |
+| `apps/server` | **mooduck-server** — the Telegram bot + web `/api`: Express, Drizzle ORM, SQLite (Turso in production or a local file in dev) |
+| `packages/core` | Shared non-UI utilities and the locale primitives (`Locale`, `Null`, `Number`, `Random`, …) |
+| `packages/contracts` | Shared wire format (Zod schemas + types) the server and web validate against |
 
 ## Prerequisites
 
@@ -38,9 +40,14 @@ Server configuration is validated in `apps/server/src/common/config/environment.
 Optional but used when you enable those features:
 
 - **Telegram** — `TELEGRAM_BOT_TOKEN` plus the webhook settings (without a token the bot simply doesn't start)
+- **Web API** — `WEB_SESSION_SECRET` (≥32 chars, different from the two secrets above) enables the web `/api`; the app also needs `TELEGRAM_BOT_TOKEN`
 - **DeepSeek** — `DEEPSEEK_API_TOKEN` for AI-assisted replies
 
 Copy or create `.env` under `apps/server` as you normally would for local work.
+
+The web app (`apps/web`) reads one build-time variable, `VITE_TELEGRAM_BOT_USERNAME`, the bot username the Login Widget renders for. The widget only works on the domain registered with BotFather (`/setdomain`) and **will not render on `localhost`** — there is deliberately no dev bypass, so local development uses a separate dev bot pointed at an HTTPS tunnel (`Secure` cookies need HTTPS).
+
+📖 **[Testing the web app locally](docs/LocalWebAppGuide.md)** — how to run the dashboard on your machine, including how to sign in without a tunnel.
 
 ## Common scripts (repo root)
 
@@ -49,6 +56,7 @@ Copy or create `.env` under `apps/server` as you normally would for local work.
 | `pnpm dev` | Runs Turborepo `dev` (server + landing and related packages, with `MODE=dev`) |
 | `pnpm dev.landing` | Dev for the Next.js landing site only (`http://localhost:3002`) |
 | `pnpm dev.server` | Dev for the bot server only |
+| `pnpm --filter mooduck-web dev` | Dev for the web app (`http://localhost:5173/app`; proxies `/api` to `:3001`) |
 | `pnpm dev.local` | Server dev with **`USE_LOCAL_DB=true`** (local SQLite file) |
 | `pnpm build` | Production build (`MODE=prod`) |
 | `pnpm typecheck` | Typecheck across the workspace |
@@ -57,6 +65,8 @@ Copy or create `.env` under `apps/server` as you normally would for local work.
 | `pnpm db.push` / `pnpm db.migrate` / `pnpm db.studio` | Drizzle against configured remote DB |
 
 Package-specific scripts (lint, `test.watch`, etc.) live in each `package.json`.
+
+Running the web app needs the server up as well, plus a way past Telegram-only auth — see [Testing the web app locally](docs/LocalWebAppGuide.md).
 
 ## Production process
 
@@ -68,8 +78,9 @@ CI (`.github/workflows/deploy.yml`) installs with a frozen lockfile, runs `pnpm 
 
 ## Tech stack (short)
 
-- **Web:** Vite, React 19, TypeScript, Zod  
-- **Server:** Express, Drizzle + libSQL/Turso, Zod, Winston, optional `node-telegram-bot-api` and OpenAI-compatible client for DeepSeek  
+- **Landing:** React 19, Next.js (App Router, static export), Tailwind CSS v4 + CSS Modules
+- **Web app:** Vite, React 19, TypeScript, CSS Modules, ECharts, Zod (via `@mooduck/contracts`)
+- **Server:** Express, Drizzle + libSQL/Turso, Zod, optional `node-telegram-bot-api` and OpenAI-compatible client for DeepSeek
 - **Repo:** Turborepo, Prettier at the root
 
 ---

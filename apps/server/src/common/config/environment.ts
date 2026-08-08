@@ -29,18 +29,36 @@ const envSchema = object({
   ),
   ADMIN_TELEGRAM_LOGINS: string().optional(),
   DEEPSEEK_API_TOKEN: string().optional(),
-}).refine(
-  (data) => {
-    const isDev = (data.MODE ?? "dev") === "dev";
-    const useLocalDb = data.USE_LOCAL_DB && isDev;
-    if (useLocalDb) return true;
-    return !!(data.TURSO_CONNECTION_URL && data.TURSO_AUTH_TOKEN);
-  },
-  {
-    message:
-      "Either USE_LOCAL_DB=true with MODE=dev, or TURSO_CONNECTION_URL and TURSO_AUTH_TOKEN are required",
-  },
-);
+  // Seals the web session cookie (AES-256-GCM key via HKDF). Required only when
+  // the web API is enabled; a separate secret from the identity hash and the
+  // user-data encryption secret, matching the repo's existing discipline.
+  WEB_SESSION_SECRET: string().min(32, "WEB_SESSION_SECRET must be at least 32 characters").optional(),
+  // Only needed if the app is ever served from a different host than the API;
+  // absent ⇒ same-origin, no CORS.
+  WEB_APP_ORIGIN: url().optional(),
+})
+  .refine(
+    (data) => {
+      const isDev = (data.MODE ?? "dev") === "dev";
+      const useLocalDb = data.USE_LOCAL_DB && isDev;
+      if (useLocalDb) return true;
+      return !!(data.TURSO_CONNECTION_URL && data.TURSO_AUTH_TOKEN);
+    },
+    {
+      message:
+        "Either USE_LOCAL_DB=true with MODE=dev, or TURSO_CONNECTION_URL and TURSO_AUTH_TOKEN are required",
+    },
+  )
+  .refine(
+    (data) =>
+      !data.WEB_SESSION_SECRET ||
+      (data.WEB_SESSION_SECRET !== data.TELEGRAM_USER_ID_SECURE_HASH &&
+        data.WEB_SESSION_SECRET !== data.TELEGRAM_USER_DATA_ENCRYPTION_SECRET),
+    {
+      message:
+        "WEB_SESSION_SECRET must differ from TELEGRAM_USER_ID_SECURE_HASH and TELEGRAM_USER_DATA_ENCRYPTION_SECRET",
+    },
+  );
 
 const values = envSchema.parse(process.env);
 
@@ -83,6 +101,11 @@ export function getEnvironmentVariables() {
 
     crypto: {
       userDataEncryptionSecret: values.TELEGRAM_USER_DATA_ENCRYPTION_SECRET,
+    },
+
+    web: {
+      sessionSecret: values.WEB_SESSION_SECRET,
+      appOrigin: values.WEB_APP_ORIGIN,
     },
 
     deepseek: {
