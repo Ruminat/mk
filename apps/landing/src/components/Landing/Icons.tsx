@@ -151,6 +151,17 @@ export function BackArrowIcon({ className }: IconProps) {
   );
 }
 
+/** A browser window — the web dashboard, as opposed to the chat. */
+export function BrowserIcon({ className }: IconProps) {
+  return (
+    <svg {...strokeDefaults} className={className}>
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <path d="M3 9h18" />
+      <path d="M7 6.5h.01M10 6.5h.01" />
+    </svg>
+  );
+}
+
 export function DotsVerticalIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>

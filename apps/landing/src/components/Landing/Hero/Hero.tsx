@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { TLandingMessages } from "@/I18n/Catalogs/En";
-import { GITHUB_URL, TELEGRAM_URL } from "../Definitions";
-import { GithubIcon, HeartSolidIcon, LockIcon, TelegramIcon } from "../Icons";
+import { GITHUB_URL, TELEGRAM_URL, WEB_APP_URL } from "../Definitions";
+import { BrowserIcon, GithubIcon, HeartSolidIcon, LockIcon, TelegramIcon } from "../Icons";
 import styles from "./Hero.module.css";
 
 interface HeroProps {
@@ -30,6 +30,11 @@ export function Hero({ messages }: HeroProps) {
           >
             <TelegramIcon className={styles.buttonIcon} />
             {cta.openInTelegram}
+          </a>
+          {/* Same host, different app — a normal navigation, so no target/rel. */}
+          <a className={`${styles.button} ${styles.buttonSecondary}`} href={WEB_APP_URL}>
+            <BrowserIcon className={styles.buttonIcon} />
+            {cta.openWebApp}
           </a>
           <a
             className={`${styles.button} ${styles.buttonSecondary}`}

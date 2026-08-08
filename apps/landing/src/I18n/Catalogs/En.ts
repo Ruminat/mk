@@ -23,6 +23,7 @@ export const en = {
   cta: {
     openInTelegram: "Open in Telegram",
     openInTelegramShort: "Telegram",
+    openWebApp: "Open the web app",
     viewOnGithub: "View on GitHub",
   },
 
@@ -35,6 +36,7 @@ export const en = {
     features: "Features",
     howItWorks: "How it works",
     privacy: "Privacy",
+    webApp: "Web app",
     github: "GitHub",
   } satisfies Record<NavId, string>,
 

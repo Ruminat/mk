@@ -25,8 +25,15 @@ import {
 export const TELEGRAM_URL = "https://t.me/Moo_Duck_zae_bot";
 export const GITHUB_URL = "https://github.com/Ruminat/mooduck";
 
+/**
+ * The web app is served by nginx at /app on this same host, so this is a plain
+ * path — and a plain `<a>`, not `next/link`: /app isn't a route of this static
+ * export, and client-side routing to it would 404 instead of leaving the site.
+ */
+export const WEB_APP_URL = "/app";
+
 /** Anchor navigation in the header. `github` is an external link. */
-export type NavId = "features" | "howItWorks" | "privacy" | "github";
+export type NavId = "features" | "howItWorks" | "privacy" | "webApp" | "github";
 
 export interface NavLink {
   id: NavId;
@@ -38,6 +45,7 @@ export const NAV_LINKS: NavLink[] = [
   { id: "features", href: "#features" },
   { id: "howItWorks", href: "#how-it-works" },
   { id: "privacy", href: "#privacy" },
+  { id: "webApp", href: WEB_APP_URL },
   { id: "github", href: GITHUB_URL, external: true },
 ];
 

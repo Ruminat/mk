@@ -17,6 +17,7 @@ export const ru: TLandingMessages = {
   cta: {
     openInTelegram: "Открыть в Telegram",
     openInTelegramShort: "Telegram",
+    openWebApp: "Открыть веб-версию",
     viewOnGithub: "Посмотреть на GitHub",
   },
 
@@ -29,6 +30,7 @@ export const ru: TLandingMessages = {
     features: "Возможности",
     howItWorks: "Как это работает",
     privacy: "Приватность",
+    webApp: "Веб-версия",
     github: "GitHub",
   },
 
